@@ -1,0 +1,34 @@
+<?php
+
+namespace Database\Factories;
+
+use Illuminate\Database\Eloquent\Factories\Factory;
+use Faker\Factory as Faker;
+
+/**
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Urgency>
+ */
+class UrgencyFactory extends Factory
+{
+    /**
+     * Define the model's default state.
+     *
+     * @return array<string, mixed>
+     */
+    public function definition(): array
+    {
+        $urgencies = [
+            'Critical',
+            'High',
+            'Normal',
+            'Low',
+        ];
+
+        $faker = Faker::create('id_ID');
+
+        return [
+            'name'  => $faker->unique()->randomElement($urgencies),
+            'hours' => $faker->unique()->numberBetween(1,4),
+        ];
+    }
+}
