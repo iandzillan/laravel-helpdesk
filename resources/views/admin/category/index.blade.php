@@ -84,12 +84,6 @@
                         
                         // clear form
                         $("#form-create-category")[0].reset();
-                        // $('#category-name').val('');
-
-                        // clear alert
-                        $('#alert-category-name').removeClass('d-block');
-                        $('#alert-category-name').addClass('d-none');
-                        $('#category-name').removeClass('is-invalid');
                         
                         // close modal
                         $('#modal-create-category').modal('hide');

@@ -16,9 +16,9 @@ class CategoryController extends Controller
         if ($request->ajax()) {
             return datatables()->of($categories)
                 ->addIndexColumn()
-                ->addColumn('action', function($row){
-                    $btn = '<a href="javascript:void(0)" id="btn-edit-category" data-id="'.$row->id.'" class="btn btn-primary btn-sm" title="Edit this category"> <i class="fa-solid fa-pen-to-square"></i> </a>';
-                    $btn = $btn . ' ' . '<a href="javascript:void(0)" id="btn-delete-category" data-id="'.$row->id.'" class="btn btn-danger btn-sm" title="Delete this category"> <i class="fa-solid fa-eraser"></i> </a>';
+                ->addColumn('action', function ($row) {
+                    $btn = '<a href="javascript:void(0)" id="btn-edit-category" data-id="' . $row->id . '" class="btn btn-primary btn-sm" title="Edit this category"> <i class="fa-solid fa-pen-to-square"></i> </a>';
+                    $btn = $btn . ' ' . '<a href="javascript:void(0)" id="btn-delete-category" data-id="' . $row->id . '" class="btn btn-danger btn-sm" title="Delete this category"> <i class="fa-solid fa-eraser"></i> </a>';
                     return $btn;
                 })
                 ->rawColumns(['action'])
@@ -50,7 +50,7 @@ class CategoryController extends Controller
 
         // return response
         return response()->json([
-            'success'   => true, 
+            'success'   => true,
             'message'   => 'New category has been added',
             'data'      => $category
         ]);
@@ -62,7 +62,7 @@ class CategoryController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Detail category',
-            'data'    => $category  
+            'data'    => $category
         ]);
     }
 
@@ -70,7 +70,7 @@ class CategoryController extends Controller
     {
         // Set validation
         $validator = Validator::make($request->all(), [
-            'name' => 'required|unique:categories,name,'.$category->id
+            'name' => 'required|unique:categories,name,' . $category->id
         ]);
 
         // check if validation fails
@@ -85,15 +85,16 @@ class CategoryController extends Controller
 
         // return response
         return response()->json([
-            'success' => true, 
+            'success' => true,
             'message' => 'The category has been updated',
             'data'    => $category
         ]);
     }
 
-    public function destroy($category)
+    public function destroy(Category $category)
     {
-        $category = Category::where('id', $category)->delete();
+        // $category = Category::where('id', $category)->delete();
+        $category->delete();
 
         return response()->json([
             'success' => true,
