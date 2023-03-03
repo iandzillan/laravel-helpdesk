@@ -32,7 +32,7 @@
     </div>
 
     @include('admin.subcategory.modal-create')
-    {{-- @include('admin.subcategory.modal-edit') --}}
+    @include('admin.subcategory.modal-edit')
 
     <script>
         $(function(){
@@ -150,11 +150,15 @@
                     url: `sub-categories/${subcategory_id}/edit`,
                     type: "get",
                     cache: false,
-                    success:function(respone){
-                        // fill form 
-                        $('#subcategory-id').val(response.data.id);
-                        $('#subcategory-name-edit').val(response.data.name);
-                        $('#subcategory-categoryid').val(response.data.category_id);
+                    success:function(response){
+                        if (response) {
+                            // fill form 
+                            $('#subcategory-id').val(response.data.id);
+                            $('#subcategory-name-edit').val(response.data.name);
+                            $('#subcategory-categoryid-edit').val(response.category.id).change();
+
+                            $('#subcategory-categoryid-edit').html(response.category.name).change();
+                        }
                     }
                 });
 

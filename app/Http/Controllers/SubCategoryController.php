@@ -70,6 +70,20 @@ class SubCategoryController extends Controller
         ]);
     }
 
+    public function show(SubCategory $subcategory)
+    {
+        // get category
+        $category = Category::where('id', $subcategory->category_id)->first();
+
+        // return response
+        return response()->json([
+            'success'   => true,
+            'message'   => 'Detail Sub Category',
+            'data'      => $subcategory,
+            'category'  => $category
+        ]);
+    }
+
     public function destroy(SubCategory $subcategory)
     {
         $subcategory->delete();
