@@ -140,6 +140,28 @@
                 });
             });
 
+            // edit sub category button event
+            $('body').on('click', '#btn-edit-subcategory', function(){
+                // define variable
+                let subcategory_id = $(this).data('id');
+
+                // fetch detail sub category to modal
+                $.ajax({
+                    url: `sub-categories/${subcategory_id}/edit`,
+                    type: "get",
+                    cache: false,
+                    success:function(respone){
+                        // fill form 
+                        $('#subcategory-id').val(response.data.id);
+                        $('#subcategory-name-edit').val(response.data.name);
+                        $('#subcategory-categoryid').val(response.data.category_id);
+                    }
+                });
+
+                // show modal
+                $('#modal-edit-subcategory').modal('show');
+            });
+
             // delete sub category button event
             $('body').on('click', '#btn-delete-subcategory', function(){
                 let subcategory_id  = $(this).data('id');

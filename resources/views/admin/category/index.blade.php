@@ -111,7 +111,7 @@
                 // define variable 
                 let category_id = $(this).data('id');
 
-                // fetch detail post to modal
+                // fetch detail category to modal
                 $.ajax({
                     url: `categories/${category_id}/edit`,
                     type: "get",
@@ -120,9 +120,6 @@
                         // fill form
                         $('#category-id').val(response.data.id);
                         $('#category-name-edit').val(response.data.name);
-
-                        // open modal
-                        $('#modal-edit-category').modal('show');
                     }
                 });
 
