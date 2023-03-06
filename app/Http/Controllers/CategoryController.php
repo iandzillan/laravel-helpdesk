@@ -66,7 +66,7 @@ class CategoryController extends Controller
         ]);
     }
 
-    public function edit(Request $request, Category $category)
+    public function update(Request $request, Category $category)
     {
         // Set validation
         $validator = Validator::make($request->all(), [

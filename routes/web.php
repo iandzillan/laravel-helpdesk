@@ -41,13 +41,14 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/admin/categories', [CategoryController::class, 'index'])->name('admin.categories');
         Route::post('/admin/categories', [CategoryController::class, 'store'])->name('admin.categories.store');
         Route::get('/admin/categories/{category}/edit', [CategoryController::class, 'show'])->name('admin.categories.show');
-        Route::patch('/admin/categories/{category}', [CategoryController::class, 'edit'])->name('admin.categories.update');
+        Route::patch('/admin/categories/{category}', [CategoryController::class, 'update'])->name('admin.categories.update');
         Route::delete('/admin/categories/{category}', [CategoryController::class, 'destroy'])->name('admin.categories.destroy');
 
         Route::get('/admin/sub-categories', [SubCategoryController::class, 'index'])->name('admin.subcategories');
         Route::get('/admin/sub-categories/category', [SubCategoryController::class, 'getCategories'])->name('admin.subcategories.categories');
         Route::post('/admin/sub-categories', [SubCategoryController::class, 'store'])->name('admin.subcategories.store');
         Route::get('/admin/sub-categories/{subcategory}/edit', [SubCategoryController::class, 'show'])->name('admin.subcategories.show');
+        Route::patch('/admin/sub-categories/{subcategory}', [SubCategoryController::class, 'update'])->name('admin.subcategories.update');
         Route::delete('/admin/sub-categories/{subcategory}', [SubCategoryController::class, 'destroy'])->name('admin.subcategories.destroy');
 
         Route::get('/admin/urgencies', [UrgencyController::class, 'index'])->name('admin.urgencies');

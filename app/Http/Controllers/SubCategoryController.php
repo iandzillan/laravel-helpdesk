@@ -13,6 +13,7 @@ class SubCategoryController extends Controller
     public function index(Request $request)
     {
         $sub_categories = SubCategory::with('category')->latest()->get();
+        $categories     = Category::all();
 
         // Draw Data Table
         if ($request->ajax()) {
@@ -33,6 +34,7 @@ class SubCategoryController extends Controller
         return view('admin.subcategory.index', [
             'title'             => 'Sub Categories - Helpdesk Ticketing System',
             'sub_categories'    => $sub_categories,
+            'categories'         => $categories
         ]);
     }
 
@@ -70,17 +72,43 @@ class SubCategoryController extends Controller
         ]);
     }
 
-    public function show(SubCategory $subcategory)
+    public function show($subcategory)
     {
-        // get category
-        $category = Category::where('id', $subcategory->category_id)->first();
+        $sub_category = SubCategory::with('category')->where('id', $subcategory)->first();
+        $categories = Category::all('id', 'name');
 
-        // return response
+        return response()->json([
+            'success'    => true,
+            'message'    => 'Detail sub category',
+            'data'       => $sub_category,
+            'category'   => $sub_category->category,
+            'categories' => $categories
+        ]);
+    }
+
+    public function update(SubCategory $subcategory, Request $request)
+    {
+        // set validation
+        $validator = Validator::make($request->all(), [
+            'name'          => 'required|unique:sub_categories,name,' . $subcategory->id,
+            'category_id'   => 'required'
+        ]);
+
+        // check if validation fails
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 422);
+        }
+
+        // update sub category
+        $category = Category::where('id', $request->category_id)->first();
+        $subcategory->name = $request->name;
+        $subcategory->category()->associate($category);
+        $subcategory->save();
+
         return response()->json([
             'success'   => true,
-            'message'   => 'Detail Sub Category',
-            'data'      => $subcategory,
-            'category'  => $category
+            'message'   => 'The sub category has been updated',
+            'data'      => $subcategory
         ]);
     }
 

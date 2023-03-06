@@ -143,21 +143,24 @@
             // edit sub category button event
             $('body').on('click', '#btn-edit-subcategory', function(){
                 // define variable
-                let subcategory_id = $(this).data('id');
+                let id = $(this).data('id');
 
                 // fetch detail sub category to modal
                 $.ajax({
-                    url: `sub-categories/${subcategory_id}/edit`,
+                    url: `sub-categories/${id}/edit`,
                     type: "get",
                     cache: false,
                     success:function(response){
-                        if (response) {
-                            // fill form 
+                        if(response){
+                            // fill form
                             $('#subcategory-id').val(response.data.id);
                             $('#subcategory-name-edit').val(response.data.name);
-                            $('#subcategory-categoryid-edit').val(response.category.id).change();
-
-                            $('#subcategory-categoryid-edit').html(response.category.name).change();
+                            $.each(response.categories, function(code, category){
+                                $('#subcategory-categoryid-edit').append('<option value="'+category.id+'">'+category.name+'</option>');
+                                $(`#subcategory-categoryid-edit option[value=${response.data.category_id}]`).attr('selected', 'selected')
+                            });
+                        } else {
+                            $('#form-edit-subcategory')[0].reset();
                         }
                     }
                 });
@@ -165,6 +168,72 @@
                 // show modal
                 $('#modal-edit-subcategory').modal('show');
             });
+
+            // function when edit modal hide or close
+            $('#modal-edit-subcategory').on('hidden.bs.modal', function(e) {
+                $('#subcategory-categoryid-edit').empty();
+            });
+
+            // update sub category button event
+            $('#update-subcategory').click(function(e){
+                e.preventDefault();
+
+                // define variable
+                let id          = $('#subcategory-id').val();
+                let name        = $('#subcategory-name-edit').val();
+                let category_id = $('#subcategory-categoryid-edit').val();
+                let token       = $('meta[name="csrf-token"]').attr('content');
+
+                // ajax update
+                $.ajax({
+                    url: `sub-categories/${id}`,
+                    type: "patch",
+                    cache: false,
+                    data:{
+                        'name': name,
+                        'category_id': category_id,
+                        '_token': token
+                    }, 
+                    success:function(response){
+                        // show message success
+                        Swal.fire({
+                            icon: 'success',
+                            title: `${response.message}`,
+                            showConfirmButton: false,
+                            timer: 3000
+                        });
+
+                        // close modal
+                        $('#modal-edit-subcategory').modal('hide');
+
+                        // draw table
+                        table.draw();
+                    },
+                    error:function(error){
+                        // check if sub category name error
+                        if(error.responseJSON.name){
+                            // show alert
+                            $('#subcategory-name-edit').addClass('is-invalid');
+                            $('#alert-subcategory-name-edit').removeClass('d-none');
+                            $('#alert-subcategory-name-edit').addClass('d-block');
+
+                            // add message to alert
+                            $('#alert-subcategory-name-edit').html(error.responseJSON.name);
+                        }
+
+                        // check if category option error
+                        if (error.responseJSON.category_id){
+                            // show alert
+                            $('#subcategory-categoryid-edit').addClass('is-invalid');
+                            $('#subcategory-categoryid-edit').removeClass('d-none');
+                            $('#subcategory-categoryid-edit').addClass('d-block');
+
+                            // add message to alert
+                            $('#alert-subcategory-categoryid-edit').html(error.responeJSON.category_id);
+                        }
+                    }
+                });
+            })
 
             // delete sub category button event
             $('body').on('click', '#btn-delete-subcategory', function(){
