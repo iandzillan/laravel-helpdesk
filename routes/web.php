@@ -60,6 +60,10 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/admin/users', [UserController::class, 'index'])->name('admin.users');
 
         Route::get('/admin/departments', [DepartmentController::class, 'index'])->name('admin.departments');
+        Route::post('/admin/departments', [DepartmentController::class, 'store'])->name('admin.departments.store');
+        Route::get('/admin/departments/{department}/edit', [DepartmentController::class, 'show'])->name('admin.departments.show');
+        Route::patch('/admin/departments/{department}', [DepartmentController::class, 'update'])->name('admin.departments.update');
+        Route::delete('/admin/departments/{department}', [DepartmentController::class, 'destroy'])->name('admin.departments.destroy');
 
         Route::get('/admin/sub-departments', [SubDepartmentController::class, 'index'])->name('admin.subdepartments');
     });

@@ -7,14 +7,14 @@
                 <div class="header-title">
                     <h4 class="card-title">Departments</h4>
                 </div>
-                <a href="javascript:void(0)" class="btn btn-primary mb-2" id="btn-create-category">
+                <a href="javascript:void(0)" class="btn btn-primary mb-2" id="btn-create-department">
                     <i class="fa-solid fa-folder-plus"></i>
                     Add Department
                 </a>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
-                    <table id="datatable" class="table" data-toggle="data-table">
+                    <table class="table table-bordered data-table display responsive nowrap" width=100%>
                         <thead>
                             <tr>
                                 <th>#</th>
@@ -23,24 +23,203 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($departments as $department)
-                                <tr id="index_{{$department->id}}">
-                                    <td>{{$loop->iteration}}</td>
-                                    <td>{{$department->name}}</td>
-                                    <td>
-                                        <a href="javascript:void(0)" id="btn-edit-department" data-id="{{$department->id}}" class="btn btn-primary btn-sm" title="Edit this department">
-                                            <i class="fa-solid fa-pen-to-square"></i>
-                                        </a>
-                                        <a href="javascript:void(0)" id="btn-delete-department" data-id="{{$department->id}}" class="btn btn-danger btn-sm" title="Delete this department">
-                                            <i class="fa-solid fa-eraser"></i>
-                                        </a>
-                                    </td>
-                                </tr>
-                            @endforeach
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
     </div>
+
+    @include('admin.department.modal-create')
+    @include('admin.department.modal-edit')
+
+    <script>
+        $(function(){
+            // draw table
+            let table = $('.data-table').DataTable({
+                responsive: true,
+                processing: true,
+                serverSide: true,
+                ajax: "{{ route('admin.departments') }}", 
+                columns: [
+                    {data: 'DT_RowIndex', name: 'DT_RowIndex'},
+                    {data: 'name', name: 'name'},
+                    {data: 'action', name: 'action', orderable: false, searchable: false},
+                ]
+            });
+
+            // add button event
+            $('body').on('click', '#btn-create-department', function(){
+                // reset form create
+                $('#form-create-department').trigger('reset');
+
+                // show modal
+                $('#modal-create-department').modal('show');
+            });
+
+            // store button event
+            $('#store-department').click(function(e){
+                e.preventDefault();
+
+                // define variable
+                let name  = $('#department-name').val();
+                let token = $('meta[name=csrf-token]').attr('content');
+                
+                // ajax create
+                $.ajax({
+                    url: "{{ route('admin.departments.store') }}",
+                    type: "post",
+                    cache: false,
+                    data: {
+                        'name': name,
+                        '_token': token
+                    }, 
+                    success:function(response){
+                        // Show message
+                        Swal.fire({
+                            icon: "success",
+                            title: `${response.message}`,
+                            showConfirmButton: false,
+                            timer: 3000
+                        });
+
+                        // form reset
+                        $('#form-create-department').trigger('reset');
+
+                        // close modal
+                        $('#modal-create-department').modal('hide');
+
+                        // drar table
+                        table.draw();
+                    }, 
+                    error:function(error){
+                        // if error on name field
+                        if (error.responseJSON.name) {
+                            // show alert
+                            $('#alert-department-name').removeClass('d-none');
+                            $('#alert-department-name').addClass('d-block');
+                            $('#department-name').addClass('is-invalid');
+
+                            // show message 
+                            $('#alert-department-name').html(error.responseJSON.name);
+                        }
+                    }
+                });
+            });
+
+            // edit button event
+            $('body').on('click', '#btn-edit-department', function(){
+                // define variable
+                let id = $(this).data('id');
+
+                // fetch data to modal
+                $.ajax({
+                    url: `departments/${id}/edit`,
+                    type: "get",
+                    cache: false,
+                    success:function(response){
+                        // fill form
+                        $('#department-id').val(response.data.id)
+                        $('#department-name-edit').val(response.data.name);
+                    }
+                });
+
+                // show edit modal
+                $('#modal-edit-department').modal('show');
+            });
+
+            // update button event
+            $('#update-department').click(function(e){
+                e.preventDefault();
+
+                // define variable
+                let id    = $('#department-id').val();
+                let name  = $('#department-name-edit').val();
+                let token = $('meta[name="csrf-token"]').attr('content');
+
+                // ajax update
+                $.ajax({
+                    url: `departments/${id}`,
+                    type: "patch",
+                    cache: false,
+                    data: {
+                        'name': name,
+                        '_token': token
+                    },
+                    success:function(response){
+                        // show message
+                        Swal.fire({
+                            icon: "success",
+                            title: "The department has been updated",
+                            showConfirmButton: false,
+                            timer: 3000
+                        });
+
+                        // reset form
+                        $('#form-edit-department').trigger('reset');
+
+                        // close modal
+                        $('#modal-edit-department').modal('hide');
+
+                        // draw table
+                        table.draw();
+                    }, 
+                    error:function(error){
+                        // if error on name field
+                        if (error.responseJSON.name) {
+                            // show alert
+                            $('#alert-department-name-edit').removeClass('d-none');
+                            $('#alert-department-name-edit').addClass('d-block');
+                            $('#department-name-edit').addClass('is-invalid');
+
+                            // show message 
+                            $('#alert-department-name-edit').html(error.responseJSON.name);
+                        }
+                    }
+                });
+            });
+
+            // delete button event
+            $('body').on('click', '#btn-delete-department', function(){
+                // define variable
+                let id    = $(this).data('id');
+                let token = $('meta[name="csrf-token"]').attr('content');
+
+                // show confirmation
+                Swal.fire({
+                    icon: 'warning', 
+                    title: 'Are you sure?',
+                    text: 'This department will be deleted',
+                    showCancelButton: true,
+                    cancelButtonText: "No", 
+                    confirmButtonText: "Yes"
+                }).then((result) => {
+                    if(result.isConfirmed){
+                        // ajax delete
+                        $.ajax({
+                            url: `departments/${id}`,
+                            type: 'delete',
+                            cache: false,
+                            data: {
+                                '_token': token
+                            },
+                            success:function(response){
+                                // show message
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: `${response.message}`,
+                                    showConfirmButton: false,
+                                    timer: 3000
+                                });
+
+                                // draw table
+                                table.draw();
+                            }
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+    
 @endsection

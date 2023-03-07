@@ -73,6 +73,37 @@ class UrgencyController extends Controller
         ]);
     }
 
+    public function update(Request $request, Urgency $urgency)
+    {
+        // set validation
+        $validator = Validator::make($request->all(), [
+            'name'  => 'required|unique:urgencies,name,' . $urgency->id,
+            'hours' => 'required|integer'
+        ], [
+            'hours.required' => 'The duration field is required',
+            'hours.integer'  => 'The duration field must be number'
+        ]);
+
+        // check if validation fails()
+        if ($validator->fails()) {
+            // return response error
+            return response()->json($validator->errors(), 422);
+        }
+
+        // update urgency
+        $urgency->update([
+            'name'  => $request->name,
+            'hours' => $request->hours
+        ]);
+
+        // return response success
+        return response()->json([
+            'success' => true,
+            'message' => 'The urgnecy has been updated',
+            'data'    => $urgency
+        ]);
+    }
+
     public function destroy(Urgency $urgency)
     {
         // delete urgency

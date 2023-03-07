@@ -53,6 +53,9 @@
 
             // add urgency button event
             $('body').on('click', '#btn-create-urgency', function(){
+                // reset form when modal opened
+                $('#form-create-urgency').trigger('reset');
+
                 // show modal create
                 $('#modal-create-urgency').modal('show');
             })
@@ -87,6 +90,9 @@
 
                         // close modal
                         $('#modal-create-urgency').modal('hide');
+
+                        // clear form
+                        $('#form-create-urgency')[0].reset();
 
                         // draw table
                         table.draw();
@@ -124,7 +130,7 @@
 
                 // fetch detail urgency to modal
                 $.ajax({
-                    url: `urgency/${id}/edit`,
+                    url: `urgencies/${id}/edit`,
                     type: "get",
                     cache: false,
                     success:function(response){
@@ -141,6 +147,66 @@
 
                 // show modal
                 $('#modal-edit-urgency').modal('show');
+            });
+
+            // update urgency button event
+            $('#update-urgency').click(function(e){
+                e.preventDefault();
+
+                // define variable
+                let id    = $('#urgency-id').val();
+                let name  = $('#urgency-name-edit').val();
+                let hours = $('#urgency-hours-edit').val();
+                let token = $('meta[name="csrf-token"]').attr('content');
+                
+                // ajax update 
+                $.ajax({
+                    url: `urgencies/${id}`,
+                    type: "patch",
+                    cache: false,
+                    data: {
+                        "name": name,
+                        "hours": hours,
+                        "_token": token
+                    },
+                    success:function(response){
+                        Swal.fire({
+                            icon: "success", 
+                            title: `${response.message}`,
+                            showConfirmButton: false,
+                            timer: 3000
+                        });
+
+                        // modal edit hide
+                        $('#modal-edit-urgency').modal('hide');
+
+                        // draw table
+                        table.draw();
+                    }, 
+                    error:function(error){
+                        // check if name field error
+                        if (error.responseJSON.name) {
+                            // show alert
+                            $('#alert-urgency-name-edit').removeClass('d-none');
+                            $('#alert-urgency-name-edit').addClass('d-block');
+                            $('#urgency-name-edit').addClass('is-invalid');
+
+                            // show message
+                            $('#alert-urgency-name-edit').html(error.responseJSON.name)
+                        }
+
+                        // check if duration field error
+                        if (error.responseJSON.hours) {
+                            // show alert
+                            $('#alert-urgency-hours-edit').removeClass('d-none');
+                            $('#alert-urgency-hours-edit').addClass('d-block');
+                            $('#urgency-hours-edit').addClass('is-invalid');
+
+                            // show message
+                            $('#alert-urgency-hours-edit').html(error.responseJSON.hours);
+                        }
+                    }
+                });
             });
 
             // delete urgency button event
