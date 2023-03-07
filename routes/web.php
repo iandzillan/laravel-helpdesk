@@ -3,6 +3,7 @@
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DepartmentController;
+use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\SubCategoryController;
 use App\Http\Controllers\SubDepartmentController;
@@ -71,5 +72,15 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/admin/sub-departments/{subdept}/edit', [SubDepartmentController::class, 'show'])->name('admin.subdepartments.show');
         Route::patch('/admin/sub-departments/{subdept}', [SubDepartmentController::class, 'update'])->name('admin.subdepartments.update');
         Route::delete('/admin/sub-departments/{subdept}', [SubDepartmentController::class, 'destroy'])->name('admin.subdepartments.destroy');
+    });
+
+    Route::group(['middleware' => ['role:Approver']], function () {
+        Route::get('/approver/dashboard', [DashboardController::class, 'approverHome'])->name('approver.dashboard');
+
+        Route::get('/approver/new-employee', [EmployeeController::class, 'index'])->name('approver.employees.index');
+        Route::get('/approver/new-employee/dept', [EmployeeController::class, 'getDepts'])->name('approver.employees.depts');
+        Route::get('/approver/new-employee/{dept}', [EmployeeController::class, 'getSubDepts'])->name('approver.employees.subdepts');
+        Route::get('/approver/new-employee/{subdept}', [EmployeeController::class, 'getPositions'])->name('approver.employees.positions');
+        Route::post('/approver/new-employee', [EmployeeController::class, 'store'])->name('approver.employees.store');
     });
 });

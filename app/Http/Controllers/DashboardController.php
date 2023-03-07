@@ -11,7 +11,15 @@ class DashboardController extends Controller
     {
         return view('admin.dashboard', [
             'title' => 'Admin Dashboard - Helpdesk Ticketing System',
-            'name'  => Auth::user()->username
+            'name'  => Auth::user()->employee->name
+        ]);
+    }
+
+    public function approverHome()
+    {
+        return view('approver.dashboard', [
+            'title' => 'Approver Dashboard - Helpdesk Ticketing system',
+            'name'  => Auth::user()->employee->name
         ]);
     }
 }

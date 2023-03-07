@@ -50,7 +50,7 @@
             <div class="col-md-12">
                 <div class="flex-wrap d-flex justify-content-between align-items-center">
                     <div>
-                        <h1>Hello {{Auth::user()->employee->name}}</h1>
+                        <h1>Hello {{$name}}</h1>
                     </div>
                 </div>
             </div>
