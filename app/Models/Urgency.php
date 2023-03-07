@@ -9,6 +9,11 @@ class Urgency extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'name',
+        'hours'
+    ];
+
     public function tickets()
     {
         return $this->hasMany('App\Models\Ticket');

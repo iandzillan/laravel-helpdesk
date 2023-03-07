@@ -52,6 +52,10 @@ Route::group(['middleware' => ['auth']], function () {
         Route::delete('/admin/sub-categories/{subcategory}', [SubCategoryController::class, 'destroy'])->name('admin.subcategories.destroy');
 
         Route::get('/admin/urgencies', [UrgencyController::class, 'index'])->name('admin.urgencies');
+        Route::post('/admin/urgencies', [UrgencyController::class, 'store'])->name('admin.urgencies.store');
+        Route::get('/admin/urgencies/{urgency}/edit', [UrgencyController::class, 'show'])->name('admin.urgencies.show');
+        Route::patch('/admin/urgencies/{urgency}', [UrgencyController::class, 'update'])->name('admin.urgencies.update');
+        Route::delete('/admin/urgencies/{urgency}', [UrgencyController::class, 'destroy'])->name('admin.urgencies.destroy');
 
         Route::get('/admin/users', [UserController::class, 'index'])->name('admin.users');
 

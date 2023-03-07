@@ -1,4 +1,5 @@
-<aside class="sidebar sidebar-default navs-rounded-all ">
+<aside class="sidebar sidebar-default navs-rounded-all">
+
     <div class="sidebar-header d-flex align-items-center justify-content-start">
         <a href="#" class="navbar-brand">
             <i class="fa-solid fa-screwdriver-wrench"></i>
@@ -177,6 +178,7 @@
                             <span class="item-name">Sub Departments</span>
                         </a>
                     </li>
+                    <br>
                 @endif
             </ul>
             {{-- Sidebar menu end --}}

@@ -38,7 +38,7 @@
         $(function(){
 
             // draw table
-            var table = $('.data-table').DataTable({
+            let table = $('.data-table').DataTable({
                 responsive: true,
                 processing: true,
                 serverSide: true,
