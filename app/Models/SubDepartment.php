@@ -9,6 +9,11 @@ class SubDepartment extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'department_id',
+        'name'
+    ];
+
     public function positions()
     {
         return $this->hasMany('App\Models\Position');

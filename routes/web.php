@@ -66,5 +66,10 @@ Route::group(['middleware' => ['auth']], function () {
         Route::delete('/admin/departments/{department}', [DepartmentController::class, 'destroy'])->name('admin.departments.destroy');
 
         Route::get('/admin/sub-departments', [SubDepartmentController::class, 'index'])->name('admin.subdepartments');
+        Route::get('/admin/sub-departments/depts', [SubDepartmentController::class, 'getDepts'])->name('admin.subdepartments.getDepts');
+        Route::post('/admin/sub-departments', [SubDepartmentController::class, 'store'])->name('admin.subdepartments.store');
+        Route::get('/admin/sub-departments/{subdept}/edit', [SubDepartmentController::class, 'show'])->name('admin.subdepartments.show');
+        Route::patch('/admin/sub-departments/{subdept}', [SubDepartmentController::class, 'update'])->name('admin.subdepartments.update');
+        Route::delete('/admin/sub-departments/{subdept}', [SubDepartmentController::class, 'destroy'])->name('admin.subdepartments.destroy');
     });
 });

@@ -153,6 +153,7 @@
                     success:function(response){
                         if(response){
                             // fill form
+                            $('#subcategory-categoryid-edit').empty();
                             $('#subcategory-id').val(response.data.id);
                             $('#subcategory-name-edit').val(response.data.name);
                             $.each(response.categories, function(code, category){
@@ -160,18 +161,13 @@
                                 $(`#subcategory-categoryid-edit option[value=${response.data.category_id}]`).attr('selected', 'selected')
                             });
                         } else {
-                            $('#form-edit-subcategory')[0].reset();
+                            $('#subcategory-categoryid-edit').empty();
                         }
                     }
                 });
 
                 // show modal
                 $('#modal-edit-subcategory').modal('show');
-            });
-
-            // function when edit modal hide or close
-            $('#modal-edit-subcategory').on('hidden.bs.modal', function(e) {
-                $('#subcategory-categoryid-edit').empty();
             });
 
             // update sub category button event
