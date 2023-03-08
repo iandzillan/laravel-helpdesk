@@ -79,8 +79,8 @@ Route::group(['middleware' => ['auth']], function () {
 
         Route::get('/approver/new-employee', [EmployeeController::class, 'index'])->name('approver.employees.index');
         Route::get('/approver/new-employee/dept', [EmployeeController::class, 'getDepts'])->name('approver.employees.depts');
-        Route::get('/approver/new-employee/{dept}', [EmployeeController::class, 'getSubDepts'])->name('approver.employees.subdepts');
-        Route::get('/approver/new-employee/{subdept}', [EmployeeController::class, 'getPositions'])->name('approver.employees.positions');
+        Route::get('/approver/new-employee/subdept', [EmployeeController::class, 'getSubDepts'])->name('approver.employees.subdepts');
+        Route::get('/approver/new-employee/position', [EmployeeController::class, 'getPositions'])->name('approver.employees.positions');
         Route::post('/approver/new-employee', [EmployeeController::class, 'store'])->name('approver.employees.store');
     });
 });

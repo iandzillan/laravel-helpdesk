@@ -15,7 +15,7 @@
                     </div>
                     <div class="form-group">
                         <label for="select-category-id">Category</label>
-                        <select id="subcategory-categoryid" name="subcategory-categoryid" class="form-select mb-3 bg-white shadow-none"></select>
+                        <select id="subcategory-categoryid" name="category" class="form-select mb-3 bg-white shadow-none"></select>
                         <div class="invalid-feedback d-none" role="alert" id="alert-subcategory-categoryid"></div>
                     </div>
                 </div>

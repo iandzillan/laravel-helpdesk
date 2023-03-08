@@ -9,6 +9,13 @@ class Employee extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'nik',
+        'name',
+        'image',
+        'position_id'
+    ];
+
     public function user()
     {
         return $this->hasOne('App\Models\User');

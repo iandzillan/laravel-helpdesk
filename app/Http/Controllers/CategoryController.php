@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 class CategoryController extends Controller
@@ -27,6 +28,7 @@ class CategoryController extends Controller
 
         return view('admin.category.index', [
             'title'         => 'Categories - Helpdesk Ticketing System',
+            'name'          => Auth::user()->employee->name,
             'categories'    => $categories
         ]);
     }

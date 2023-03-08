@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\SubCategory;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -33,8 +34,9 @@ class SubCategoryController extends Controller
 
         return view('admin.subcategory.index', [
             'title'             => 'Sub Categories - Helpdesk Ticketing System',
+            'name'              => Auth::user()->employee->name,
             'sub_categories'    => $sub_categories,
-            'categories'         => $categories
+            'categories'        => $categories
         ]);
     }
 

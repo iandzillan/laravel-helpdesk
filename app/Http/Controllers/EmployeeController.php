@@ -29,19 +29,19 @@ class EmployeeController extends Controller
         return response()->json($depts);
     }
 
-    public function getSubDepts($dept)
+    public function getSubDepts(Request $request)
     {
         // get all sub department based on department
-        $subdepts = SubDepartment::where('department_id', $dept)->get();
+        $subdepts = SubDepartment::where('department_id', $request->id)->get();
 
         // return response
         return response()->json($subdepts);
     }
 
-    public function getPositions($subdept)
+    public function getPositions(Request $request)
     {
         // gel all position based on sub department
-        $positions = Position::where('sub_department_id', $subdept)->get();
+        $positions = Position::where('sub_department_id', $request->id)->get();
 
         // return response
         return response()->json($positions);
@@ -51,8 +51,9 @@ class EmployeeController extends Controller
     {
         // set validation
         $validator = Validator::make($request->all(), [
-            'nik'         => 'required|min_digits:6|max_digits:6|integer',
+            'nik'         => 'required|min_digits:6|max_digits:6|integer|unique:employees',
             'name'        => 'required',
+            'image'       => 'sometimes|image|mimes:jpeg,png,jpg|max:1024',
             'dept'        => 'required',
             'subdept'     => 'required',
             'position_id' => 'required'
@@ -64,10 +65,22 @@ class EmployeeController extends Controller
             return response()->json($validator->errors(), 422);
         }
 
+        // check if there is image
+        if ($request->hasFile('image')) {
+            // set name for image
+            $image_ext  = $request->image->getClientOriginalExtension();
+            $image_name = $request->nik . '-' . $request->name . '.' . $image_ext;
+            // save to app storage
+            $request->image->storeAs('public/photo-profile', $image_name);
+        } else {
+            $image_name = "avtar_1.png";
+        }
+
         // create employee
         $employee = Employee::create([
             'nik'          => $request->nik,
             'name'         => $request->name,
+            'image'        => $image_name,
             'position_id'  => $request->position_id,
         ]);
 

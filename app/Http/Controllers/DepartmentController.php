@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Department;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -27,6 +28,7 @@ class DepartmentController extends Controller
 
         return view('admin.department.index', [
             'title'         => 'Departments - Helpdesk Ticketing System',
+            'name'          => Auth::user()->employee->name,
             'departments'   => $departments
         ]);
     }

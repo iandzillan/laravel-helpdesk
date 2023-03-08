@@ -12,9 +12,6 @@
     
     <!-- Library / Plugin Css Build -->
     <link rel="stylesheet" href="{{asset('assets/css/core/libs.min.css')}}" />
-
-    {{-- Bootstrap 5 --}}
-    {{-- <link rel="stylesheet" href="{{asset('assets/vendor/bootstrap-5.0.2-dist/css/bootstrap.min.css')}}"> --}}
     
     <!-- Aos Animation Css -->
     <link rel="stylesheet" href="{{asset('assets/vendor/aos/dist/aos.css')}}" />
@@ -34,12 +31,6 @@
     <!-- RTL Css -->
     <link rel="stylesheet" href="{{asset('assets/css/rtl.min.css')}}"/>
 
-    {{-- jquery --}}
-    {{-- <script src="{{asset('assets/vendor/jquery-3.6.3.min.js')}}"></script> --}}
-
-    {{-- Bootstrap 5 js --}}
-    {{-- <script src="{{asset('assets/vendor/bootstrap-5.0.2-dist/js/bootstrap.min.js')}}"></script> --}}
-
     <!-- Library Bundle Script -->
     <script src="{{asset('assets/js/core/libs.min.js')}}"></script>
 
@@ -51,6 +42,11 @@
     {{-- Sweetalert --}}
     <script src="{{asset('assets/vendor/sweetalert/dist/sweetalert2.all.min.js')}}"></script>
     <link rel="stylesheet" href="{{asset('assets/vendor/sweetalert/dist/sweetalert2.min.css')}}">
+
+    {{-- select2 --}}
+    <link rel="stylesheet" href="{{asset('assets/vendor/bootstrap-select2/css/select2.min.css')}}" />
+    <link rel="stylesheet" href="{{asset('assets/vendor/bootstrap-select2/css/select2-bootstrap-5-theme.min.css')}}" />
+    <script src="{{asset('assets/vendor/bootstrap-select2/js/select2.full.min.js')}}"></script>
 </head>
 
 <body>
@@ -124,5 +120,14 @@
     
     <!-- App Script -->
     <script src="{{asset('assets/js/hope-ui.js')}}" defer></script>
+
+    {{-- select2 script --}}
+    <script>
+        $('.basic-usage').select2({
+            theme: "bootstrap-5",
+            width: $(this).data('width') ? $(this).data('width') : $(this).hasClass('w-100') ? '100%' : 'style',
+            placeholder: $(this).data('placeholder')
+        });
+    </script>
 </body>
 </html>
