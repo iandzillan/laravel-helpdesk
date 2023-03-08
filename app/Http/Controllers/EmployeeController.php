@@ -9,6 +9,7 @@ use App\Models\SubDepartment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use Yajra\DataTables\Facades\DataTables;
 
 class EmployeeController extends Controller
 {
@@ -89,6 +90,62 @@ class EmployeeController extends Controller
             'success' => true,
             'message' => 'New employee has been added',
             'data'    => $employee
+        ]);
+    }
+
+    public function list(Request $request)
+    {
+        $employees = Employee::latest()->get();
+
+        // draw table
+        if ($request->ajax()) {
+            return DataTables::of($employees)
+                ->addIndexColumn()
+                ->addColumn('dept', function ($row) {
+                    return $row->position->subDepartment->department->name;
+                })
+                ->addColumn('subdept', function ($row) {
+                    return $row->position->subDepartment->name;
+                })
+                ->addColumn('position', function ($row) {
+                    return $row->position->name;
+                })
+                ->addColumn('action', function ($row) {
+                    $btn = '<a href="' . route('approver.employees.show', $row->nik) . '" class="btn btn-primary btn-sm" title="Edit this employee"> <i class="fa-solid fa-pen-to-square"></i> </a>';
+                    $btn = $btn . ' ' . '<a href="' . route('approver.employees.destroy', $row->nik) . '" class="btn btn-danger btn-sm" id="btn-delete-employee" title="Delete this employee"> <i class="fa-solid fa-eraser"></i> </a>';
+                    return $btn;
+                })
+                ->rawColumns(['action'])
+                ->make(true);
+        }
+
+        // return to view
+        return view('approver.employee.list', [
+            'title' => 'List Employess - Helpdesk Ticketing System',
+            'name'  => Auth::user()->name
+        ]);
+    }
+
+    public function show()
+    {
+    }
+
+    public function update()
+    {
+    }
+
+    public function destroy($employee)
+    {
+        // get employee
+        $employee_nik = Employee::where('nik', $employee)->first();
+
+        // delete employee
+        $employee_nik->delete();
+
+        // return response
+        return response()->json([
+            'success' => true,
+            'message' => 'The employee has been deleted'
         ]);
     }
 }

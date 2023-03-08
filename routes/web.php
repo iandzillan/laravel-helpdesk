@@ -82,5 +82,9 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/approver/new-employee/subdept', [EmployeeController::class, 'getSubDepts'])->name('approver.employees.subdepts');
         Route::get('/approver/new-employee/position', [EmployeeController::class, 'getPositions'])->name('approver.employees.positions');
         Route::post('/approver/new-employee', [EmployeeController::class, 'store'])->name('approver.employees.store');
+        Route::get('/approver/employees', [EmployeeController::class, 'list'])->name('approver.employees.list');
+        Route::get('/approver/employees/{employee}/edit', [EmployeeController::class . 'show'])->name('approver.employees.show');
+        Route::patch('/approver/employees/{employee}', [EmployeeController::class . 'update'])->name('approver.employees.update');
+        Route::delete('/approver/employees/{employee}', [EmployeeController::class . 'destroy'])->name('approver.employees.destroy');
     });
 });
