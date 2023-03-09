@@ -50,9 +50,44 @@
             });
 
             // delete  button event
-            $('#btn-delete-employee').click(function(){
+            $('body').on('click', '#btn-delete-employee', function(){
                 // define variable
-                
+                let nik   = $(this).data('id');
+                let token = $('meta[name="csrf-token"]').attr('content');
+
+                // show confirmation
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Are you sure?',
+                    text: 'All ticket data owned by this employee will be deleted as well.',
+                    showCancelButton: true,
+                    cancelButtonText: 'No',
+                    confirmButtonText: 'Yes'
+                }).then((result) => {
+                    if(result.isConfirmed){
+                        // ajax delete
+                        $.ajax({
+                            url: `employees/${nik}`,
+                            type: 'delete',
+                            cache: false,
+                            data: {
+                                '_token': token
+                            },
+                            success:function(response){
+                                // show message
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: `${response.message}`,
+                                    showConfirmButton: false,
+                                    timer: 3000
+                                });
+
+                                // draw table
+                                table.draw();
+                            }
+                        });
+                    }
+                });
             });
         });
     </script>

@@ -158,7 +158,7 @@
                             $('#subcategory-name-edit').val(response.data.name);
                             $.each(response.categories, function(code, category){
                                 $('#subcategory-categoryid-edit').append('<option value="'+category.id+'">'+category.name+'</option>');
-                                $(`#subcategory-categoryid-edit option[value=${response.data.category_id}]`).attr('selected', 'selected')
+                                $(`#subcategory-categoryid-edit option[value=${response.data.category_id}]`).attr('selected', 'selected');
                             });
                         } else {
                             $('#subcategory-categoryid-edit').empty();

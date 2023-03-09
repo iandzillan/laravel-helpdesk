@@ -227,7 +227,7 @@
                     </li>
 
                     <li class="nav-item">
-                        <a class="nav-link {{(request()->segment(2) == 'new-employees') ? 'active' : ''}}" aria-current="page" href="{{ route('approver.employees.index') }}">
+                        <a class="nav-link {{(request()->segment(2) == 'new-employee') ? 'active' : ''}}" aria-current="page" href="{{ route('approver.employees.index') }}">
                             <i class="icon">
                                 <i class="fa-solid fa-address-card"></i>
                             </i>

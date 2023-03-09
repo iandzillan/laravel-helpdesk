@@ -6,18 +6,20 @@
             <div class="card">
                 <div class="card-header d-flex justify-content-between">
                     <div class="header-title">
-                        <h4 class="card-title text-bold">New Employee Information</h4>
+                        <h4 class="card-title text-bold">Edit {{ $employee->name }} Information</h4>
                     </div>
                 </div>
                 <div class="card-body">
-                    <form id="form-create-employee" enctype="multipart/form-data">
+                    <form id="form-update-employee" enctype="multipart/form-data" method="post">
+                        @method('put')
                         @csrf
                         <div class="new-user info">
+                            <input type="hidden" id="employee-id" name="id" value="{{ $employee->id }}">
                             <div class="row">
                                 <div class="col-xl-6 col-lg-6">
                                     <div class="form-group">
                                         <div class="profile-img-edit position relative mb-3">
-                                            <img src="{{ asset('storage/uploads/photo-profile/avtar_1.png') }}" id="employee-image-preview" alt="profile-pic" class="theme-color-default-img profile-pic rounded avatar-100">
+                                            <img src="{{ asset('storage/uploads/photo-profile/'.$employee->image) }}" id="employee-image-preview" alt="profile-pic" class="theme-color-default-img profile-pic rounded avatar-100">
                                         </div>
                                         <input type="file" class="form-control" id="employee-image" name="image">
                                         <div class="invalid-feedback d-none" role="alert" id="alert-employee-image"></div>
@@ -33,12 +35,12 @@
                                 <div class="col-xl-6 col-lg-6">
                                     <div class="form-group">
                                         <label for="employee-nik" class="form-label">NIK</label>
-                                        <input type="text" class="form-control" id="employee-nik" name="nik" placeholder="Employee's nik">
+                                        <input type="text" class="form-control" id="employee-nik" name="nik" placeholder="Employee's nik" value="{{ $employee->nik }}" readonly>
                                         <div class="invalid-feedback d-none" role="alert" id="alert-employee-nik"></div>
                                     </div>
                                     <div class="form-group">
                                         <label for="employee-name" class="form-label">Full Name</label>
-                                        <input type="text" class="form-control" id="employee-name" name="name" placeholder="Employee's name">
+                                        <input type="text" class="form-control" id="employee-name" name="name" placeholder="Employee's name" value="{{ $employee->name }}">
                                         <div class="invalid-feedback d-none" role="alert" id="alert-employee-name"></div>
                                     </div>
                                 </div>
@@ -46,7 +48,8 @@
                             <div class="row">
                                 <div class="form-group col-md-4">
                                     <label for="employee-dept" class="form-label">Department</label>
-                                    <select id="employee-dept" name="dept" class="selectpicker form-control basic-usage"></select>
+                                    <select id="employee-dept" name="dept" class="selectpicker form-control basic-usage">
+                                    </select>
                                     <div class="invalid-feedback d-none" role="alert" id="alert-employee-dept"></div>
                                 </div>
                                 <div class="form-group col-md-4">
@@ -60,7 +63,7 @@
                                     <div class="invalid-feedback d-none" role="alert" id="alert-employee-position"></div>
                                 </div>
                             </div>
-                            <button type="subtmit" class="btn btn-primary mt-3" id="store-employee">Save</button>
+                            <button type="subtmit" class="btn btn-primary mt-3" id="update-employee">Save</button>
                         </div>
                     </form>
                 </div>
@@ -70,23 +73,70 @@
 
     <script>
         $(document).ready(function(){
-            // get all dept data
+            // define variable
+            let dept_id     = "{{ $employee->position->subDepartment->department->id }}";
+            let subdept_id  = "{{ $employee->position->subDepartment->id }}";
+            let position_id = "{{ $employee->position_id }}";
+
+            // get all data
             $.ajax({
                 url: "{{ route('approver.employees.depts') }}",
-                type: "get",
+                type: 'get',
                 cache: false,
                 success:function(response){
                     if (response) {
                         // fill dept select option
-                        $('#employee-dept').empty();
                         $('#employee-dept').append('<option selected> -- Choose -- </option>');
-                        $('#employee-subdept').append('<option selected> -- Choose -- </option>');
-                        $('#employee-position').append('<option selected> -- Choose -- </option>');
                         $.each(response, function(code, dept){
                             $('#employee-dept').append('<option value="'+dept.id+'">'+dept.name+'</option>');
+                            $('#employee-dept option[value='+dept_id+']').attr('selected', 'selected');
                         });
                     } else {
                         $('#employee-dept').empty();
+                    }
+                }
+            });
+
+            // get all subdept
+            $.ajax({
+                url: "{{ route('approver.employees.subdepts') }}",
+                type: 'get',
+                cache: false,
+                data: {
+                    'id': dept_id
+                },
+                success:function(response){
+                    if (response) {
+                        // fill dept select option
+                        $('#employee-subdept').append('<option selected> -- Choose -- </option>');
+                        $.each(response, function(code, subdept){
+                            $('#employee-subdept').append('<option value="'+subdept.id+'">'+subdept.name+'</option>');
+                            $('#employee-subdept option[value='+subdept_id+']').attr('selected', 'selected');
+                        });
+                    } else {
+                        $('#employee-subdept').empty();
+                    }
+                }
+            });
+
+            // get all position
+            $.ajax({
+                url: "{{ route('approver.employees.positions') }}",
+                type: 'get',
+                cache: false,
+                data: {
+                    'id': subdept_id
+                },
+                success:function(response){
+                    if (response) {
+                        // fill dept select option
+                        $('#employee-position').append('<option selected> -- Choose -- </option>');
+                        $.each(response, function(code, position){
+                            $('#employee-position').append('<option value="'+position.id+'">'+position.name+'</option>');
+                            $('#employee-position option[value='+position_id+']').attr('selected', 'selected');
+                        });
+                    } else {
+                        $('#employee-position').empty();
                     }
                 }
             });
@@ -164,16 +214,17 @@
                 reader.readAsDataURL(this.files[0]);
             });
 
-            // store button event
-            $('#form-create-employee').on('submit', function(e){
+
+            // update button event
+            $('#form-update-employee').on('submit', function(e){
                 e.preventDefault();
 
-                // define variable form
+                // define form variable
                 let formData = this;
 
-                // ajax create
+                // ajax update
                 $.ajax({
-                    url: "{{ route('approver.employees.store') }}",
+                    url: "{{ route('approver.employees.update') }}",
                     type: "post",
                     cache: false,
                     data: new FormData(formData), 
@@ -193,28 +244,17 @@
                         setTimeout(function(){
                             location.reload();
                         }, 2000);
-                    },
+
+                    }, 
                     error:function(error){
                         // check if photo profile field error
                         if (error.responseJSON.image) {
-                            // show alert
                             $('#employee-image').addClass('is-invalid');
                             $('#alert-employee-image').removeClass('d-none');
                             $('#alert-employee-image').addClass('d-block');
 
                             // show message
                             $('#alert-employee-image').html(error.responseJSON.image);
-                        }
-
-                        // check if nik field error
-                        if (error.responseJSON.nik) {
-                            // show alert
-                            $('#employee-nik').addClass('is-invalid');
-                            $('#alert-employee-nik').removeClass('d-none');
-                            $('#alert-employee-nik').addClass('d-block');
-
-                            // show message
-                            $('#alert-employee-nik').html(error.responseJSON.nik);
                         }
 
                         // check if name field error
@@ -263,6 +303,7 @@
                     }
                 });
             });
+
         });
     </script>
 
