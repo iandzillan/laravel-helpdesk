@@ -59,6 +59,7 @@ Route::group(['middleware' => ['auth']], function () {
         Route::delete('/admin/urgencies/{urgency}', [UrgencyController::class, 'destroy'])->name('admin.urgencies.destroy');
 
         Route::get('/admin/users', [UserController::class, 'index'])->name('admin.users');
+        Route::post('/admin/users', [UserController::class, 'store'])->name('admin.users.store');
 
         Route::get('/admin/departments', [DepartmentController::class, 'index'])->name('admin.departments');
         Route::post('/admin/departments', [DepartmentController::class, 'store'])->name('admin.departments.store');

@@ -93,7 +93,7 @@
 
                 @if (Auth::user()->role == 'Admin')
                 <li class="nav-item">
-                    <a class="nav-link {{(request()->segment(2) == 'unassigned-tickets') ? 'active' : ''}}" aria-current="page" href="#">
+                    <a class="nav-link {{(request()->segment(2) == 'unassigned-tickets') ? 'active' : ''}}" aria-current="page" href="#" title="Unassigned Ticket">
                         <i class="icon">
                             <i class="fa-solid fa-list"></i>
                         </i>
@@ -104,10 +104,10 @@
 
                 <li class="nav-item">
                 @if (Auth::user()->role == 'Admin')
-                    <a class="nav-link {{(request()->segment(2) == 'onwork-tickets') ? 'active' : ''}}" aria-current="page" href="#">
+                    <a class="nav-link {{(request()->segment(2) == 'onwork-tickets') ? 'active' : ''}}" aria-current="page" href="#" title="On Work Ticket">
                 @endif
                 @if (Auth::user()->role == 'Approver')
-                    <a class="nav-link {{(request()->segment(2) == 'onwork-tickets') ? 'active' : ''}}" aria-current="page" href="#">
+                    <a class="nav-link {{(request()->segment(2) == 'onwork-tickets') ? 'active' : ''}}" aria-current="page" href="#" title="On Work Ticket">
                 @endif
                         <i class="icon">
                             <i class="fa-solid fa-hammer"></i>
@@ -118,10 +118,10 @@
 
                 <li class="nav-item">
                 @if (Auth::user()->role == 'Admin')
-                    <a class="nav-link {{(request()->segment(2) == 'complete-tickets') ? 'active' : ''}}" aria-current="page" href="#">
+                    <a class="nav-link {{(request()->segment(2) == 'complete-tickets') ? 'active' : ''}}" aria-current="page" href="#" title="Completed Ticket">
                 @endif
                 @if (Auth::user()->role == 'Approver')
-                    <a class="nav-link {{(request()->segment(2) == 'complete-tickets') ? 'active' : ''}}" aria-current="page" href="#">
+                    <a class="nav-link {{(request()->segment(2) == 'complete-tickets') ? 'active' : ''}}" aria-current="page" href="#" title="Completed Ticket">
                 @endif
                         <i class="icon">
                             <i class="fa-solid fa-circle-check"></i>
@@ -132,10 +132,10 @@
 
                 <li class="nav-item">
                 @if (Auth::user()->role == 'Admin')
-                    <a class="nav-link {{(request()->segment(2) == 'reject-tickets') ? 'active' : ''}}" aria-current="page" href="#">
+                    <a class="nav-link {{(request()->segment(2) == 'reject-tickets') ? 'active' : ''}}" aria-current="page" href="#" title="Rejected Ticket">
                 @endif
                 @if (Auth::user()->role == 'Approver')
-                    <a class="nav-link {{(request()->segment(2) == 'reject-tickets') ? 'active' : ''}}" aria-current="page" href="#">
+                    <a class="nav-link {{(request()->segment(2) == 'reject-tickets') ? 'active' : ''}}" aria-current="page" href="#" title="Rejected Ticket">
                 @endif
                         <i class="icon">
                             <i class="fa-solid fa-circle-xmark"></i>
