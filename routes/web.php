@@ -5,6 +5,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\LoginController;
+use App\Http\Controllers\PositionController;
 use App\Http\Controllers\SubCategoryController;
 use App\Http\Controllers\SubDepartmentController;
 use App\Http\Controllers\UrgencyController;
@@ -59,6 +60,7 @@ Route::group(['middleware' => ['auth']], function () {
         Route::delete('/admin/urgencies/{urgency}', [UrgencyController::class, 'destroy'])->name('admin.urgencies.destroy');
 
         Route::get('/admin/users', [UserController::class, 'index'])->name('admin.users');
+        Route::get('/admin/users/user-request', [UserController::class, 'requestList'])->name('admin.users.requestList');
         Route::post('/admin/users', [UserController::class, 'store'])->name('admin.users.store');
 
         Route::get('/admin/departments', [DepartmentController::class, 'index'])->name('admin.departments');
@@ -88,5 +90,11 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/approver/employees/{employee}/edit', [EmployeeController::class, 'show'])->name('approver.employees.show');
         Route::put('/approver/employees/update', [EmployeeController::class, 'update'])->name('approver.employees.update');
         Route::delete('/approver/employees/{employee}', [EmployeeController::class, 'destroy'])->name('approver.employees.destroy');
+
+        Route::get('/approver/user-request', [EmployeeController::class, 'userRequestList'])->name('approver.userrequestlist');
+        Route::get('/approver/user-request/{employee}', [EmployeeController::class, 'userRequest'])->name('approver.userrequest');
+        Route::post('/approver/send-request', [EmployeeController::class, 'sendRequest'])->name('approver.sendrequest');
+
+        Route::get('/approver/positions', [PositionController::class, 'index'])->name('approver.positions');
     });
 });

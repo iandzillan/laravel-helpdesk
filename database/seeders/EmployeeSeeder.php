@@ -22,7 +22,8 @@ class EmployeeSeeder extends Seeder
                 'nik'           => $faker->unique()->numerify('10####'),
                 'name'          => $faker->firstName . " " . $faker->lastName,
                 'position_id'   => $faker->numberBetween(1, Position::count()),
-                'image'         => 'avtar_1.png'
+                'image'         => 'avtar_1.png',
+                'isRequest'     => 1
             ]);
         }
     }

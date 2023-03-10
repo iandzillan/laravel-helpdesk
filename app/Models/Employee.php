@@ -13,7 +13,8 @@ class Employee extends Model
         'nik',
         'name',
         'image',
-        'position_id'
+        'position_id',
+        'isRequest'
     ];
 
     public function user()

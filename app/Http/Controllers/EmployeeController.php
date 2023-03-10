@@ -6,8 +6,11 @@ use App\Models\Department;
 use App\Models\Employee;
 use App\Models\Position;
 use App\Models\SubDepartment;
+use App\Models\User;
+use App\Notifications\UserRequestNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Yajra\DataTables\Facades\DataTables;
@@ -214,6 +217,91 @@ class EmployeeController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'The employee has been deleted'
+        ]);
+    }
+
+    public function userRequestList(Request $request)
+    {
+        // get employe who haven't have user account
+        $employees = Employee::where('isRequest', 0)->latest()->get();
+
+        // draw table
+        if ($request->ajax()) {
+            return DataTables::of($employees)
+                ->addIndexColumn()
+                ->addColumn('position', function ($row) {
+                    return $row->position->name;
+                })
+                ->addColumn('subdept', function ($row) {
+                    return $row->position->subDepartment->name;
+                })
+                ->addColumn('dept', function ($row) {
+                    return $row->position->subDepartment->department->name;
+                })
+                ->addColumn('action', function ($row) {
+                    $btn = '<a href="javascript:void(0)" id="user-request-button" data-id="' . $row->nik . '" class="btn btn-primary btn-sm" title="Request user account"><i class="fa-solid fa-user-plus"></i></a>';
+                    return $btn;
+                })
+                ->rawColumns(['action'])
+                ->make(true);
+        }
+
+        // return view
+        return view('approver.employee.user-request', [
+            'title' => 'User Account Request - Helpdesk Ticketing System',
+            'name'  => Auth::user()->employee->name
+        ]);
+    }
+
+    public function userRequest($employee)
+    {
+        // get employee
+        $employee = Employee::where('nik', $employee)->first();
+
+        // return response
+        return response()->json([
+            'success' => true,
+            'message' => 'Detail employee',
+            'data'    => $employee
+        ]);
+    }
+
+    public function sendRequest(Request $request)
+    {
+        // get employee who has account request
+        $employee = Employee::where('nik', $request->nik)->first();
+
+        // set validation
+        $validator = Validator::make($request->all(), [
+            'nik'      => 'required',
+            'name'     => 'required',
+            'email'    => 'required|unique:users|email',
+            'username' => 'required|unique:users',
+            'password' => 'required|confirmed',
+            'role'     => 'required',
+        ]);
+
+        // check if validation fails
+        if ($validator->fails()) {
+            // return error response
+            return response()->json($validator->errors(), 422);
+        }
+
+        // Send email request to admin
+        // $admin = User::where('email', 'iandzillanm@gmail.com')->first();
+        // Notification::send($admin, new UserRequestNotification());
+        // dd($admin->notifications);
+
+        // update employee status request
+        $employee->update([
+            'isRequest' => 1
+        ]);
+
+        // return success response
+        return response()->json([
+            'success' => true,
+            'message' => 'User account request has been sended',
+            'data'    => $employee
         ]);
     }
 }

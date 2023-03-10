@@ -243,6 +243,15 @@
                             <span class="item-name">Employees List</span>
                         </a>
                     </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link {{(request()->segment(2) == 'user-request') ? 'active' : ''}}" aria-current="page" href="{{ route('approver.userrequestlist') }}">
+                            <i class="icon">
+                                <i class="fa-solid fa-chalkboard-user"></i>
+                            </i>
+                            <span class="item-name">Account Request</span>
+                        </a>
+                    </li>
                     <br>
                 @endif
             </ul>

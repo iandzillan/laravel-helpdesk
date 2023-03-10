@@ -5,11 +5,11 @@
         <div class="card">
             <div class="card-header d-flex justify-content-between">
                 <div class="header-title">
-                    <h4 class="card-title">Users</h4>
+                    <h4 class="card-title">Positions</h4>
                 </div>
-                <a href="{{ route('admin.users.requestList') }}" class="btn btn-primary mb-2" id="btn-create-user">
+                <a href="javascript:void(0)" class="btn btn-primary mb-2" id="btn-create-position">
                     <i class="fa-solid fa-folder-plus"></i>
-                    Add User
+                    Add Position
                 </a>
             </div>
             <div class="card-body">
@@ -18,10 +18,8 @@
                         <thead>
                             <tr>
                                 <th>#</th>
-                                <th>Nik</th>
                                 <th>Name</th>
-                                <th>Email</th>
-                                <th>Role</th>
+                                <th>Total Employees</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -35,22 +33,19 @@
 
     <script>
         $(document).ready(function(){
-            // draw table
             let table = $('.data-table').DataTable({
                 responsive: true,
                 processing: true,
                 serverSide: true,
-                ajax: "{{ route('admin.users') }}",
+                ajax: "{{ route('approver.positions') }}",
                 columns: [
                     {data: 'DT_RowIndex', name: 'DT_RowIndex'},
-                    {data: 'nik', name: 'nik'},
                     {data: 'name', name: 'name'},
-                    {data: 'email', name: 'email'},
-                    {data: 'role', name: 'role'},
-                    {data: 'action', name: 'action', orderable: false, searchable: false}
+                    {data: 'total', name: 'total'},
+                    {data: 'action', name: 'action', orderable: false, searchable: false},
                 ]
             });
         });
     </script>
-    
+
 @endsection
