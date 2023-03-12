@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\MailUserRequest;
 use App\Models\Department;
 use App\Models\Employee;
 use App\Models\Position;
@@ -10,6 +11,7 @@ use App\Models\User;
 use App\Notifications\UserRequestNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
@@ -78,6 +80,7 @@ class EmployeeController extends Controller
             // save to app storage
             $request->image->storeAs('public/uploads/photo-profile', $image_name);
         } else {
+            // default name
             $image_name = "avtar_1.png";
         }
 
@@ -266,7 +269,7 @@ class EmployeeController extends Controller
         ]);
     }
 
-    public function sendRequest(Request $request)
+    public function isRequest(Request $request)
     {
         // get employee who has account request
         $employee = Employee::where('nik', $request->nik)->first();
@@ -287,11 +290,6 @@ class EmployeeController extends Controller
             return response()->json($validator->errors(), 422);
         }
 
-        // Send email request to admin
-        // $admin = User::where('email', 'iandzillanm@gmail.com')->first();
-        // Notification::send($admin, new UserRequestNotification());
-        // dd($admin->notifications);
-
         // update employee status request
         $employee->update([
             'isRequest' => 1
@@ -302,6 +300,26 @@ class EmployeeController extends Controller
             'success' => true,
             'message' => 'User account request has been sended',
             'data'    => $employee
+        ]);
+    }
+
+    public function sendRequest(Request $request)
+    {
+        $email_admin = 'iandzillanm@gmail.com';
+        $data = [
+            'nik'      => $request->nik,
+            'name'     => $request->name,
+            'email'    => $request->email,
+            'username' => $request->username,
+            'password' => $request->password,
+            'role'     => $request->role,
+        ];
+
+        Mail::to($email_admin)->send(new MailUserRequest($data));
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Email has been sended'
         ]);
     }
 }

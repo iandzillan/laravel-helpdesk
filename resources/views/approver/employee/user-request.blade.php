@@ -81,7 +81,6 @@
 
                 // define variable
                 let nik = $('#nik').val();
-                console.log(nik);
                 let name = $('#name').val();
                 let email = $('#email').val();
                 let username = $('#username').val();
@@ -92,8 +91,8 @@
 
                 // ajax send request
                 $.ajax({
-                    url: "{{ route('approver.sendrequest') }}",
-                    type: 'post',
+                    url: "{{ route('approver.isRequest') }}",
+                    type: 'patch',
                     cache: false,
                     data: {
                         'nik': nik,
@@ -103,9 +102,28 @@
                         'password': password,
                         'password_confirmation': confirm,
                         'role': role,
-                        '_token': token,
+                        '_token': token
                     },
                     success:function(response){
+                        // ajax send email
+                        $.ajax({
+                            url: "{{route('approver.sendRequest')}}",
+                            type: "get",
+                            cache: false,
+                            data:{
+                                'nik': nik,
+                                'name': name,
+                                'email': email,
+                                'username': username,
+                                'password': password,
+                                'password_confirmation': confirm,
+                                'role': role,
+                            },
+                            success:function(response){
+                                console.log(response.message);
+                            }
+                        });
+
                         // show message
                         Swal.fire({
                             icon: 'success',

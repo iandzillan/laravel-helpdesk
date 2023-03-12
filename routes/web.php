@@ -93,7 +93,8 @@ Route::group(['middleware' => ['auth']], function () {
 
         Route::get('/approver/user-request', [EmployeeController::class, 'userRequestList'])->name('approver.userrequestlist');
         Route::get('/approver/user-request/{employee}', [EmployeeController::class, 'userRequest'])->name('approver.userrequest');
-        Route::post('/approver/send-request', [EmployeeController::class, 'sendRequest'])->name('approver.sendrequest');
+        Route::patch('/approver/is-request', [EmployeeController::class, 'isRequest'])->name('approver.isRequest');
+        Route::get('/approver/send-request', [EmployeeController::class, 'sendRequest'])->name('approver.sendRequest');
 
         Route::get('/approver/positions', [PositionController::class, 'index'])->name('approver.positions');
     });
