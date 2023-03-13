@@ -19,7 +19,7 @@
                             <tr>
                                 <th>#</th>
                                 <th>Name</th>
-                                <th>Department</th>
+                                <th>Total Employee</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -45,34 +45,13 @@
                 columns: [
                     {data: 'DT_RowIndex', name: 'DT_RowIndex'},
                     {data: 'name', name: 'name'},
-                    {data: 'department', name: 'department'},
+                    {data: 'total', name: 'total'},
                     {data: 'action', name: 'action', orderable: false, searchable: false},
                 ]
             });
 
             // add button event
             $('#btn-create-subdept').click(function(){
-                // fetch departments to select option
-                $.ajax({
-                    url: "{{ route('dept.subdepartments.getDepts') }}",
-                    type: "get",
-                    cache: false,
-                    success:function(response){
-                        if (response) {
-                            // fill select option with departments
-                            $('#dept-id').empty();
-                            $('#dept-id').append(`
-                                <option selected> -- Choose Department -- </option>
-                            `);
-                            $.each(response, function(code, dept){
-                                $('#dept-id').append('<option value="'+dept.id+'">'+dept.name+'</option>');
-                            });
-                        } else {
-                            $('#dept-id').empty();
-                        }
-                    }
-                });
-
                 // show modal
                 $('#modal-create-subdept').modal('show');
             });
@@ -81,8 +60,20 @@
             $('#store-subdept').click(function(e){
                 e.preventDefault();
 
+                // show loading
+                Swal.fire({
+                    title: 'Please wait',
+                    text: 'Sending request...',
+                    showConfirmButton: false,
+                    allowOutsideClick: false,
+                    allowEscapeKey: false, 
+                    allowEnterKey: false,
+                    didOpen: ()=>{
+                        Swal.showLoading();
+                    }
+                });
+
                 // define variable
-                let dept_id = $('#dept-id').val();
                 let name    = $('#subdept-name').val();
                 let token   = $('meta[name="csrf-token"]').attr('content');
 
@@ -92,7 +83,6 @@
                     type: "post",
                     cache: false,
                     data: {
-                        "department_id": dept_id,
                         "name": name,
                         "_token": token
                     },
@@ -102,7 +92,7 @@
                             icon: 'success',
                             title: `${response.message}`,
                             showConfirmButton: false,
-                            timer: 3000
+                            timer: 2000
                         });
 
                         // clear form
@@ -115,6 +105,14 @@
                         table.draw();
                     },
                     error:function(error){
+                        // show message
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Please check again',
+                            showConfirmButton: false,
+                            timer: 1000
+                        });
+
                         // check if name field error
                         if (error.responseJSON.name) {
                             // show alert
@@ -124,17 +122,6 @@
 
                             // show message
                             $('#alert-subdept-name').html(error.responseJSON.name);
-                        }
-
-                        // check if dept field error
-                        if (error.responseJSON.department_id) {
-                            // show alert
-                            $('#alert-dept-id').removeClass('d-none');
-                            $('#alert-dept-id').addClass('d-block');
-                            $('#dept-id').addClass('is-invalid');
-
-                            // show message
-                            $('#alert-dept-id').html(error.responseJSON.department_id);
                         }
                     }
                 });
@@ -153,15 +140,8 @@
                     success:function(response){
                         if (response) {
                             // fill form
-                            $('#dept-id-edit').empty();
                             $('#subdept-id').val(response.data.id);
                             $('#subdept-name-edit').val(response.data.name);
-                            $.each(response.depts, function(code, dept){
-                                $('#dept-id-edit').append('<option value="'+dept.id+'">'+dept.name+'</option>');
-                                $(`#dept-id-edit option[value="${response.data.department_id}"]`).attr('selected', 'selected');
-                            });
-                        } else {
-                            $('#dept-id-edit').empty();
                         }
                     }
                 });
@@ -174,10 +154,22 @@
             $('#update-subdept').click(function(e){
                 e.preventDefault();
 
+                // show loading
+                Swal.fire({
+                    title: 'Please wait',
+                    text: 'Sending request...',
+                    showConfirmButton: false,
+                    allowOutsideClick: false,
+                    allowEscapeKey: false, 
+                    allowEnterKey: false,
+                    didOpen: ()=>{
+                        Swal.showLoading();
+                    }
+                });
+
                 // define variable
                 let id      = $('#subdept-id').val();
                 let name    = $('#subdept-name-edit').val();
-                let dept_id = $('#dept-id-edit').val();
                 let token   = $('meta[name="csrf-token"]').attr('content');
 
                 // ajax update
@@ -187,7 +179,6 @@
                     cache: false,
                     data: {
                         'name': name,
-                        'department_id': dept_id,
                         '_token': token
                     }, 
                     success:function(response){
@@ -195,7 +186,7 @@
                             icon: 'success',
                             title: `${response.message}`,
                             showConfirmButton: false,
-                            timer: 3000
+                            timer: 2000
                         });
 
                         // clear form 
@@ -208,6 +199,13 @@
                         table.draw();
                     }, 
                     error:function(error){
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Please check again',
+                            showConfirmButton: false,
+                            timer: 1000
+                        });
+
                         // check if name field has error
                         if (error.responseJSON.name) {
                             // show alert
@@ -217,17 +215,6 @@
 
                             // show message
                             $('#alert-subdept-name-edit').html(error.responseJSON.name);
-                        }
-
-                        // check if dept select option has error
-                        if (error.responseJSON.department_id) {
-                            // show alert
-                            $('#alert-dept-id-edit').removeClass('d-none');
-                            $('#alert-dept-id-edit').addClass('d-block');
-                            $('#dept-id-edit').addClass('is-invalid');
-
-                            // show message
-                            $('#alert-dept-id-edit').html(error.responseJSON.department_id);
                         }
                     }
                 });
@@ -249,6 +236,19 @@
                     confirmButtonText: 'yes'
                 }).then((result) => {
                     if (result.isConfirmed) {
+                        // show loading
+                        Swal.fire({
+                            title: 'Please wait',
+                            text: 'Sending request...',
+                            showConfirmButton: false,
+                            allowOutsideClick: false,
+                            allowEscapeKey: false, 
+                            allowEnterKey: false,
+                            didOpen: ()=>{
+                                Swal.showLoading();
+                            }
+                        });
+
                         // ajax delete
                         $.ajax({
                             url: `sub-departments/${id}`,
@@ -263,7 +263,7 @@
                                     icon: 'success',
                                     title: `${response.message}`,
                                     showConfirmButton: false,
-                                    timer: 3000
+                                    timer: 2000
                                 });
 
                                 // draw table

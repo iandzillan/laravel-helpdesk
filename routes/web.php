@@ -74,7 +74,6 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/dept/dashboard', [DashboardController::class, 'deptHome'])->name('dept.dashboard');
 
         Route::get('/dept/sub-departments', [SubDepartmentController::class, 'index'])->name('dept.subdepartments');
-        Route::get('/dept/sub-departments/depts', [SubDepartmentController::class, 'getDepts'])->name('dept.subdepartments.getDepts');
         Route::post('/dept/sub-departments', [SubDepartmentController::class, 'store'])->name('dept.subdepartments.store');
         Route::get('/dept/sub-departments/{subdept}/edit', [SubDepartmentController::class, 'show'])->name('dept.subdepartments.show');
         Route::patch('/dept/sub-departments/{subdept}', [SubDepartmentController::class, 'update'])->name('dept.subdepartments.update');

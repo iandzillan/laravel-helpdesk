@@ -41,23 +41,11 @@
                                         <input type="text" class="form-control" id="employee-name" name="name" placeholder="Employee's name">
                                         <div class="invalid-feedback d-none" role="alert" id="alert-employee-name"></div>
                                     </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="form-group col-md-4">
-                                    <label for="employee-dept" class="form-label">Department</label>
-                                    <select id="employee-dept" name="dept" class="selectpicker form-control basic-usage"></select>
-                                    <div class="invalid-feedback d-none" role="alert" id="alert-employee-dept"></div>
-                                </div>
-                                <div class="form-group col-md-4">
-                                    <label for="employee-subdept" class="form-label">Sub Department</label>
-                                    <select id="employee-subdept" name="subdept" class="selectpicker form-control basic-usage"></select>
-                                    <div class="invalid-feedback d-none" role="alert" id="alert-employee-subdept"></div>
-                                </div>
-                                <div class="form-group col-md-4">
-                                    <label for="employee-position" class="form-label">Position</label>
-                                    <select id="employee-position" name="position_id" class="selectpicker form-control basic-usage"></select>
-                                    <div class="invalid-feedback d-none" role="alert" id="alert-employee-position"></div>
+                                    <div class="form-group">
+                                        <label for="employee-position" class="form-label">Position</label>
+                                        <select id="employee-position" name="position_id" class="selectpicker form-control basic-usage"></select>
+                                        <div class="invalid-feedback d-none" role="alert" id="alert-employee-position"></div>
+                                    </div>
                                 </div>
                             </div>
                             <button type="subtmit" class="btn btn-primary mt-3" id="store-employee">Save</button>
@@ -70,88 +58,24 @@
 
     <script>
         $(document).ready(function(){
-            // get all dept data
+            // get position
             $.ajax({
-                url: "{{ route('approver.employees.depts') }}",
+                url: "{{ route('subdept.employees.positions') }}",
                 type: "get",
                 cache: false,
                 success:function(response){
                     if (response) {
-                        // fill dept select option
-                        $('#employee-dept').empty();
-                        $('#employee-dept').append('<option selected> -- Choose -- </option>');
-                        $('#employee-subdept').append('<option selected> -- Choose -- </option>');
-                        $('#employee-position').append('<option selected> -- Choose -- </option>');
-                        $.each(response, function(code, dept){
-                            $('#employee-dept').append('<option value="'+dept.id+'">'+dept.name+'</option>');
+                        // empty select option
+                        $('#employee-position').empty();
+                        $('#employee-position').append('<option> -- Choose -- </option>');
+                        // fill position select option
+                        $.each(response, function(code, position){
+                            $('#employee-position').append('<option value="'+position.id+'">'+position.name+'</option>');
                         });
                     } else {
-                        $('#employee-dept').empty();
+                        $('#employee-position').empty();
                     }
                 }
-            });
-
-            // get subdepts data when dept change
-            $('#employee-dept').change(function(){
-                // empty subdept and position select option
-                $('#employee-subdept').empty();
-                $('#employee-subdept').append('<option selected> -- Choose -- </option>');
-                $('#employee-position').empty();
-                $('#employee-position').append('<option selected> -- Choose -- </option>');
-
-                // get dept id
-                let dept_id = $('#employee-dept').val();
-
-                // fetch subdepts data based on dept_id
-                $.ajax({
-                    url: "{{ route('approver.employees.subdepts') }}",
-                    type: "get",
-                    cache: false,
-                    data: {
-                        'id': dept_id
-                    },
-                    success:function(response){
-                        if (response) {
-                            // fill subdept select option
-                            $.each(response, function(code, subdept){
-                                $('#employee-subdept').append('<option value="'+subdept.id+'">'+subdept.name+'</option>');
-                            });
-                        } else {
-                            $('#employee-subdept').empty();
-                            $('#employee-position').empty();
-                        }
-                    }
-                });
-            });
-
-            // get positions data when subdept change
-            $('#employee-subdept').change(function(){
-                // empty position select option
-                $('#employee-position').empty();
-                $('#employee-position').append('<option selected> -- Choose -- </option>');
-
-                // get subdept id
-                let subdept_id = $('#employee-subdept').val();
-
-                // fetch positions data when subdept change
-                $.ajax({
-                    url: "{{ route('approver.employees.positions') }}",
-                    type: "get",
-                    cache: false,
-                    data: {
-                        'id': subdept_id
-                    },
-                    success:function(response){
-                        if (response) {
-                            // fill position select option
-                            $.each(response, function(code, position){
-                                $('#employee-position').append('<option value="'+position.id+'">'+position.name+'</option>');
-                            });
-                        } else {
-                            $('#employee-position').empty();
-                        }
-                    }
-                });
             });
 
             // preview image
@@ -168,12 +92,25 @@
             $('#form-create-employee').on('submit', function(e){
                 e.preventDefault();
 
+                // show loading
+                Swal.fire({
+                    title: 'Please wait',
+                    text: 'Sending request...',
+                    showConfirmButton: false,
+                    allowOutsideClick: false,
+                    allowEscapeKey: false, 
+                    allowEnterKey: false,
+                    didOpen: ()=>{
+                        Swal.showLoading();
+                    }
+                });
+
                 // define variable form
                 let formData = this;
 
                 // ajax create
                 $.ajax({
-                    url: "{{ route('approver.employees.store') }}",
+                    url: "{{ route('subdept.employees.store') }}",
                     type: "post",
                     cache: false,
                     data: new FormData(formData), 
@@ -188,13 +125,19 @@
                             showConfirmButton: false,
                             timer: 2000
                         });
-
+                        
                         // reload page
-                        setTimeout(function(){
-                            location.reload();
-                        }, 2000);
+                        location.reload();
                     },
                     error:function(error){
+                        // show message
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Please check again',
+                            showConfirmButton: false,
+                            timer: 2000
+                        });
+
                         // check if photo profile field error
                         if (error.responseJSON.image) {
                             // show alert
@@ -226,28 +169,6 @@
 
                             // show message
                             $('#alert-employee-name').html(error.responseJSON.name);
-                        }
-
-                        // check if dept field error
-                        if (error.responseJSON.dept) {
-                            // show alert
-                            $('#employee-dept').addClass('is-invalid');
-                            $('#alert-employee-dept').removeClass('d-none');
-                            $('#alert-employee-dept').addClass('d-block');
-
-                            // show message
-                            $('#alert-employee-dept').html(error.responseJSON.dept);
-                        }
-
-                        // check if subdept field error
-                        if (error.responseJSON.subdept) {
-                            // show alert
-                            $('#employee-subdept').addClass('is-invalid');
-                            $('#alert-employee-subdept').removeClass('d-none');
-                            $('#alert-employee-subdept').addClass('d-block');
-
-                            // show message
-                            $('#alert-employee-subdept').html(error.responseJSON.subdept);
                         }
 
                         // check if position field error

@@ -14,7 +14,6 @@ class SubCategoryController extends Controller
     public function index(Request $request)
     {
         $sub_categories = SubCategory::with('category')->latest()->get();
-        $categories     = Category::all();
 
         // Draw Data Table
         if ($request->ajax()) {
@@ -34,9 +33,7 @@ class SubCategoryController extends Controller
 
         return view('admin.subcategory.index', [
             'title'             => 'Sub Categories - Helpdesk Ticketing System',
-            'name'              => Auth::user()->employee->name,
-            'sub_categories'    => $sub_categories,
-            'categories'        => $categories
+            'name'              => Auth::user()->employee->name
         ]);
     }
 

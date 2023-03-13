@@ -255,7 +255,7 @@
                     </li>
 
                     <li class="nav-item">
-                        <a class="nav-link {{(request()->segment(2) == 'new-employee') ? 'active' : ''}}" aria-current="page" href="{{ route('approver.employees.index') }}">
+                        <a class="nav-link {{(request()->segment(2) == 'new-employee') ? 'active' : ''}}" aria-current="page" href="{{ route('subdept.employees.index') }}">
                             <i class="icon">
                                 <i class="fa-solid fa-address-card"></i>
                             </i>
@@ -264,7 +264,7 @@
                     </li>
 
                     <li class="nav-item">
-                        <a class="nav-link {{(request()->segment(2) == 'employees') ? 'active' : ''}}" aria-current="page" href="{{ route('approver.employees.list') }}">
+                        <a class="nav-link {{(request()->segment(2) == 'employees') ? 'active' : ''}}" aria-current="page" href="{{ route('subdept.employees.list') }}">
                             <i class="icon">
                                 <i class="fa-solid fa-id-card-clip"></i>
                             </i>
@@ -273,7 +273,7 @@
                     </li>
 
                     <li class="nav-item">
-                        <a class="nav-link {{(request()->segment(2) == 'user-request') ? 'active' : ''}}" aria-current="page" href="{{ route('approver.userrequestlist') }}">
+                        <a class="nav-link {{(request()->segment(2) == 'user-request') ? 'active' : ''}}" aria-current="page" href="{{ route('subdept.userrequestlist') }}">
                             <i class="icon">
                                 <i class="fa-solid fa-chalkboard-user"></i>
                             </i>
@@ -282,7 +282,7 @@
                     </li>
 
                     <li class="nav-item">
-                        <a class="nav-link {{(request()->segment(2) == 'positions') ? 'active' : ''}}" aria-current="page" href="{{ route('approver.positions') }}">
+                        <a class="nav-link {{(request()->segment(2) == 'positions') ? 'active' : ''}}" aria-current="page" href="{{ route('subdept.positions') }}">
                             <i class="icon">
                                 <i class="fa-solid fa-sitemap"></i>
                             </i>

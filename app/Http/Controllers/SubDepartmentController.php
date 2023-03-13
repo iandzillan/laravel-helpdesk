@@ -7,19 +7,20 @@ use App\Models\SubDepartment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 use Yajra\DataTables\Facades\DataTables;
 
 class SubDepartmentController extends Controller
 {
     public function index(Request $request)
     {
-        $sub_departments = SubDepartment::with('department')->where('department_id', Auth::user()->employee->position->subDepartment->department_id)->latest()->get();
+        $sub_departments = SubDepartment::where('department_id', Auth::user()->employee->position->subDepartment->department_id)->withCount('employees')->latest()->get();
 
         if ($request->ajax()) {
             return DataTables::of($sub_departments)
                 ->addIndexColumn()
-                ->addColumn('department', function ($row) {
-                    return $row->department->name;
+                ->addColumn('total', function($row){
+                    return $row->employees_count;
                 })
                 ->addColumn('action', function ($row) {
                     $btn = '<a href="javascript:void(0)" id="btn-edit-subdept" data-id="' . $row->id . '" class="btn btn-primary btn-sm" title="Edit this sub department"> <i class="fa-solid fa-pen-to-square"></i> </a>';
@@ -31,24 +32,21 @@ class SubDepartmentController extends Controller
         }
 
         return view('admin.subdepartment.index', [
-            'title'             => 'Sub Departments - Helpdesk Ticketing System',
-            'name'              => Auth::user()->employee->name,
-            'sub_departments'   => $sub_departments
+            'title' => 'Sub Departments - Helpdesk Ticketing System',
+            'name'  => Auth::user()->employee->name,
         ]);
-    }
-
-    public function getDepts()
-    {
-        $depts = Department::all('id', 'name');
-        return response()->json($depts);
     }
 
     public function store(Request $request)
     {
+        // get dept id
+        $dept = Auth::user()->employee->position->subDepartment->department_id;
         // set validation
         $validator = Validator::make($request->all(), [
-            'department_id' => 'required',
-            'name'          => 'required|unique:sub_departments'
+            'name' => [
+                'required',
+                Rule::unique('sub_departments')->where('department_id', $dept)
+            ]
         ]);
 
         // check if validation fails()
@@ -58,7 +56,7 @@ class SubDepartmentController extends Controller
         }
 
         // create sub department
-        $dept = Department::where('id', $request->department_id)->first();
+        $dept = Department::where('id', Auth::user()->employee->position->subDepartment->department_id)->first();
         $subdept = new SubDepartment;
         $subdept->name = $request->name;
         $subdept->department()->associate($dept);
@@ -72,26 +70,26 @@ class SubDepartmentController extends Controller
         ]);
     }
 
-    public function show($subdept)
+    public function show(SubDepartment $subdept)
     {
-        $subdept = SubDepartment::with('department')->where('id', $subdept)->first();
-        $depts = Department::all('id', 'name');
-
         return response()->json([
             'success' => true,
             'message' => 'Sub department detail',
-            'data'    => $subdept,
-            'dept'    => $subdept->department,
-            'depts'   => $depts
+            'data'    => $subdept
         ]);
     }
 
     public function update(Request $request, SubDepartment $subdept)
     {
+        // get dept id
+        $dept = Auth::user()->employee->position->subDepartment->department_id; 
+
         // set validation
         $validator = Validator::make($request->all(), [
-            'name' => 'required|unique:sub_departments,name,' . $subdept->id,
-            'department_id' => 'required'
+            'name' => [
+                'required',
+                Rule::unique('sub_departments')->ignore($subdept->id)->where('department_id', $dept)
+            ]
         ]);
 
         // check if validation fails
@@ -101,7 +99,6 @@ class SubDepartmentController extends Controller
         }
 
         // update sub department
-        $dept = Department::where('id', $request->department_id)->first();
         $subdept->name = $request->name;
         $subdept->department()->associate($dept);
         $subdept->save();

@@ -7,13 +7,10 @@ use App\Models\Department;
 use App\Models\Employee;
 use App\Models\Position;
 use App\Models\SubDepartment;
-use App\Models\User;
-use App\Notifications\UserRequestNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Yajra\DataTables\Facades\DataTables;
@@ -22,34 +19,19 @@ class EmployeeController extends Controller
 {
     public function index()
     {
-        return view('approver.employee.index', [
+        return view('approver2.employee.index', [
             'title' => 'New employee - Helpdesk Ticketing System',
             'name'  => Auth::user()->employee->name
         ]);
     }
 
-    public function getDepts()
+    public function getPositions()
     {
-        // get all department
-        $depts = Department::all('id', 'name');
+        // get sub dept id
+        $subdept = Auth::user()->employee->position->sub_department_id;
 
-        // return response
-        return response()->json($depts);
-    }
-
-    public function getSubDepts(Request $request)
-    {
-        // get all sub department based on department
-        $subdepts = SubDepartment::where('department_id', $request->id)->get();
-
-        // return response
-        return response()->json($subdepts);
-    }
-
-    public function getPositions(Request $request)
-    {
         // gel all position based on sub department
-        $positions = Position::where('sub_department_id', $request->id)->get();
+        $positions = Position::where('sub_department_id', $subdept)->get();
 
         // return response
         return response()->json($positions);
@@ -62,8 +44,6 @@ class EmployeeController extends Controller
             'nik'         => 'required|min_digits:6|max_digits:6|integer|unique:employees',
             'name'        => 'required',
             'image'       => 'sometimes|image|mimes:jpeg,png,jpg|max:1024',
-            'dept'        => 'required',
-            'subdept'     => 'required',
             'position_id' => 'required'
         ]);
 

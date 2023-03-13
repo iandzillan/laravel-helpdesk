@@ -10,7 +10,6 @@ class SubDepartment extends Model
     use HasFactory;
 
     protected $fillable = [
-        'department_id',
         'name'
     ];
 

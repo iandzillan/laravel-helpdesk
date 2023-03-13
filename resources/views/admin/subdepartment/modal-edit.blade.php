@@ -14,11 +14,6 @@
                         <input type="text" class="form-control bg-white" id="subdept-name-edit">
                         <div class="invalid-feedback d-none" role="alert" id="alert-subdept-name-edit"></div>
                     </div>
-                    <div class="form-group">
-                        <label for="dept-id-edit">Category</label>
-                        <select id="dept-id-edit" name="dept-id-edit" class="form-select mb-3 bg-white shadow-none"></select>
-                        <div class="invalid-feedback d-none" role="alert" id="alert-dept-id-edit"></div>
-                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
