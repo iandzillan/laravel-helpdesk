@@ -6,6 +6,7 @@ use App\Models\Position;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 use Yajra\DataTables\Facades\DataTables;
 
 class PositionController extends Controller
@@ -15,7 +16,7 @@ class PositionController extends Controller
         // get position
         $positions = Position::whereHas('subDepartment', function ($query) {
             $query->where('name', Auth::user()->employee->position->subDepartment->name);
-        })->withCount('employees')->get();
+        })->withCount('employees')->latest()->get();
 
         // draw table
         if ($request->ajax()) {
@@ -41,9 +42,12 @@ class PositionController extends Controller
 
     public function store(Request $request)
     {
+        // get subdept id
+        $subdept = Auth::user()->employee->position->subDepartment->id;
+
         // set validation
         $validator = Validator::make($request->all(), [
-            'name' => 'required|unique:positions'
+            'name' => 'required|unique:positions,name,NULL,id,sub_department_id,' . $subdept
         ]);
 
         // check if validation fails
@@ -53,9 +57,10 @@ class PositionController extends Controller
         }
 
         // create position
-        $position = Position::create([
-            'name' => $request->name
-        ]);
+        $position = new Position;
+        $position->name = $request->name;
+        $position->subDepartment()->associate($subdept);
+        $position->save();
 
         // return success response
         return response()->json([
@@ -77,9 +82,15 @@ class PositionController extends Controller
 
     public function update(Position $position, Request $request)
     {
+        // get subdept id
+        $subdept = Auth::user()->employee->position->subDepartment->id;
+
         // set validation
         $validator = Validator::make($request->all(), [
-            'name' => 'required|unique:positions,name,' . $position->name
+            'name' => [
+                'required',
+                Rule::unique('positions')->ignore($position->id)->where('sub_department_id', $subdept)
+            ]
         ]);
 
         // check if validation fails
@@ -89,9 +100,9 @@ class PositionController extends Controller
         }
 
         // update position
-        $position->update([
-            'name' => $request->name
-        ]);
+        $position->name = $request->name;
+        $position->subDepartment()->associate($subdept);
+        $position->save();
 
         // return success response
         return response()->json([

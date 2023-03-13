@@ -5,7 +5,7 @@
         <div class="card">
             <div class="card-header d-flex justify-content-between">
                 <div class="header-title">
-                    <h4 class="card-title">Employess</h4>
+                    <h4 class="card-title">{{ Auth::user()->employee->position->subDepartment->department->name }}'s Employess</h4>
                 </div>
             </div>
             <div class="card-body">
@@ -18,7 +18,6 @@
                                 <th>Name</th>
                                 <th>Position</th>
                                 <th>Sub Department</th>
-                                <th>Department</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -41,10 +40,9 @@
                 columns: [
                     {data: 'DT_RowIndex', name: 'DT_RowIndex'},
                     {data: 'nik', name: 'nik'},
-                    {data: 'name', name: 'name'},
+                    {data: 'employee', name: 'employee'},
                     {data: 'position', name: 'position'},
                     {data: 'subdept', name: 'subdept'},
-                    {data: 'dept', name: 'dept'},
                     {data: 'action', name: 'action', orderable: false, searchable: false},
                 ]
             });

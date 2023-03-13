@@ -41,7 +41,7 @@
                 responsive: true,
                 processing: true,
                 serverSide: true,
-                ajax: "{{ route('admin.subdepartments') }}",
+                ajax: "{{ route('dept.subdepartments') }}",
                 columns: [
                     {data: 'DT_RowIndex', name: 'DT_RowIndex'},
                     {data: 'name', name: 'name'},
@@ -54,7 +54,7 @@
             $('#btn-create-subdept').click(function(){
                 // fetch departments to select option
                 $.ajax({
-                    url: "{{ route('admin.subdepartments.getDepts') }}",
+                    url: "{{ route('dept.subdepartments.getDepts') }}",
                     type: "get",
                     cache: false,
                     success:function(response){
@@ -88,7 +88,7 @@
 
                 // ajax create
                 $.ajax({
-                    url: "{{ route('admin.subdepartments.store') }}",
+                    url: "{{ route('dept.subdepartments.store') }}",
                     type: "post",
                     cache: false,
                     data: {

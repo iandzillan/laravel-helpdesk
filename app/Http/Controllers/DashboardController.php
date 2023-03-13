@@ -15,10 +15,18 @@ class DashboardController extends Controller
         ]);
     }
 
-    public function approverHome()
+    public function deptHome()
     {
-        return view('approver.dashboard', [
-            'title' => 'Approver Dashboard - Helpdesk Ticketing system',
+        return view('approver1.dashboard', [
+            'title' => 'Dept Head Dashboard - Helpdesk Ticketing system',
+            'name'  => Auth::user()->employee->name
+        ]);
+    }
+
+    public function subdeptHome()
+    {
+        return view('approver2.dashboard', [
+            'title' => 'Sub Dept Head Dashboard - Helpdesk Ticketing system',
             'name'  => Auth::user()->employee->name
         ]);
     }

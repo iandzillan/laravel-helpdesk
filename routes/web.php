@@ -68,34 +68,42 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/admin/departments/{department}/edit', [DepartmentController::class, 'show'])->name('admin.departments.show');
         Route::patch('/admin/departments/{department}', [DepartmentController::class, 'update'])->name('admin.departments.update');
         Route::delete('/admin/departments/{department}', [DepartmentController::class, 'destroy'])->name('admin.departments.destroy');
-
-        Route::get('/admin/sub-departments', [SubDepartmentController::class, 'index'])->name('admin.subdepartments');
-        Route::get('/admin/sub-departments/depts', [SubDepartmentController::class, 'getDepts'])->name('admin.subdepartments.getDepts');
-        Route::post('/admin/sub-departments', [SubDepartmentController::class, 'store'])->name('admin.subdepartments.store');
-        Route::get('/admin/sub-departments/{subdept}/edit', [SubDepartmentController::class, 'show'])->name('admin.subdepartments.show');
-        Route::patch('/admin/sub-departments/{subdept}', [SubDepartmentController::class, 'update'])->name('admin.subdepartments.update');
-        Route::delete('/admin/sub-departments/{subdept}', [SubDepartmentController::class, 'destroy'])->name('admin.subdepartments.destroy');
     });
 
-    Route::group(['middleware' => ['role:Approver']], function () {
-        Route::get('/approver/dashboard', [DashboardController::class, 'approverHome'])->name('approver.dashboard');
+    Route::group(['middleware' => ['role:Approver1']], function () {
+        Route::get('/dept/dashboard', [DashboardController::class, 'deptHome'])->name('dept.dashboard');
 
-        Route::get('/approver/new-employee', [EmployeeController::class, 'index'])->name('approver.employees.index');
-        Route::get('/approver/new-employee/dept', [EmployeeController::class, 'getDepts'])->name('approver.employees.depts');
-        Route::get('/approver/new-employee/subdept', [EmployeeController::class, 'getSubDepts'])->name('approver.employees.subdepts');
-        Route::get('/approver/new-employee/position', [EmployeeController::class, 'getPositions'])->name('approver.employees.positions');
-        Route::post('/approver/new-employee', [EmployeeController::class, 'store'])->name('approver.employees.store');
+        Route::get('/dept/sub-departments', [SubDepartmentController::class, 'index'])->name('dept.subdepartments');
+        Route::get('/dept/sub-departments/depts', [SubDepartmentController::class, 'getDepts'])->name('dept.subdepartments.getDepts');
+        Route::post('/dept/sub-departments', [SubDepartmentController::class, 'store'])->name('dept.subdepartments.store');
+        Route::get('/dept/sub-departments/{subdept}/edit', [SubDepartmentController::class, 'show'])->name('dept.subdepartments.show');
+        Route::patch('/dept/sub-departments/{subdept}', [SubDepartmentController::class, 'update'])->name('dept.subdepartments.update');
+        Route::delete('/dept/sub-departments/{subdept}', [SubDepartmentController::class, 'destroy'])->name('dept.subdepartments.destroy');
+    });
 
-        Route::get('/approver/employees', [EmployeeController::class, 'list'])->name('approver.employees.list');
-        Route::get('/approver/employees/{employee}/edit', [EmployeeController::class, 'show'])->name('approver.employees.show');
-        Route::put('/approver/employees/update', [EmployeeController::class, 'update'])->name('approver.employees.update');
-        Route::delete('/approver/employees/{employee}', [EmployeeController::class, 'destroy'])->name('approver.employees.destroy');
+    Route::group(['middleware' => ['role:Approver2']], function () {
+        Route::get('/subdept/dashboard', [DashboardController::class, 'subdeptHome'])->name('subdept.dashboard');
 
-        Route::get('/approver/user-request', [EmployeeController::class, 'userRequestList'])->name('approver.userrequestlist');
-        Route::get('/approver/user-request/{employee}', [EmployeeController::class, 'userRequest'])->name('approver.userrequest');
-        Route::patch('/approver/is-request', [EmployeeController::class, 'isRequest'])->name('approver.isRequest');
-        Route::get('/approver/send-request', [EmployeeController::class, 'sendRequest'])->name('approver.sendRequest');
+        Route::get('/subdept/new-employee', [EmployeeController::class, 'index'])->name('subdept.employees.index');
+        Route::get('/subdept/new-employee/dept', [EmployeeController::class, 'getDepts'])->name('subdept.employees.depts');
+        Route::get('/subdept/new-employee/subdept', [EmployeeController::class, 'getSubDepts'])->name('subdept.employees.subdepts');
+        Route::get('/subdept/new-employee/position', [EmployeeController::class, 'getPositions'])->name('subdept.employees.positions');
+        Route::post('/subdept/new-employee', [EmployeeController::class, 'store'])->name('subdept.employees.store');
 
-        Route::get('/approver/positions', [PositionController::class, 'index'])->name('approver.positions');
+        Route::get('/subdept/employees', [EmployeeController::class, 'list'])->name('subdept.employees.list');
+        Route::get('/subdept/employees/{employee}/edit', [EmployeeController::class, 'show'])->name('subdept.employees.show');
+        Route::put('/subdept/employees/update', [EmployeeController::class, 'update'])->name('subdept.employees.update');
+        Route::delete('/subdept/employees/{employee}', [EmployeeController::class, 'destroy'])->name('subdept.employees.destroy');
+
+        Route::get('/subdept/user-request', [EmployeeController::class, 'userRequestList'])->name('subdept.userrequestlist');
+        Route::get('/subdept/user-request/{employee}', [EmployeeController::class, 'userRequest'])->name('subdept.userrequest');
+        Route::patch('/subdept/is-request', [EmployeeController::class, 'isRequest'])->name('subdept.isRequest');
+        Route::get('/subdept/send-request', [EmployeeController::class, 'sendRequest'])->name('subdept.sendRequest');
+
+        Route::get('/subdept/positions', [PositionController::class, 'index'])->name('subdept.positions');
+        Route::post('/subdept/positions', [PositionController::class, 'store'])->name('subdept.positions.store');
+        Route::get('/subdept/positions/{position}/edit', [PositionController::class, 'show'])->name('subdept.positions.show');
+        Route::patch('/subdept/positions/{position}', [PositionController::class, 'update'])->name('subdept.positions.update');
+        Route::delete('/subdept/positions/{position}', [PositionController::class, 'destroy'])->name('subdept.positions.destroy');
     });
 });

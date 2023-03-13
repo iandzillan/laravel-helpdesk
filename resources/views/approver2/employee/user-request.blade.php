@@ -79,6 +79,20 @@
             $('#request').click(function(e){
                 e.preventDefault();
 
+                // show loader
+                // $('#myloader').show();
+                Swal.fire({
+                    title: "Please wait",
+                    text: "Sending request...",
+                    showConfirmButton: false,
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    allowEnterKey: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
                 // define variable
                 let nik = $('#nik').val();
                 let name = $('#name').val();
@@ -89,7 +103,7 @@
                 let role = $('#role').val();
                 let token = $('meta[name="csrf-token"]').attr('content');
 
-                // ajax send request
+                // ajax update isRequest
                 $.ajax({
                     url: "{{ route('approver.isRequest') }}",
                     type: 'patch',
@@ -119,17 +133,33 @@
                                 'password_confirmation': confirm,
                                 'role': role,
                             },
-                            success:function(response){
-                                console.log(response.message);
-                            }
-                        });
+                            success:function(response1){
+                                console.log(response1.message);
 
-                        // show message
-                        Swal.fire({
-                            icon: 'success',
-                            title: `${response.message}`,
-                            showConfirmButton: false,
-                            timer: 2000
+                                // hide loader
+                                // $('#myloader').hide();
+
+                                // show message
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: `${response1.message}`,
+                                    showConfirmButton: false,
+                                    timer: 2000
+                                });
+                            },
+                            error:function(error1){
+                                console.log(error1.responseJSON.message);
+                                // hide loader
+                                // $('#myloader').hide();
+
+                                // show message
+                                Swal.fire({
+                                    icon: 'warning',
+                                    title: "Can't send user account email request",
+                                    text: `${error1.responseJSON.message}`,
+                                    showConfirmButton: false,
+                                });
+                            }
                         });
 
                         // close modal
@@ -139,6 +169,15 @@
                         table.draw();
                     }, 
                     error:function(error){
+                        // hide loader
+                        // $('#myloader').hide();
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Please check again', 
+                            showConfirmButton: false,
+                            timer: 1000
+                        });
+
                         // check if email field has error
                         if (error.responseJSON.email) {
                             // show alert

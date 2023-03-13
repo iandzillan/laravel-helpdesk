@@ -47,6 +47,9 @@
     <link rel="stylesheet" href="{{asset('assets/vendor/bootstrap-select2/css/select2.min.css')}}" />
     <link rel="stylesheet" href="{{asset('assets/vendor/bootstrap-select2/css/select2-bootstrap-5-theme.min.css')}}" />
     <script src="{{asset('assets/vendor/bootstrap-select2/js/select2.full.min.js')}}"></script>
+
+    {{-- lodaing css --}}
+    <link rel="stylesheet" href="{{asset('assets/css/loading.css')}}">
 </head>
 
 <body>
@@ -56,6 +59,8 @@
             <div class="loader-body"></div>
         </div>    
     </div>
+
+    <div id='myloader'></div>
     <!-- loader END -->
 
     {{-- Sidebar Star --}}

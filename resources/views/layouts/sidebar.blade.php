@@ -32,8 +32,11 @@
                 @if (Auth::user()->role == 'Admin')
                     <a class="nav-link {{(request()->segment(2) == 'dashboard') ? 'active' : ''}}" aria-current="page" href="{{route('admin.dashboard')}}">
                 @endif
-                @if (Auth::user()->role == 'Approver')
-                    <a class="nav-link {{(request()->segment(2) == 'dashboard') ? 'active' : ''}}" aria-current="page" href="{{route('approver.dashboard')}}">
+                @if (Auth::user()->role == 'Approver1')
+                    <a class="nav-link {{(request()->segment(2) == 'dashboard') ? 'active' : ''}}" aria-current="page" href="{{route('dept.dashboard')}}">
+                @endif
+                @if (Auth::user()->role == 'Approver2')
+                    <a class="nav-link {{(request()->segment(2) == 'dashboard') ? 'active' : ''}}" aria-current="page" href="{{route('subdept.dashboard')}}">
                 @endif
                 @if (Auth::user()->role == 'User')
                     <a class="nav-link {{(request()->segment(2) == 'dashboard') ? 'active' : ''}}" aria-current="page" href="{{route('user.dashboard')}}">
@@ -55,7 +58,10 @@
                 @if (Auth::user()->role == 'Admin')
                     <a class="nav-link {{(request()->segment(2) == 'all-tickets') ? 'active' : ''}}" aria-current="page" href="#">
                 @endif
-                @if (Auth::user()->role == 'Approver')
+                @if (Auth::user()->role == 'Approver1')
+                    <a class="nav-link {{(request()->segment(2) == 'all-tickets') ? 'active' : ''}}" aria-current="page" href="#">
+                @endif
+                @if (Auth::user()->role == 'Approver2')
                     <a class="nav-link {{(request()->segment(2) == 'all-tickets') ? 'active' : ''}}" aria-current="page" href="#">
                 @endif
                 @if (Auth::user()->role == 'User')
@@ -75,7 +81,10 @@
                 @if (Auth::user()->role == 'Admin')
                     <a class="nav-link {{(request()->segment(2) == 'new-tickets') ? 'active' : ''}}" aria-current="page" href="#">
                 @endif
-                @if (Auth::user()->role == 'Approver')
+                @if (Auth::user()->role == 'Approver1')
+                    <a class="nav-link {{(request()->segment(2) == 'new-tickets') ? 'active' : ''}}" aria-current="page" href="#">
+                @endif
+                @if (Auth::user()->role == 'Approver2')
                     <a class="nav-link {{(request()->segment(2) == 'new-tickets') ? 'active' : ''}}" aria-current="page" href="#">
                 @endif
                 @if (Auth::user()->role == 'User')
@@ -106,7 +115,10 @@
                 @if (Auth::user()->role == 'Admin')
                     <a class="nav-link {{(request()->segment(2) == 'onwork-tickets') ? 'active' : ''}}" aria-current="page" href="#" title="On Work Ticket">
                 @endif
-                @if (Auth::user()->role == 'Approver')
+                @if (Auth::user()->role == 'Approver1')
+                    <a class="nav-link {{(request()->segment(2) == 'onwork-tickets') ? 'active' : ''}}" aria-current="page" href="#" title="On Work Ticket">
+                @endif
+                @if (Auth::user()->role == 'Approver2')
                     <a class="nav-link {{(request()->segment(2) == 'onwork-tickets') ? 'active' : ''}}" aria-current="page" href="#" title="On Work Ticket">
                 @endif
                         <i class="icon">
@@ -120,7 +132,10 @@
                 @if (Auth::user()->role == 'Admin')
                     <a class="nav-link {{(request()->segment(2) == 'complete-tickets') ? 'active' : ''}}" aria-current="page" href="#" title="Completed Ticket">
                 @endif
-                @if (Auth::user()->role == 'Approver')
+                @if (Auth::user()->role == 'Approver1')
+                    <a class="nav-link {{(request()->segment(2) == 'complete-tickets') ? 'active' : ''}}" aria-current="page" href="#" title="Completed Ticket">
+                @endif
+                @if (Auth::user()->role == 'Approver2')
                     <a class="nav-link {{(request()->segment(2) == 'complete-tickets') ? 'active' : ''}}" aria-current="page" href="#" title="Completed Ticket">
                 @endif
                         <i class="icon">
@@ -134,7 +149,10 @@
                 @if (Auth::user()->role == 'Admin')
                     <a class="nav-link {{(request()->segment(2) == 'reject-tickets') ? 'active' : ''}}" aria-current="page" href="#" title="Rejected Ticket">
                 @endif
-                @if (Auth::user()->role == 'Approver')
+                @if (Auth::user()->role == 'Approver1')
+                    <a class="nav-link {{(request()->segment(2) == 'reject-tickets') ? 'active' : ''}}" aria-current="page" href="#" title="Rejected Ticket">
+                @endif
+                @if (Auth::user()->role == 'Approver2')
                     <a class="nav-link {{(request()->segment(2) == 'reject-tickets') ? 'active' : ''}}" aria-current="page" href="#" title="Rejected Ticket">
                 @endif
                         <i class="icon">
@@ -145,7 +163,7 @@
                 </li>
                 
                 @if (Auth::user()->role == 'Admin')
-                    <li><hr class="hr-horizontal" /></li>
+                    <li><hr class="hr-horizontal"></li>
                     <li class="nav-item static-item">
                         <a class="nav-link static-item disabled" href="#" tabindex="-1">
                             <span class="default-icon">Ticket Management</span>
@@ -205,9 +223,19 @@
                             <span class="item-name">Departments</span>
                         </a>
                     </li>
+                    <br>
+                @endif
 
+                @if (Auth::user()->role == 'Approver1')
+                    <li><hr class="hr-horizontal"></li>
+                    <li class="nav-item static-item">
+                        <a class="nav-link static-item disabled" href="#" tabindex="-1">
+                            <span class="default-icon">Personel Management</span>
+                            <span class="mini-icon">-</span>
+                        </a>
+                    </li>
                     <li class="nav-item">
-                        <a class="nav-link {{(request()->segment(2) == 'sub-departments') ? 'active' : ''}}" aria-current="page" href="{{route('admin.subdepartments')}}">
+                        <a class="nav-link {{(request()->segment(2) == 'sub-departments') ? 'active' : ''}}" aria-current="page" href="{{route('dept.subdepartments')}}">
                             <i class="icon">
                                 <i class="fa-solid fa-code-fork"></i>
                             </i>
@@ -217,7 +245,7 @@
                     <br>
                 @endif
 
-                @if (Auth::user()->role == 'Approver')
+                @if (Auth::user()->role == 'Approver2')
                     <li><hr class="hr-horizontal" /></li>
                     <li class="nav-item static-item">
                         <a class="nav-link static-item disabled" href="#" tabindex="-1">
@@ -250,6 +278,15 @@
                                 <i class="fa-solid fa-chalkboard-user"></i>
                             </i>
                             <span class="item-name">Account Request</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link {{(request()->segment(2) == 'positions') ? 'active' : ''}}" aria-current="page" href="{{ route('approver.positions') }}">
+                            <i class="icon">
+                                <i class="fa-solid fa-sitemap"></i>
+                            </i>
+                            <span class="item-name">Positions</span>
                         </a>
                     </li>
                     <br>

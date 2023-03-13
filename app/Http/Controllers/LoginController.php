@@ -23,7 +23,7 @@ class LoginController extends Controller
     public function loginProcess(Request $request)
     {
         // set validation
-        $this->validate($request,[
+        $this->validate($request, [
             'username' => 'required',
             'password' => 'required'
         ]);
@@ -33,8 +33,10 @@ class LoginController extends Controller
             // check role
             if (Auth::user()->role == 'Admin') {
                 return redirect()->route('admin.dashboard');
-            } elseif (Auth::user()->role == 'Approver') {
-                return redirect()->route('approver.dashboard');
+            } elseif (Auth::user()->role == 'Approver1') {
+                return redirect()->route('dept.dashboard');
+            } elseif (Auth::user()->role == 'Approver2') {
+                return redirect()->route('subdept.dashboard');
             } elseif (Auth::user()->role == 'User') {
                 return redirect()->route('user.dashboard');
             } elseif (Auth::user()->role == 'Technician') {

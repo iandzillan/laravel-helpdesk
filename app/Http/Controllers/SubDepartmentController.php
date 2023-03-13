@@ -13,7 +13,7 @@ class SubDepartmentController extends Controller
 {
     public function index(Request $request)
     {
-        $sub_departments = SubDepartment::latest()->get();
+        $sub_departments = SubDepartment::with('department')->where('department_id', Auth::user()->employee->position->subDepartment->department_id)->latest()->get();
 
         if ($request->ajax()) {
             return DataTables::of($sub_departments)

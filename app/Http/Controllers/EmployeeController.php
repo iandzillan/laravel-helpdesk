@@ -11,6 +11,7 @@ use App\Models\User;
 use App\Notifications\UserRequestNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
@@ -102,21 +103,18 @@ class EmployeeController extends Controller
 
     public function list(Request $request)
     {
-        $employees = Employee::latest()->get();
+        $dept_id = Auth::user()->employee->position->subDepartment->department_id;
+
+        $employees = DB::select("SELECT employees.nik AS nik, employees.name AS employee, positions.name AS position, sub_departments.name AS subdept FROM employees 
+                    JOIN positions ON positions.id = position_id 
+                    JOIN sub_departments ON sub_departments.id = positions.sub_department_id 
+                    JOIN departments ON departments.id = sub_departments.department_id 
+                    WHERE departments.id = $dept_id ORDER BY employees.id DESC");
 
         // draw table
         if ($request->ajax()) {
             return DataTables::of($employees)
                 ->addIndexColumn()
-                ->addColumn('dept', function ($row) {
-                    return $row->position->subDepartment->department->name;
-                })
-                ->addColumn('subdept', function ($row) {
-                    return $row->position->subDepartment->name;
-                })
-                ->addColumn('position', function ($row) {
-                    return $row->position->name;
-                })
                 ->addColumn('action', function ($row) {
                     $btn = '<a href="' . route('approver.employees.show', $row->nik) . '" class="btn btn-primary btn-sm" title="Edit this employee"> <i class="fa-solid fa-pen-to-square"></i> </a>';
                     $btn = $btn . ' ' . '<a href="javascript:void(0)" id="btn-delete-employee" data-id="' . $row->nik . '" class="btn btn-danger btn-sm" title="Delete this employee"> <i class="fa-solid fa-eraser"></i> </a>';
@@ -298,7 +296,7 @@ class EmployeeController extends Controller
         // return success response
         return response()->json([
             'success' => true,
-            'message' => 'User account request has been sended',
+            'message' => 'The employee data has been updated',
             'data'    => $employee
         ]);
     }
@@ -319,7 +317,7 @@ class EmployeeController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Email has been sended'
+            'message' => 'User account request has been sended'
         ]);
     }
 }

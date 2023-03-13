@@ -23,4 +23,9 @@ class SubDepartment extends Model
     {
         return $this->belongsTo('App\Models\Department');
     }
+
+    public function employees()
+    {
+        return $this->hasManyThrough('App\Models\Employee', 'App\Models\Position');
+    }
 }

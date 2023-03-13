@@ -20,7 +20,8 @@ class UserSeeder extends Seeder
 
         $role = [
             'Admin',
-            'Approver',
+            'Approver1',
+            'Approver2',
             'User',
             'Technician',
         ];

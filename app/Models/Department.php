@@ -15,4 +15,9 @@ class Department extends Model
     {
         return $this->hasMany('App\Models\SubDepartment');
     }
+
+    public function positions()
+    {
+        return $this->hasManyThrough('App\Models\Position', 'App\Models\SubDepartment');
+    }
 }

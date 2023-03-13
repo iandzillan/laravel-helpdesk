@@ -12,7 +12,7 @@ class UserController extends Controller
     public function index(Request $request)
     {
         // get all user
-        $users = User::latest()->get();
+        $users = User::orderBy('role', 'ASC')->get();
 
         // draw table
         if ($request->ajax()) {
@@ -28,11 +28,14 @@ class UserController extends Controller
                     if ($row->role == 'Admin') {
                         $role = '<span class="badge bg-primary">' . $row->role . '</span>';
                     }
-                    if ($row->role == 'Approver') {
+                    if ($row->role == 'Approver1') {
                         $role = '<span class="badge bg-info">' . $row->role . '</span>';
                     }
-                    if ($row->role == 'User') {
+                    if ($row->role == 'Approver2') {
                         $role = '<span class="badge bg-success">' . $row->role . '</span>';
+                    }
+                    if ($row->role == 'User') {
+                        $role = '<span class="badge bg-secondary">' . $row->role . '</span>';
                     }
                     if ($row->role == 'Technician') {
                         $role = '<span class="badge bg-warning">' . $row->role . '</span>';
