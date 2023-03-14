@@ -17,8 +17,6 @@
                                 <th>NIK</th>
                                 <th>Name</th>
                                 <th>Position</th>
-                                <th>Sub Department</th>
-                                <th>Department</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -30,7 +28,7 @@
         </div>
     </div>
 
-    @include('approver.employee.modal-user-request')
+    @include('approver2.employee.modal-user-request')
 
     <script>
         $(document).ready(function(){
@@ -39,14 +37,12 @@
                 responsive: true,
                 processing: true,
                 serverSide: true,
-                ajax: "{{ route('approver.userrequestlist') }}",
+                ajax: "{{ route('subdept.userrequestlist') }}",
                 columns: [
                     {data: 'DT_RowIndex', name: 'DT_RowIndex'},
                     {data: 'nik', name: 'nik'},
                     {data: 'name', name: 'name'},
                     {data: 'position', name: 'position'},
-                    {data: 'subdept', name: 'subdept'},
-                    {data: 'dept', name: 'dept'},
                     {data: 'action', name: 'action', orderable: false, searchable: false},
                 ]
             });
@@ -105,7 +101,7 @@
 
                 // ajax update isRequest
                 $.ajax({
-                    url: "{{ route('approver.isRequest') }}",
+                    url: "{{ route('subdept.isRequest') }}",
                     type: 'patch',
                     cache: false,
                     data: {
@@ -121,7 +117,7 @@
                     success:function(response){
                         // ajax send email
                         $.ajax({
-                            url: "{{route('approver.sendRequest')}}",
+                            url: "{{route('subdept.sendRequest')}}",
                             type: "get",
                             cache: false,
                             data:{

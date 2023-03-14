@@ -17,7 +17,7 @@
                                 <div class="col-xl-6 col-lg-6">
                                     <div class="form-group">
                                         <div class="profile-img-edit position relative mb-3">
-                                            <img src="{{ asset('storage/uploads/photo-profile/avtar_1.png') }}" id="employee-image-preview" alt="profile-pic" class="theme-color-default-img profile-pic rounded avatar-100">
+                                            <img src="{{ asset('assets/images/avatars/avtar_1.png') }}" id="employee-image-preview" alt="profile-pic" class="theme-color-default-img profile-pic rounded avatar-100">
                                         </div>
                                         <input type="file" class="form-control" id="employee-image" name="image">
                                         <div class="invalid-feedback d-none" role="alert" id="alert-employee-image"></div>
@@ -127,7 +127,9 @@
                         });
                         
                         // reload page
-                        location.reload();
+                        setTimeout(() => {
+                            location.reload();
+                        }, 2000);
                     },
                     error:function(error){
                         // show message

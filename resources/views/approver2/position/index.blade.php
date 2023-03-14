@@ -5,7 +5,7 @@
         <div class="card">
             <div class="card-header d-flex justify-content-between">
                 <div class="header-title">
-                    <h4 class="card-title">Positions</h4>
+                    <h4 class="card-title">{{ Auth::user()->employee->position->subDepartment->name }}'s Position List</h4>
                 </div>
                 <a href="javascript:void(0)" class="btn btn-primary mb-2" id="btn-create-position">
                     <i class="fa-solid fa-folder-plus"></i>
@@ -31,8 +31,8 @@
         </div>
     </div>
 
-    @include('approver.position.modal-create')
-    @include('approver.position.modal-edit')
+    @include('approver2.position.modal-create')
+    @include('approver2.position.modal-edit')
 
     <script>
         $(document).ready(function(){
@@ -41,7 +41,7 @@
                 responsive: true,
                 processing: true,
                 serverSide: true,
-                ajax: "{{ route('approver.positions') }}",
+                ajax: "{{ route('subdept.positions') }}",
                 columns: [
                     {data: 'DT_RowIndex', name: 'DT_RowIndex'},
                     {data: 'name', name: 'name'},
@@ -82,7 +82,7 @@
 
                 // run ajax create
                 $.ajax({
-                    url: "{{ route('approver.positions.store') }}",
+                    url: "{{ route('subdept.positions.store') }}",
                     type: "post",
                     cache: false,
                     data: {
@@ -112,8 +112,6 @@
                             showConfirmButton: false,
                             timer: 1000
                         });
-
-                        console.log(error.responseJSON);
 
                         // check if name field which has error
                         if (error.responseJSON.name) {
@@ -212,8 +210,6 @@
                             showConfirmButton: false,
                             timer: 1000
                         });
-
-                        console.log(error.responseJSON.message);
 
                         // check if name field has error
                         if (error.responseJSON.name) {

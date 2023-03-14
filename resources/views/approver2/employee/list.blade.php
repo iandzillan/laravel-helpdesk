@@ -5,7 +5,7 @@
         <div class="card">
             <div class="card-header d-flex justify-content-between">
                 <div class="header-title">
-                    <h4 class="card-title">{{ Auth::user()->employee->position->subDepartment->department->name }}'s Employess</h4>
+                    <h4 class="card-title">{{ Auth::user()->employee->position->subDepartment->name }}'s Employess</h4>
                 </div>
             </div>
             <div class="card-body">
@@ -17,7 +17,6 @@
                                 <th>NIK</th>
                                 <th>Name</th>
                                 <th>Position</th>
-                                <th>Sub Department</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -36,13 +35,12 @@
                 responsive: true,
                 processing: true,
                 serverSide: true,
-                ajax: "{{ route('approver.employees.list') }}",
+                ajax: "{{ route('subdept.employees.list') }}",
                 columns: [
                     {data: 'DT_RowIndex', name: 'DT_RowIndex'},
                     {data: 'nik', name: 'nik'},
-                    {data: 'employee', name: 'employee'},
+                    {data: 'name', name: 'name'},
                     {data: 'position', name: 'position'},
-                    {data: 'subdept', name: 'subdept'},
                     {data: 'action', name: 'action', orderable: false, searchable: false},
                 ]
             });
@@ -63,6 +61,19 @@
                     confirmButtonText: 'Yes'
                 }).then((result) => {
                     if(result.isConfirmed){
+                        // show loading
+                        Swal.fire({
+                            title: 'Please wait',
+                            text: 'Sending request...',
+                            showConfirmButton: false,
+                            allowOutsideClick: false,
+                            allowEscapeKey: false, 
+                            allowEnterKey: false,
+                            didOpen: ()=>{
+                                Swal.showLoading();
+                            }
+                        });
+
                         // ajax delete
                         $.ajax({
                             url: `employees/${nik}`,

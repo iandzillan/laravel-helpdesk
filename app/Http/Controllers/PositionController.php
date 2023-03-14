@@ -34,7 +34,7 @@ class PositionController extends Controller
                 ->make(true);
         }
 
-        return view('approver.position.index', [
+        return view('approver2.position.index', [
             'title' => 'Positions - Helpdesk Ticketing System',
             'name'  => Auth::user()->employee->name
         ]);
@@ -47,7 +47,10 @@ class PositionController extends Controller
 
         // set validation
         $validator = Validator::make($request->all(), [
-            'name' => 'required|unique:positions,name,NULL,id,sub_department_id,' . $subdept
+            'name' => [
+                'required',
+                Rule::unique('positions')->where('sub_department_id', $subdept)
+            ]
         ]);
 
         // check if validation fails

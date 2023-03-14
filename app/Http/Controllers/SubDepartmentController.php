@@ -19,7 +19,7 @@ class SubDepartmentController extends Controller
         if ($request->ajax()) {
             return DataTables::of($sub_departments)
                 ->addIndexColumn()
-                ->addColumn('total', function($row){
+                ->addColumn('total', function ($row) {
                     return $row->employees_count;
                 })
                 ->addColumn('action', function ($row) {
@@ -31,7 +31,7 @@ class SubDepartmentController extends Controller
                 ->make(true);
         }
 
-        return view('admin.subdepartment.index', [
+        return view('approver1.subdepartment.index', [
             'title' => 'Sub Departments - Helpdesk Ticketing System',
             'name'  => Auth::user()->employee->name,
         ]);
@@ -82,7 +82,7 @@ class SubDepartmentController extends Controller
     public function update(Request $request, SubDepartment $subdept)
     {
         // get dept id
-        $dept = Auth::user()->employee->position->subDepartment->department_id; 
+        $dept = Auth::user()->employee->position->subDepartment->department_id;
 
         // set validation
         $validator = Validator::make($request->all(), [

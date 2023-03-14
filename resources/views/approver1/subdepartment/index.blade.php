@@ -31,8 +31,8 @@
         </div>
     </div>
 
-    @include('admin.subdepartment.modal-create')
-    @include('admin.subdepartment.modal-edit')
+    @include('approver1.subdepartment.modal-create')
+    @include('approver1.subdepartment.modal-edit')
 
     <script>
         $(function(){

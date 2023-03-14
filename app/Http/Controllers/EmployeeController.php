@@ -83,20 +83,19 @@ class EmployeeController extends Controller
 
     public function list(Request $request)
     {
-        $dept_id = Auth::user()->employee->position->subDepartment->department_id;
-
-        $employees = DB::select("SELECT employees.nik AS nik, employees.name AS employee, positions.name AS position, sub_departments.name AS subdept FROM employees 
-                    JOIN positions ON positions.id = position_id 
-                    JOIN sub_departments ON sub_departments.id = positions.sub_department_id 
-                    JOIN departments ON departments.id = sub_departments.department_id 
-                    WHERE departments.id = $dept_id ORDER BY employees.id DESC");
+        // query has many through employees
+        $subdept =  SubDepartment::where('id', Auth::user()->employee->position->sub_department_id)->first();
+        $employees = $subdept->employees->sortByDesc('id');
 
         // draw table
         if ($request->ajax()) {
             return DataTables::of($employees)
                 ->addIndexColumn()
+                ->addColumn('position', function ($row) {
+                    return $row->position->name;
+                })
                 ->addColumn('action', function ($row) {
-                    $btn = '<a href="' . route('approver.employees.show', $row->nik) . '" class="btn btn-primary btn-sm" title="Edit this employee"> <i class="fa-solid fa-pen-to-square"></i> </a>';
+                    $btn = '<a href="' . route('subdept.employees.show', $row->nik) . '" class="btn btn-primary btn-sm" title="Edit this employee"> <i class="fa-solid fa-pen-to-square"></i> </a>';
                     $btn = $btn . ' ' . '<a href="javascript:void(0)" id="btn-delete-employee" data-id="' . $row->nik . '" class="btn btn-danger btn-sm" title="Delete this employee"> <i class="fa-solid fa-eraser"></i> </a>';
                     return $btn;
                 })
@@ -105,7 +104,7 @@ class EmployeeController extends Controller
         }
 
         // return to view
-        return view('approver.employee.list', [
+        return view('approver2.employee.list', [
             'title' => 'List Employess - Helpdesk Ticketing System',
             'name'  => Auth::user()->employee->name
         ]);
@@ -117,7 +116,7 @@ class EmployeeController extends Controller
         $employee = Employee::where('nik', $employee)->first();
 
         // return view
-        return view('approver.employee.edit', [
+        return view('approver2.employee.edit', [
             'title'    => "$employee->name - Helpdesk Ticketing System",
             'name'     => Auth::user()->employee->name,
             'employee' => $employee
@@ -134,8 +133,6 @@ class EmployeeController extends Controller
             'name'        => 'required',
             'position_id' => 'required',
             'image'       => 'sometimes|image|mimes:jpeg,png,jpg|max:1024',
-            'dept'        => 'required',
-            'subdept'     => 'required',
         ]);
 
         // check if validation fails
@@ -185,7 +182,7 @@ class EmployeeController extends Controller
         // get employee
         $employee = Employee::where('nik', $employee)->first();
 
-        // check if employee use deafult profile
+        // check if employee not use deafult profile
         if ($employee->image != 'avtar_1.png') {
             // delete employe photo profile
             Storage::delete("public/uploads/photo-profile/$employee->image");
@@ -203,8 +200,9 @@ class EmployeeController extends Controller
 
     public function userRequestList(Request $request)
     {
-        // get employe who haven't have user account
-        $employees = Employee::where('isRequest', 0)->latest()->get();
+        // query has many through employees
+        $subdept =  SubDepartment::where('id', Auth::user()->employee->position->sub_department_id)->first();
+        $employees = $subdept->employees->where('isRequest', 0)->sortByDesc('id');
 
         // draw table
         if ($request->ajax()) {
@@ -212,12 +210,6 @@ class EmployeeController extends Controller
                 ->addIndexColumn()
                 ->addColumn('position', function ($row) {
                     return $row->position->name;
-                })
-                ->addColumn('subdept', function ($row) {
-                    return $row->position->subDepartment->name;
-                })
-                ->addColumn('dept', function ($row) {
-                    return $row->position->subDepartment->department->name;
                 })
                 ->addColumn('action', function ($row) {
                     $btn = '<a href="javascript:void(0)" id="user-request-button" data-id="' . $row->nik . '" class="btn btn-primary btn-sm" title="Request user account"><i class="fa-solid fa-user-plus"></i></a>';
@@ -228,7 +220,7 @@ class EmployeeController extends Controller
         }
 
         // return view
-        return view('approver.employee.user-request', [
+        return view('approver2.employee.user-request', [
             'title' => 'User Account Request - Helpdesk Ticketing System',
             'name'  => Auth::user()->employee->name
         ]);
