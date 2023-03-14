@@ -23,7 +23,7 @@ class EmployeeSeeder extends Seeder
                 'name'          => $faker->firstName . " " . $faker->lastName,
                 'position_id'   => $faker->numberBetween(1, Position::count()),
                 'image'         => 'avtar_1.png',
-                'isRequest'     => 1
+                'isRequest'     => 2
             ]);
         }
     }

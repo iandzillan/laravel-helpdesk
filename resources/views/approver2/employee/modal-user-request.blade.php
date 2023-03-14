@@ -18,7 +18,10 @@
                     </div>
                     <div class="form-group">
                         <label for="email">Email</label>
-                        <input type="email" class="form-control bg-white" id="email" name="email">
+                        <div class="input-group mb-3">
+                            <input type="text" class="form-control" name="email" id="email"> 
+                            <span class="input-group-text" id="basic-addon2">@example.com</span>
+                        </div>
                         <div class="invalid-feedback d-none" role="alert" id="alert-email"></div>
                     </div>
                     <div class="form-group">

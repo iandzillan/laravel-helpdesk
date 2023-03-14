@@ -92,7 +92,7 @@
                 // define variable
                 let nik = $('#nik').val();
                 let name = $('#name').val();
-                let email = $('#email').val();
+                let email = $('#email').val() + '@example.com';
                 let username = $('#username').val();
                 let password = $('#password').val();
                 let confirm = $('#confirm').val();
