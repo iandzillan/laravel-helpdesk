@@ -1,5 +1,5 @@
 {{-- Modal edit --}}
-<div class="modal fade" id="modal-edit-category" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal fade" id="modal-edit" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -11,7 +11,7 @@
 
                 <div class="form-group">
                     <label for="category-name">Name</label>
-                    <input type="text" class="form-control bg-white" id="category-name-edit">
+                    <input type="text" class="form-control" id="category-name-edit">
                     <div class="invalid-feedback d-none" role="alert" id="alert-category-name-edit"></div>
                 </div>
             </div>

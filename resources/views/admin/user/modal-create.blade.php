@@ -23,7 +23,7 @@
                             <label for="email" class="form-label">Email</label>
                             <div class="input-group mb-3">
                                 <input type="text" class="form-control" placeholder="Email..." name="email" id="email"> 
-                                <span class="input-group-text" id="basic-addon2">@example.com</span>
+                                <span class="input-group-text" id="domain-name">@example.com</span>
                             </div>
                             <div class="invalid-feedback d-none" role="alert" id="alert-email"></div>
                         </div>
@@ -38,7 +38,7 @@
                             <div class="invalid-feedback d-none" role="alert" id="alert-password"></div>
                         </div>
                         <div class="form-group col-md-6">
-                            <label for="password_confirmation" class="form-label">Confirm Password</label>
+                            <label for="password-confirm" class="form-label">Confirm Password</label>
                             <input type="password" class="form-control" id="password-confirm" name="password_confirmation" placeholder="Re-type password...">
                             <div class="invalid-feedback d-none" role="alert" id="alert-password-confirm"></div>
                         </div>

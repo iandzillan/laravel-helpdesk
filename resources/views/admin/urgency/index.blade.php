@@ -36,7 +36,6 @@
 
     <script>
         $(function(){
-
             // draw table
             let table = $('.data-table').DataTable({
                 responsive: true,
@@ -53,11 +52,8 @@
 
             // add urgency button event
             $('body').on('click', '#btn-create-urgency', function(){
-                // reset form when modal opened
-                $('#form-create-urgency').trigger('reset');
-
                 // show modal create
-                $('#modal-create-urgency').modal('show');
+                $('#modal-create').modal('show');
             })
 
             // store urgency button event
@@ -68,6 +64,19 @@
                 let name        = $('#urgency-name').val();
                 let duration    = $('#urgency-hours').val();
                 let token       = $('meta[name="csrf-token"]').attr('content');
+
+                // show loading
+                Swal.fire({
+                    title: 'Please wait',
+                    text: 'Sending request...',
+                    showConfirmButton: false,
+                    allowOutsideClick: false,
+                    allowEnterKey: false,
+                    allowEscapeKey: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
 
                 // ajax create
                 $.ajax({
@@ -85,19 +94,36 @@
                             icon: 'success',
                             title: `${response.message}`,
                             showConfirmButton: false,
-                            timer: 3000
+                            timer: 2000
                         });
 
-                        // close modal
-                        $('#modal-create-urgency').modal('hide');
-
                         // clear form
-                        $('#form-create-urgency')[0].reset();
+                        $('#form-create-urgency').trigger('reset');
+
+                        // clear alert
+                        $('#urgency-name').removeClass('is-invalid');
+                        $('#alert-urgency-name').addClass('d-none');
+                        $('#alert-urgency-name').removeClass('d-block');
+                        $('#urgency-hours').removeClass('is-invalid');
+                        $('#alert-urgency-hours').addClass('d-none');
+                        $('#alert-urgency-hours').removeClass('d-block');
+
+                        // close modal
+                        $('#modal-create').modal('hide');
 
                         // draw table
                         table.draw();
                     }, 
                     error:function(error){
+                        // show success message
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Something wrong',
+                            text: 'Please check again',
+                            showConfirmButton:false,
+                            timer:1000
+                        });
+
                         // check if urgency name error
                         if (error.responseJSON.name) {
                             // show alert
@@ -107,6 +133,11 @@
 
                             // show message alert
                             $('#alert-urgency-name').html(error.responseJSON.name);
+                        } else {
+                            // remove alert
+                            $('#urgency-name').removeClass('is-invalid');
+                            $('#alert-urgency-name').addClass('d-none');
+                            $('#alert-urgency-name').removeClass('d-block');
                         }
 
                         // check if urgency duration error
@@ -118,6 +149,11 @@
 
                             // show message alert
                             $('#alert-urgency-hours').html(error.responseJSON.hours);
+                        } else {
+                            // remove alert
+                            $('#urgency-hours').removeClass('is-invalid');
+                            $('#alert-urgency-hours').addClass('d-none');
+                            $('#alert-urgency-hours').removeClass('d-block');
                         }
                     }
                 });
@@ -140,13 +176,13 @@
                             $('#urgency-name-edit').val(response.data.name);
                             $('#urgency-hours-edit').val(response.data.hours);
                         } else {
-                            $('#form-edit-urgency')[0].reset();
+                            $('#form-edit-urgency').trigger('reset');
                         }
                     }
                 });
 
                 // show modal
-                $('#modal-edit-urgency').modal('show');
+                $('#modal-edit').modal('show');
             });
 
             // update urgency button event
@@ -158,6 +194,19 @@
                 let name  = $('#urgency-name-edit').val();
                 let hours = $('#urgency-hours-edit').val();
                 let token = $('meta[name="csrf-token"]').attr('content');
+
+                // show loading
+                Swal.fire({
+                    title: 'Please wait',
+                    text: 'Sending request...',
+                    showConfirmButton: false,
+                    allowOutsideClick: false,
+                    allowEnterKey: false,
+                    allowEscapeKey: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
                 
                 // ajax update 
                 $.ajax({
@@ -174,16 +223,36 @@
                             icon: "success", 
                             title: `${response.message}`,
                             showConfirmButton: false,
-                            timer: 3000
+                            timer: 2000
                         });
 
+                        // clear form
+                        $('#form-edit-urgency').trigger('reset');
+
+                        // clear alert
+                        $('#alert-urgency-name-edit').addClass('d-none');
+                        $('#alert-urgency-name-edit').removeClass('d-block');
+                        $('#urgency-name-edit').removeClass('is-invalid');
+                        $('#alert-urgency-hours-edit').addClass('d-none');
+                        $('#alert-urgency-hours-edit').removeClass('d-block');
+                        $('#urgency-hours-edit').removeClass('is-invalid');
+
                         // modal edit hide
-                        $('#modal-edit-urgency').modal('hide');
+                        $('#modal-edit').modal('hide');
 
                         // draw table
                         table.draw();
                     }, 
                     error:function(error){
+                        // show success message
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Something wrong',
+                            text: 'Please check again',
+                            showConfirmButton:false,
+                            timer:1000
+                        });
+
                         // check if name field error
                         if (error.responseJSON.name) {
                             // show alert
@@ -193,6 +262,11 @@
 
                             // show message
                             $('#alert-urgency-name-edit').html(error.responseJSON.name)
+                        } else {
+                            // remove alert
+                            $('#alert-urgency-name-edit').addClass('d-none');
+                            $('#alert-urgency-name-edit').removeClass('d-block');
+                            $('#urgency-name-edit').removeClass('is-invalid');
                         }
 
                         // check if duration field error
@@ -204,6 +278,11 @@
 
                             // show message
                             $('#alert-urgency-hours-edit').html(error.responseJSON.hours);
+                        } else {
+                            // remove alert
+                            $('#alert-urgency-hours-edit').addClass('d-none');
+                            $('#alert-urgency-hours-edit').removeClass('d-block');
+                            $('#urgency-hours-edit').removeClass('is-invalid');
                         }
                     }
                 });
@@ -224,6 +303,19 @@
                     confirmButtonText:"Yes"
                 }).then((result) => {
                     if (result.isConfirmed) {
+                        // show loading
+                        Swal.fire({
+                            title: 'Please wait',
+                            text: 'Sending request...',
+                            showConfirmButton: false,
+                            allowOutsideClick: false,
+                            allowEnterKey: false,
+                            allowEscapeKey: false,
+                            didOpen: () => {
+                                Swal.showLoading();
+                            }
+                        });
+                        
                         // ajax delete
                         $.ajax({
                             url: `urgencies/${id}`,

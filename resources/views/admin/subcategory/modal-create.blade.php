@@ -1,5 +1,5 @@
 {{-- Modal add --}}
-<div class="modal fade" id="modal-create-subcategory" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal fade" id="modal-create" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -10,12 +10,12 @@
                 <div class="modal-body">
                     <div class="form-group">
                         <label for="subcategory-name">Name</label>
-                        <input type="text" class="form-control bg-white" id="subcategory-name">
+                        <input type="text" class="form-control" id="subcategory-name">
                         <div class="invalid-feedback d-none" role="alert" id="alert-subcategory-name"></div>
                     </div>
                     <div class="form-group">
                         <label for="select-category-id">Category</label>
-                        <select id="subcategory-categoryid" name="category" class="form-select mb-3 bg-white shadow-none"></select>
+                        <select id="subcategory-categoryid" name="category" class="form-select mb-3 select2"></select>
                         <div class="invalid-feedback d-none" role="alert" id="alert-subcategory-categoryid"></div>
                     </div>
                 </div>

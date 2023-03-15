@@ -1,5 +1,5 @@
 {{-- Modal add --}}
-<div class="modal fade" id="modal-create-urgency" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal fade" id="modal-create" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -10,12 +10,12 @@
                 <div class="modal-body">
                     <div class="form-group">
                         <label for="urgency-name">Name</label>
-                        <input type="text" class="form-control bg-white" id="urgency-name">
+                        <input type="text" class="form-control" id="urgency-name">
                         <div class="invalid-feedback d-none" role="alert" id="alert-urgency-name"></div>
                     </div>
                     <div class="form-group">
                         <label for="urgency-hours">Duration</label>
-                        <input type="number" class="form-control bg-white" id="urgency-hours">
+                        <input type="number" class="form-control" id="urgency-hours">
                         <div class="invalid-feedback d-none" role="alert" id="alert-urgency-hours"></div>
                     </div>
                 </div>

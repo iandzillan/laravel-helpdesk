@@ -46,6 +46,14 @@
                 dropdownParent: $('#modal-create-user')
             });
 
+            // role-edit select
+            $('.select2-edit').select2({
+                theme: "bootstrap-5",
+                width: $(this).data('width') ? $(this).data('width') : $(this).hasClass('w-100') ? '100%' : 'style',
+                placeholder: $(this).data('placeholder'),
+                dropdownParent: $('#modal-edit-user')
+            }); 
+
             // draw table
             let table = $('.data-table').DataTable({
                 responsive: true,
@@ -114,7 +122,7 @@
                 // define variable
                 let employee_nik          = $('#employee').val();
                 let role                  = $('#role').val();
-                let email                 = $('#email').val() + '@example.com';
+                let email                 = $('#email').val() + $('#domain-name').text();
                 let username              = $('#username').val();
                 let password              = $('#password').val();
                 let password_confirmation = $('#password-confirm').val();
@@ -176,11 +184,11 @@
                         table.draw();
                     }, 
                     error:function(error){
-                        console.log(error.responseJSON.message);
                         // show message
                         Swal.fire({
                             icon: 'warning',
-                            title: 'Please check again',
+                            title: 'Something wrong',
+                            text: 'Please check carefully',
                             showConfirmButton: false,
                             timer: 1000
                         });
@@ -273,6 +281,194 @@
                             $('#password-confirm').removeClass('is-invalid');
                             $('#alert-password-confirm').removeClass('d-block');
                             $('#alert-password-confirm').addClass('d-none');
+                        }
+                    }
+                });
+            });
+
+            // edit button action
+            $('body').on('click', '#btn-edit-user', function(){
+                // get id
+                let id = $(this).data('id');
+
+                // ajax show
+                $.ajax({
+                    url: `users/${id}/edit`,
+                    type: 'get',
+                    cache: false,
+                    success:function(response){
+                        // fill form
+                        $('#id').val(id);
+                        $('#employee-edit').val(response.dataEmployee.nik + ' - ' + response.dataEmployee.name);
+                        $(`#role-edit option[value=${response.dataUser.role}]`).attr('selected', 'selected').change();
+                        $('#email-edit').val(response.dataUser.email.split('@')[0]);
+                        $('#username-edit').val(response.dataUser.username);
+                    }
+                });
+
+                // clear form
+                $('#form-edit-user').trigger('reset');
+
+                // show modal
+                $('#modal-edit-user').modal('show');
+            });
+
+            // update button action
+            $('body').on('click', '#update-user', function(e){
+                e.preventDefault();
+
+                // define variable
+                let id = $('#id').val();
+                let role = $('#role-edit').val();
+                let email = $('#email-edit').val() + $('#domain-name-edit').text();
+                let username = $('#username-edit').val();
+                let password = $('#password-edit').val();
+                let password_confirm = $('#password-confirm-edit').val();
+                let token = $('meta[name="csrf-token"]').attr('content');
+
+                // show loading
+                Swal.fire({
+                    title: 'Please wait',
+                    text: 'Sending request...',
+                    showConfirmButton: false,
+                    allowOutsideClick: false,
+                    allowEnterKey: false,
+                    allowEscapeKey: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                // Ajax update
+                $.ajax({
+                    url: `users/${id}`,
+                    type: 'patch',
+                    cache: false,
+                    data: {
+                        'role': role,
+                        'email': email,
+                        'username': username,
+                        'password': password,
+                        'password_confirmation': password_confirm,
+                        '_token': token
+                    },
+                    success:function(response){
+                        // show message
+                        Swal.fire({
+                            icon: 'success',
+                            title: `${response.message}`,
+                            showConfirmButton: false,
+                            timer: 2000
+                        });
+
+                        // clear form
+                        $('#form-edit-user').trigger('reset');
+
+                        // close modal
+                        $('#modal-edit-user').modal('hide');
+
+                        // draw table
+                        table.draw();
+                    },
+                    error:function(error){
+                        console.log(error.responseJSON.message);
+                        // show message
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Something wrong',
+                            text: 'Please check carefully',
+                            showConfirmButton: false,
+                            timer: 1000
+                        });
+
+                        // check if employee field has error
+                        if (error.responseJSON.employee) {
+                            // show alert
+                            $('#employee-edit').addClass('is-invalid');
+                            $('#alert-employee-edit').removeClass('d-none');
+                            $('#alert-employee-edit').addClass('d-block');
+                            // show message
+                            $('#alert-employee-edit').html(error.responseJSON.employee);
+                        } else {
+                            // remove alert
+                            $('#employee-edit').removeClass('is-invalid');
+                            $('#alert-employee-edit').removeClass('d-block');
+                            $('#alert-employee-edit').addClass('d-none');
+                        }
+
+                        // check if role field has error
+                        if (error.responseJSON.role) {
+                            // show alert
+                            $('#role-edit').addClass('is-invalid');
+                            $('#alert-role-edit').removeClass('d-none');
+                            $('#alert-role-edit').addClass('d-block');
+                            // show message
+                            $('#alert-role-edit').html(error.responseJSON.role);
+                        } else {
+                            // remove alert
+                            $('#role-edit').removeClass('is-invalid');
+                            $('#alert-role-edit').removeClass('d-block');
+                            $('#alert-role-edit').addClass('d-none');
+                        }
+
+                        // check if email field has error
+                        if (error.responseJSON.email) {
+                            // show alert
+                            $('#email-edit').addClass('is-invalid');
+                            $('#alert-email-edit').removeClass('d-none');
+                            $('#alert-email-edit').addClass('d-block');
+                            // show message
+                            $('#alert-email-edit').html(error.responseJSON.email);
+                        } else {
+                            // remove alert
+                            $('#email-edit').removeClass('is-invalid');
+                            $('#alert-email-edit').removeClass('d-block');
+                            $('#alert-email-edit').addClass('d-none');
+                        }
+
+                        // check if username field has error
+                        if (error.responseJSON.username) {
+                            // show alert
+                            $('#username-edit').addClass('is-invalid');
+                            $('#alert-username-edit').removeClass('d-none');
+                            $('#alert-username-edit').addClass('d-block');
+                            // show message
+                            $('#alert-username-edit').html(error.responseJSON.username);
+                        } else {
+                            // remove alert
+                            $('#username-edit').removeClass('is-invalid');
+                            $('#alert-username-edit').removeClass('d-block');
+                            $('#alert-username-edit').addClass('d-none');
+                        }
+
+                        // check if password field has error
+                        if (error.responseJSON.password) {
+                            // show alert
+                            $('#password-edit').addClass('is-invalid');
+                            $('#alert-password-edit').removeClass('d-none');
+                            $('#alert-password-edit').addClass('d-block');
+                            // show message
+                            $('#alert-password-edit').html(error.responseJSON.password);
+                        } else {
+                            // remove alert
+                            $('#password-edit').removeClass('is-invalid');
+                            $('#alert-password-edit').removeClass('d-block');
+                            $('#alert-password-edit').addClass('d-none');
+                        }
+
+                        // check if password-confirm field has error
+                        if (error.responseJSON.password_confirmation) {
+                            // show alert
+                            $('#password-confirm-edit').addClass('is-invalid');
+                            $('#alert-password-confirm-edit').removeClass('d-none');
+                            $('#alert-password-confirm-edit').addClass('d-block');
+                            // show message
+                            $('#alert-password-confirm-edit').html(error.responseJSON.password);
+                        } else {
+                            // remove alert
+                            $('#password-confirm-edit').removeClass('is-invalid');
+                            $('#alert-password-confirm-edit').removeClass('d-block');
+                            $('#alert-password-confirm-edit').addClass('d-none');
                         }
                     }
                 });

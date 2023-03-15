@@ -64,6 +64,19 @@
                 // define variable
                 let name  = $('#department-name').val();
                 let token = $('meta[name=csrf-token]').attr('content');
+
+                // show loading
+                Swal.fire({
+                    title: 'Please wait',
+                    text: 'Sending request...',
+                    showConfirmButton: false,
+                    allowOutsideClick: false,
+                    allowEnterKey: false,
+                    allowEscapeKey: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
                 
                 // ajax create
                 $.ajax({
@@ -80,7 +93,7 @@
                             icon: "success",
                             title: `${response.message}`,
                             showConfirmButton: false,
-                            timer: 3000
+                            timer: 2000
                         });
 
                         // form reset
@@ -93,6 +106,15 @@
                         table.draw();
                     }, 
                     error:function(error){
+                        // show success message
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Something wrong',
+                            text: 'Please check again',
+                            showConfirmButton:false,
+                            timer:1000
+                        });
+                        
                         // if error on name field
                         if (error.responseJSON.name) {
                             // show alert

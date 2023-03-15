@@ -10,7 +10,7 @@
                 <div class="modal-body">
                     <div class="form-group">
                         <label for="department-name">Name</label>
-                        <input type="text" class="form-control bg-white" id="department-name">
+                        <input type="text" class="form-control" id="department-name">
                         <div class="invalid-feedback d-none" role="alert" id="alert-department-name"></div>
                     </div>
                 </div>

@@ -988,14 +988,14 @@
 .dark .alert-bottom.alert-dark {
   border-color: #212529;
 }
-.dark .card {
+.dark .card, .dark .modal-content {
   background: #222738;
 }
-.dark .card .card-header, .dark .card .card-footer {
+.dark .card .card-header, .dark .card .card-footer, .dark .modal-content .modal-header, .dark .modal-content .modal-footer {
   background-color: #222738;
   border-bottom-color: #30384f;
 }
-.dark .card-footer {
+.dark .card-footer, .dark .modal-footer {
   border-top: 1px solid #30384f;
 }
 .dark .apexcharts-theme-light .apexcharts-tooltip {
@@ -1039,9 +1039,10 @@
   background-color: #222738;
   border-color: #30384f;
 }
-.dark .form-select {
+.dark .form-select, .dark .select2-container--bootstrap-5 .select2-selection, .dark .select2-search, .dark .select2-container--bootstrap-5 .select2-dropdown .select2-search .select2-search__field, .dark .select2-results, .dark .select2-container--bootstrap-5 .select2-selection--single .select2-selection__rendered {
   color: #8A92A6;
   background-color: #222738;
+  border-color: #30384f;
 }
 .dark .form-select.is-invalid {
   border-color: #c03221;

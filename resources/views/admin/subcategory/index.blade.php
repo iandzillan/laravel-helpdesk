@@ -73,13 +73,27 @@
                         }
                     }
                 });
+
                 // show modal
-                $('#modal-create-subcategory').modal('show');
+                $('#modal-create').modal('show');
             });
 
             // store sub category button event
             $('#store-subcategory').click(function(e){
                 e.preventDefault();
+
+                // show loading
+                Swal.fire({
+                    title: 'Please wait',
+                    text: 'Sending request...',
+                    showConfirmButton: false,
+                    allowOutsideClick: false,
+                    allowEnterKey: false,
+                    allowEscapeKey: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
 
                 // define variable
                 let name        = $('#subcategory-name').val();
@@ -102,19 +116,36 @@
                             icon: 'success',
                             title: `${response.message}`,
                             showConfirmButton: false,
-                            timer: 3000
+                            timer: 2000
                         });
 
                         // clear form
-                        $('#form-create-subcategory')[0].reset();
+                        $('#form-create-subcategory').trigger('reset');
+
+                        // clear alert
+                        $('#subcategory-name').removeClass('is-invalid');
+                        $('#alert-subcategory-name').addClass('d-none');
+                        $('#alert-subcategory-name').removeClass('d-block');
+                        $('#subcategory-categoryid').removeClass('is-invalid');
+                        $('#subcategory-categoryid').addClass('d-none');
+                        $('#subcategory-categoryid').removeClass('d-block');
 
                         // close modal
-                        $('#modal-create-subcategory').modal('hide');
+                        $('#modal-create').modal('hide');
 
                         // draw table
                         table.draw();
                     },
                     error:function(error){
+                        // show success message
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Something wrong',
+                            text: 'Please check again',
+                            showConfirmButton:false,
+                            timer:1000
+                        });
+
                         // check if sub category name error
                         if(error.responseJSON.name){
                             // show alert
@@ -124,6 +155,11 @@
 
                             // add message to alert
                             $('#alert-subcategory-name').html(error.responseJSON.name);
+                        } else {
+                            // remove alert
+                            $('#subcategory-name').removeClass('is-invalid');
+                            $('#alert-subcategory-name').addClass('d-none');
+                            $('#alert-subcategory-name').removeClass('d-block');
                         }
 
                         // check if category option error
@@ -135,6 +171,11 @@
 
                             // add message to alert
                             $('#alert-subcategory-categoryid').html(error.responeJSON.category_id);
+                        } else {
+                            // remove alert
+                            $('#subcategory-categoryid').removeClass('is-invalid');
+                            $('#subcategory-categoryid').addClass('d-none');
+                            $('#subcategory-categoryid').removeClass('d-block');
                         }
                     }
                 });
@@ -167,7 +208,7 @@
                 });
 
                 // show modal
-                $('#modal-edit-subcategory').modal('show');
+                $('#modal-edit').modal('show');
             });
 
             // update sub category button event
@@ -179,6 +220,19 @@
                 let name        = $('#subcategory-name-edit').val();
                 let category_id = $('#subcategory-categoryid-edit').val();
                 let token       = $('meta[name="csrf-token"]').attr('content');
+
+                // show loading
+                Swal.fire({
+                    title: 'Please wait',
+                    text: 'Sending request...',
+                    showConfirmButton: false,
+                    allowOutsideClick: false,
+                    allowEnterKey: false,
+                    allowEscapeKey: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
 
                 // ajax update
                 $.ajax({
@@ -196,16 +250,36 @@
                             icon: 'success',
                             title: `${response.message}`,
                             showConfirmButton: false,
-                            timer: 3000
+                            timer: 2000
                         });
 
+                        // clear form
+                        $('#form-edit-subcategory').trigger('reset');
+
+                        // clear alert
+                        $('#subcategory-name-edit').removeClass('is-invalid');
+                        $('#alert-subcategory-name-edit').addClass('d-none');
+                        $('#alert-subcategory-name-edit').removeClass('d-block');
+                        $('#subcategory-categoryid-edit').removeClass('is-invalid');
+                        $('#subcategory-categoryid-edit').addClass('d-none');
+                        $('#subcategory-categoryid-edit').removeClass('d-block');
+
                         // close modal
-                        $('#modal-edit-subcategory').modal('hide');
+                        $('#modal-edit').modal('hide');
 
                         // draw table
                         table.draw();
                     },
                     error:function(error){
+                        // show success message
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Something wrong',
+                            text: 'Please check again',
+                            showConfirmButton:false,
+                            timer:1000
+                        });
+
                         // check if sub category name error
                         if(error.responseJSON.name){
                             // show alert
@@ -215,6 +289,11 @@
 
                             // add message to alert
                             $('#alert-subcategory-name-edit').html(error.responseJSON.name);
+                        } else {
+                            // remove alert
+                            $('#subcategory-name-edit').removeClass('is-invalid');
+                            $('#alert-subcategory-name-edit').addClass('d-none');
+                            $('#alert-subcategory-name-edit').removeClass('d-block');
                         }
 
                         // check if category option error
@@ -226,6 +305,11 @@
 
                             // add message to alert
                             $('#alert-subcategory-categoryid-edit').html(error.responeJSON.category_id);
+                        } else {
+                            // remove alert
+                            $('#subcategory-categoryid-edit').removeClass('is-invalid');
+                            $('#subcategory-categoryid-edit').addClass('d-none');
+                            $('#subcategory-categoryid-edit').removeClass('d-block');
                         }
                     }
                 });
@@ -246,6 +330,19 @@
                     confirmButtonText: "Yes"
                 }).then((result) => {
                     if (result.isConfirmed) {
+                        // show loading
+                        Swal.fire({
+                            title: 'Please wait',
+                            text: 'Sending request...',
+                            showConfirmButton: false,
+                            allowOutsideClick: false,
+                            allowEnterKey: false,
+                            allowEscapeKey: false,
+                            didOpen: () => {
+                                Swal.showLoading();
+                            }
+                        });
+
                         // ajax delete
                         $.ajax({
                             url: `sub-categories/${subcategory_id}`,
@@ -260,7 +357,7 @@
                                     icon: 'success',
                                     title: `${response.message}`,
                                     showConfirmButton: false,
-                                    timer: 3000
+                                    timer: 2000
                                 });
 
                                 // draw table

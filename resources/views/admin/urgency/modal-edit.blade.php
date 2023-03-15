@@ -1,5 +1,5 @@
 {{-- Modal edit --}}
-<div class="modal fade" id="modal-edit-urgency" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal fade" id="modal-edit" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -11,12 +11,12 @@
                     <input type="hidden" id="urgency-id">
                     <div class="form-group">
                         <label for="urgency-name-edit">Name</label>
-                        <input type="text" class="form-control bg-white" id="urgency-name-edit">
+                        <input type="text" class="form-control" id="urgency-name-edit">
                         <div class="invalid-feedback d-none" role="alert" id="alert-urgency-name-edit"></div>
                     </div>
                     <div class="form-group">
                         <label for="urgency-hours-edit">Duration</label>
-                        <input type="number" class="form-control bg-white" id="urgency-hours-edit">
+                        <input type="number" class="form-control" id="urgency-hours-edit">
                         <div class="invalid-feedback d-none" role="alert" id="alert-urgency-hours-edit"></div>
                     </div>
                 </div>

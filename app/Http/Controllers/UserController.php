@@ -3,15 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Mail\MailAccountActive;
-use App\Models\Department;
 use App\Models\Employee;
-use App\Models\Position;
-use App\Models\SubDepartment;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -33,23 +31,27 @@ class UserController extends Controller
                     return $row->employee->name;
                 })
                 ->editColumn('role', function ($row) {
-                    if ($row->role == 'Admin') {
-                        $role = '<span class="badge bg-primary">' . $row->role . '</span>';
+                    $role = $row->role;
+                    switch ($role) {
+                        case 'Admin':
+                            return $role = '<span class="badge bg-primary">Admin</span>';
+                            break;
+                        case 'Approver1':
+                            return $role = '<span class="badge bg-info">Approver Lv.1</span>';
+                            break;
+                        case 'Approver2':
+                            return $role = '<span class="badge bg-success">Approver Lv.2</span>';
+                            break;
+                        case 'User':
+                            return $role = '<span class="badge bg-warning">User</span>';
+                            break;
+                        case 'Technician':
+                            return $role = '<span class="badge bg-danger">Technician</span>';
+                            break;
+                        default:
+                            return $role = '<span class="badge bg-secondary">Undefined</span>';
+                            break;
                     }
-                    if ($row->role == 'Approver1') {
-                        $role = '<span class="badge bg-info">' . $row->role . '</span>';
-                    }
-                    if ($row->role == 'Approver2') {
-                        $role = '<span class="badge bg-success">' . $row->role . '</span>';
-                    }
-                    if ($row->role == 'User') {
-                        $role = '<span class="badge bg-secondary">' . $row->role . '</span>';
-                    }
-                    if ($row->role == 'Technician') {
-                        $role = '<span class="badge bg-warning">' . $row->role . '</span>';
-                    }
-
-                    return $role;
                 })
                 ->addColumn('action', function ($row) {
                     $btn = '<a href="javascript:void(0)" id="btn-edit-user" data-id="' . $row->id . '" class="btn btn-primary btn-sm" title="Edit this user"> <i class="fa-solid fa-pen-square"></i> </a>';
@@ -141,6 +143,56 @@ class UserController extends Controller
             'success' => true,
             'message' => 'User account activated',
             'text'    => 'Notification has been sent to user'
+        ]);
+    }
+
+    public function show(User $user)
+    {
+        // return response
+        return response()->json([
+            'success'      => true,
+            'message'      => 'Detail user',
+            'dataUser'     => $user,
+            'dataEmployee' => $user->employee
+        ]);
+    }
+
+    public function update(User $user, Request $request)
+    {
+        // get employee
+        $employee = Employee::where('id', $user->id)->first();
+
+        // set validation
+        $validator = Validator::make($request->all(), [
+            'email'                 => 'required|email|unique:users,email,' . $user->id,
+            'username'              => 'required|unique:users,username,' . $user->id,
+            'password'              => 'sometimes|confirmed',
+            'role'                  => 'required'
+        ]);
+
+        // check if validation fail
+        if ($validator->fails()) {
+            // return error response
+            return response()->json($validator->errors(), 422);
+        }
+
+        // check if user has password
+        if ($request->password) {
+            $user->password = Hash::make($request->password);
+        }
+
+        // update user
+        $user->email    = $request->email;
+        $user->username = $request->username;
+        $user->role     = $request->role;
+        $user->employee()->associate($employee);
+        $user->save();
+
+        // return response
+        return response()->json([
+            'success' => true,
+            'message' => 'User has been updated',
+            'data'    => $user
         ]);
     }
 

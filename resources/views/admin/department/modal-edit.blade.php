@@ -11,7 +11,7 @@
                     <input type="hidden" id="department-id">
                     <div class="form-group">
                         <label for="department-name-edit">Name</label>
-                        <input type="text" class="form-control bg-white" id="department-name-edit">
+                        <input type="text" class="form-control" id="department-name-edit">
                         <div class="invalid-feedback d-none" role="alert" id="alert-department-name-edit"></div>
                     </div>
                 </div>

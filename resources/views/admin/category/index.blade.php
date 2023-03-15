@@ -52,7 +52,7 @@
             // button create category event
             $('body').on('click', '#btn-create-category', function(){
                 // show modal
-                $('#modal-create-category').modal('show');
+                $('#modal-create').modal('show');
             });
 
             // action create category
@@ -62,6 +62,19 @@
                 // define variable
                 let name    = $('#category-name').val();
                 let token   = $('meta[name="csrf-token"]').attr('content');
+
+                // show loading
+                Swal.fire({
+                    title: 'Please wait',
+                    text: 'Sending request...',
+                    showConfirmButton: false,
+                    allowOutsideClick: false,
+                    allowEnterKey: false,
+                    allowEscapeKey: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
 
                 // ajax
                 $.ajax({
@@ -79,20 +92,34 @@
                             icon: 'success',
                             title: `${response.message}`,
                             showConfirmButton:false,
-                            timer:3000
+                            timer:2000
                         });
                         
                         // clear form
-                        $("#form-create-category")[0].reset();
+                        $("#form-create-category").trigger('reset');
+                        
+                        // clear alert
+                        $('#alert-category-name').addClass('d-none');
+                        $('#alert-category-name').removeClass('d-block');
+                        $('#category-name').removeClass('is-invalid');
                         
                         // close modal
-                        $('#modal-create-category').modal('hide');
+                        $('#modal-create').modal('hide');
                         
                         // draw table
                         table.draw();
                     },
 
                     error:function(error){
+                        // show success message
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Something wrong',
+                            text: 'Please check again',
+                            showConfirmButton:false,
+                            timer:1000
+                        });
+
                         if(error.responseJSON.name){
                             // show alert
                             $('#alert-category-name').removeClass('d-none');
@@ -101,6 +128,11 @@
 
                             // add message to alert
                             $('#alert-category-name').html(error.responseJSON.name);
+                        } else {
+                            // remove alert
+                            $('#alert-category-name').addClass('d-none');
+                            $('#alert-category-name').removeClass('d-block');
+                            $('#category-name').removeClass('is-invalid');
                         }
                     }
                 });
@@ -124,12 +156,25 @@
                 });
 
                 // show modal
-                $('#modal-edit-category').modal('show');
+                $('#modal-edit').modal('show');
             });
 
             // action update category button
             $('#update-category').click(function(e){
                 e.preventDefault();
+
+                // show loading
+                Swal.fire({
+                    title: 'Please wait',
+                    text: 'Sending request...',
+                    showConfirmButton: false,
+                    allowOutsideClick: false,
+                    allowEnterKey: false,
+                    allowEscapeKey: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
 
                 // define variable
                 let category_id     = $('#category-id').val();
@@ -150,21 +195,30 @@
                             icon: 'success',
                             title: `${response.message}`,
                             showConfirmButton: false,
-                            timer: 3000
+                            timer: 2000
                         });
 
-                        // draw table
-                        table.draw();
-                        
                         // clear alert
                         $('#alert-category-name-edit').removeClass('d-block');
                         $('#alert-category-name-edit').addClass('d-none');
                         $('#category-name-edit').removeClass('is-invalid');
 
                         // close modal
-                        $('#modal-edit-category').modal('hide');
+                        $('#modal-edit').modal('hide');
+                        
+                        // draw table
+                        table.draw();
                     }, 
                     error:function(error){
+                        // show success message
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Something wrong',
+                            text: 'Please check again',
+                            showConfirmButton:false,
+                            timer:1000
+                        });
+
                         if(error.responseJSON.name){
                             // show alert
                             $('#alert-category-name-edit').removeClass('d-none');
@@ -173,6 +227,11 @@
 
                             // add message to alert
                             $('#alert-category-name-edit').html(error.responseJSON.name);
+                        } else {
+                            // remove alert
+                            $('#alert-category-name-edit').addClass('d-none');
+                            $('#alert-category-name-edit').removeClass('d-block');
+                            $('#category-name-edit').removeClass('is-invalid');
                         }
                     }
                 });
@@ -193,6 +252,19 @@
                     confirmButtonText: "Yes"
                 }).then((result) => {
                     if (result.isConfirmed) {
+                        // show loading
+                        Swal.fire({
+                            title: 'Please wait',
+                            text: 'Sending request...',
+                            showConfirmButton: false,
+                            allowOutsideClick: false,
+                            allowEnterKey: false,
+                            allowEscapeKey: false,
+                            didOpen: () => {
+                                Swal.showLoading();
+                            }
+                        });
+
                         // ajax delete
                         $.ajax({
                             url: `categories/${category_id}`,
@@ -207,7 +279,7 @@
                                     icon: 'success',
                                     title: `${response.message}`,
                                     showConfirmButton: false,
-                                    timer: 3000
+                                    timer: 2000
                                 });
                                 // draw table
                                 table.draw();
