@@ -6,20 +6,18 @@
             <div class="card">
                 <div class="card-header d-flex justify-content-between">
                     <div class="header-title">
-                        <h4 class="card-title text-bold">Edit {{ $employee->name }}'s Information</h4>
+                        <h4 class="card-title text-bold">New Employee Information</h4>
                     </div>
                 </div>
                 <div class="card-body">
-                    <form id="form-update-employee" enctype="multipart/form-data" method="post">
-                        @method('put')
+                    <form id="form-create-employee" enctype="multipart/form-data">
                         @csrf
                         <div class="new-user info">
-                            <input type="hidden" id="employee-id" name="id" value="{{ $employee->id }}">
                             <div class="row">
                                 <div class="col-xl-6 col-lg-6">
                                     <div class="form-group">
                                         <div class="profile-img-edit position relative mb-3">
-                                            <img src="{{ asset('storage/uploads/photo-profile/'.$employee->image) }}" id="employee-image-preview" alt="profile-pic" class="theme-color-default-img profile-pic rounded avatar-100">
+                                            <img src="{{ asset('assets/images/avatars/avtar_1.png') }}" id="employee-image-preview" alt="profile-pic" class="theme-color-default-img profile-pic rounded avatar-100">
                                         </div>
                                         <input type="file" class="form-control" id="employee-image" name="image">
                                         <div class="invalid-feedback d-none" role="alert" id="alert-employee-image"></div>
@@ -35,22 +33,33 @@
                                 <div class="col-xl-6 col-lg-6">
                                     <div class="form-group">
                                         <label for="employee-nik" class="form-label">NIK</label>
-                                        <input type="text" class="form-control" id="employee-nik" name="nik" placeholder="Employee's nik" value="{{ $employee->nik }}" readonly>
+                                        <input type="text" class="form-control" id="employee-nik" name="nik" placeholder="Employee's nik">
                                         <div class="invalid-feedback d-none" role="alert" id="alert-employee-nik"></div>
                                     </div>
                                     <div class="form-group">
                                         <label for="employee-name" class="form-label">Full Name</label>
-                                        <input type="text" class="form-control" id="employee-name" name="name" placeholder="Employee's name" value="{{ $employee->name }}">
+                                        <input type="text" class="form-control" id="employee-name" name="name" placeholder="Employee's name">
                                         <div class="invalid-feedback d-none" role="alert" id="alert-employee-name"></div>
                                     </div>
-                                    <div class="form-group">
-                                    <label for="employee-position" class="form-label">Position</label>
-                                    <select id="employee-position" name="position_id" class="form-control form-select2"></select>
-                                    <div class="invalid-feedback d-none" role="alert" id="alert-employee-position"></div>
-                                </div>
                                 </div>
                             </div>
-                            <button type="subtmit" class="btn btn-primary mt-3" id="update-employee">Save</button>
+                            <div class="row d-felx justify-content-end">
+                                <div class="col-xl-6 col-lg-6">
+                                    <div class="form-group">
+                                        <label for="employee-subdept" class="form-label">Sub Department</label>
+                                        <select id="employee-subdept" name="sub_department_id" class="form-control form-select2"></select>
+                                        <div class="invalid-feedback d-none" role="alert" id="alert-employee-subdept"></div>
+                                    </div>
+                                </div>
+                                <div class="col-xl-6 col-lg-6">
+                                    <div class="form-group">
+                                        <label for="employee-position" class="form-label">Position</label>
+                                        <select id="employee-position" name="position_id" class="form-control form-select2"></select>
+                                        <div class="invalid-feedback d-none" role="alert" id="alert-employee-position"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="subtmit" class="btn btn-primary mt-3" id="store-employee">Save</button>
                         </div>
                     </form>
                 </div>
@@ -60,26 +69,56 @@
 
     <script>
         $(document).ready(function(){
-            // define varibale
-            let position_id = "{{ $employee->position_id }}";
+            // get employee dept id
+            let id = "{{ Auth::user()->employee->position->subDepartment->department_id }}";
 
-            // get all position
+            // get subdept based on dept id 
             $.ajax({
-                url: "{{ route('subdept.employees.positions') }}",
-                type: 'get',
+                url: "{{ route('dept.employees.subdepts') }}",
+                type: "get",
                 cache: false,
+                data: {
+                    'id': id
+                }, 
                 success:function(response){
-                    if (response) {
-                        // fill dept select option
+                    // fill the subdept select option
+                    $('#employee-subdept').empty();
+                    $('#employee-subdept').append('<option selected> -- Choose -- </option>');
+                    $('#employee-position').append('<option selected> -- Choose -- </option>');
+                    $.each(response, function(code, subdept){
+                        $('#employee-subdept').append(`<option value="${subdept.id}">${subdept.name}</option>`);
+                    });
+                }, 
+                error:function(error){
+                    console.log(error.responseJSON.message);
+                    $('#employee-subdept').empty();
+                }
+            });
+
+            // get position based on subdept change
+            $('#employee-subdept').change(function(){
+                let id = $('#employee-subdept').val();
+
+                $.ajax({
+                    url: "{{ route('dept.employees.positions') }}",
+                    type: "get",
+                    cache: false,
+                    data: {
+                        'id': id
+                    },
+                    success:function(response){
+                        // fill the position select option
+                        $('#employee-position').empty();
                         $('#employee-position').append('<option selected> -- Choose -- </option>');
                         $.each(response, function(code, position){
-                            $('#employee-position').append('<option value="'+position.id+'">'+position.name+'</option>');
-                            $('#employee-position option[value='+position_id+']').attr('selected', 'selected');
+                            $('#employee-position').append(`<option value="${position.id}">${position.name}</option>`);
                         });
-                    } else {
+                    }, 
+                    error:function(error){
+                        console.log(error.responseJSON.message);
                         $('#employee-position').empty();
                     }
-                }
+                });
             });
 
             // preview image
@@ -92,10 +131,12 @@
                 reader.readAsDataURL(this.files[0]);
             });
 
-
-            // update button event
-            $('#form-update-employee').on('submit', function(e){
+            // store action button
+            $('#form-create-employee').on('submit', function(e){
                 e.preventDefault();
+
+                // define variable
+                let formData = this;
 
                 // show loading
                 Swal.fire({
@@ -104,21 +145,18 @@
                     showConfirmButton: false,
                     allowOutsideClick: false,
                     allowEnterKey: false,
-                    allowEscapeKey: false, 
+                    allowEscapeKey: false,
                     didOpen: () => {
                         Swal.showLoading();
                     }
                 });
 
-                // define form variable
-                let formData = this;
-
-                // ajax update
+                // ajax store
                 $.ajax({
-                    url: "{{ route('subdept.employees.update') }}",
+                    url: "{{ route('dept.employees.store') }}",
                     type: "post",
                     cache: false,
-                    data: new FormData(formData), 
+                    data: new FormData(formData),
                     processData:false,
                     dataType:'json',
                     contentType:false,
@@ -132,11 +170,12 @@
                         });
 
                         // reload page
-                        setTimeout(function(){
+                        setTimeout(() => {
                             location.reload();
                         }, 2000);
-                    }, 
+                    },
                     error:function(error){
+                        console.log(error.responseJSON.message);
                         // show message
                         Swal.fire({
                             icon: 'warning',
@@ -146,26 +185,44 @@
                             timer: 1000
                         });
 
-                        // check if photo profile field error
+                        // check if image employee has error
                         if (error.responseJSON.image) {
+                            // show alert
                             $('#employee-image').addClass('is-invalid');
-                            $('#alert-employee-image').removeClass('d-none');
                             $('#alert-employee-image').addClass('d-block');
+                            $('#alert-employee-image').removeClass('d-none');
 
                             // show message
                             $('#alert-employee-image').html(error.responseJSON.image);
                         } else {
+                            // remove alert
                             $('#employee-image').removeClass('is-invalid');
                             $('#alert-employee-image').removeClass('d-block');
                             $('#alert-employee-image').addClass('d-none');
                         }
 
-                        // check if name field error
+                        // check if nik employee has error
+                        if (error.responseJSON.nik) {
+                            // show alert
+                            $('#employee-nik').addClass('is-invalid');
+                            $('#alert-employee-nik').addClass('d-block');
+                            $('#alert-employee-nik').removeClass('d-none');
+
+                            // show message
+                            $('#alert-employee-nik').html(error.responseJSON.nik);
+                        } else {
+                            // remove alert
+                            $('#employee-nik').removeClass('is-invalid');
+                            $('#alert-employee-nik').removeClass('d-block');
+                            $('#alert-employee-nik').addClass('d-none');
+                        }
+
+                        // check if name employee has error
                         if (error.responseJSON.name) {
                             // show alert
                             $('#employee-name').addClass('is-invalid');
-                            $('#alert-employee-name').removeClass('d-none');
                             $('#alert-employee-name').addClass('d-block');
+                            $('#alert-employee-name').removeClass('d-none');
 
                             // show message
                             $('#alert-employee-name').html(error.responseJSON.name);
@@ -176,12 +233,28 @@
                             $('#alert-employee-name').addClass('d-none');
                         }
 
-                        // check if position field error
+                        // check if subdept employee has error
+                        if (error.responseJSON.subdept_id) {
+                            // show alert
+                            $('#employee-subdept').addClass('is-invalid');
+                            $('#alert-employee-subdept').addClass('d-block');
+                            $('#alert-employee-subdept').removeClass('d-none');
+
+                            // show message
+                            $('#alert-employee-subdept').html(error.responseJSON.subdept_id);
+                        } else {
+                            // remove alert
+                            $('#employee-subdept').removeClass('is-invalid');
+                            $('#alert-employee-subdept').removeClass('d-block');
+                            $('#alert-employee-subdept').addClass('d-none');
+                        }
+
+                        // check if position employee has error
                         if (error.responseJSON.position_id) {
                             // show alert
                             $('#employee-position').addClass('is-invalid');
-                            $('#alert-employee-position').removeClass('d-none');
                             $('#alert-employee-position').addClass('d-block');
+                            $('#alert-employee-position').removeClass('d-none');
 
                             // show message
                             $('#alert-employee-position').html(error.responseJSON.position_id);
@@ -194,8 +267,6 @@
                     }
                 });
             });
-
         });
     </script>
-
 @endsection

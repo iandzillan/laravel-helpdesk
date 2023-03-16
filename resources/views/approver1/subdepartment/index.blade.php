@@ -53,7 +53,7 @@
             // add button event
             $('#btn-create-subdept').click(function(){
                 // show modal
-                $('#modal-create-subdept').modal('show');
+                $('#modal-create').modal('show');
             });
 
             //store button event
@@ -98,8 +98,13 @@
                         // clear form
                         $('#form-create-subdept').trigger('reset');
 
+                        // clear alert
+                        $('input').removeClass('is-invalid');
+                        $('.invalid-feedback').removeClass('d-block');
+                        $('.invalid-feedback').addClass('d-none');
+
                         // modal close
-                        $('#modal-create-subdept').modal('hide');
+                        $('#modal-create').modal('hide');
 
                         // draw table
                         table.draw();
@@ -122,6 +127,11 @@
 
                             // show message
                             $('#alert-subdept-name').html(error.responseJSON.name);
+                        } else {
+                            // remove alert
+                            $('#alert-subdept-name').removeClass('d-block');
+                            $('#alert-subdept-name').addClass('d-none');
+                            $('#subdept-name').removeClass('is-invalid');
                         }
                     }
                 });
@@ -147,7 +157,7 @@
                 });
 
                 // show modal edit
-                $('#modal-edit-subdept').modal('show');
+                $('#modal-edit').modal('show');
             });
 
             // update button event
@@ -192,8 +202,13 @@
                         // clear form 
                         $('#form-edit-subdept').trigger('reset');
 
+                        // clear alert
+                        $('input').removeClass('is-invalid');
+                        $('.invalid-feedback').removeClass('d-block');
+                        $('.invalid-feedback').addClass('d-none');
+
                         // close modal
-                        $('#modal-edit-subdept').modal('hide');
+                        $('#modal-edit').modal('hide');
 
                         // draw table
                         table.draw();
@@ -215,6 +230,11 @@
 
                             // show message
                             $('#alert-subdept-name-edit').html(error.responseJSON.name);
+                        } else {
+                            // remove alert
+                            $('#subdept-name-edit').removeClass('is-invalid');
+                            $('#alert-subdept-name-edit').removeClass('d-block');
+                            $('#alert-subdept-name-edit').addClass('d-none');
                         }
                     }
                 });
@@ -230,7 +250,7 @@
                 Swal.fire({
                     icon: 'warning',
                     title: 'Are you sure?',
-                    text: 'This sub department will be deleted',
+                    text: 'All data related to this sub department will be deleted as well.',
                     showCancelButton: true,
                     cancelButtonText: 'No',
                     confirmButtonText: 'yes'

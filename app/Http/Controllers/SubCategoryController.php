@@ -7,6 +7,7 @@ use App\Models\SubCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 use Yajra\DataTables\Facades\DataTables;
 
 class SubCategoryController extends Controller
@@ -45,10 +46,18 @@ class SubCategoryController extends Controller
 
     public function store(Request $request)
     {
+        // get category id
+        $category = Category::where('id', $request->category_id)->first();
+
         // set validation
         $validator = Validator::make($request->all(), [
-            'name'          => 'required|unique:sub_categories',
+            'name'          => [
+                'required',
+                Rule::unique('sub_categories')->where('category_id', $category)
+            ],
             'category_id'   => 'required'
+        ], [
+            'name.unique' => "This sub category already exists in $category->name category"
         ]);
 
         // check if validation fails
@@ -87,10 +96,18 @@ class SubCategoryController extends Controller
 
     public function update(SubCategory $subcategory, Request $request)
     {
+        // get category id
+        $category = Category::where('id', $request->category_id)->first();
+
         // set validation
         $validator = Validator::make($request->all(), [
-            'name'          => 'required|unique:sub_categories,name,' . $subcategory->id,
+            'name'          => [
+                'required',
+                Rule::unique('sub_categories')->ignore($subcategory->id)->where('category_id', $category)
+            ],
             'category_id'   => 'required'
+        ], [
+            'name.unique' => "This sub category already exists in $category->name category"
         ]);
 
         // check if validation fails
@@ -117,7 +134,8 @@ class SubCategoryController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => "The sub category has been deleted"
+            'message' => "The sub category has been deleted",
+            'data'    => $subcategory
         ]);
     }
 }

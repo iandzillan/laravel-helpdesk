@@ -52,11 +52,8 @@
 
             // add button action
             $('body').on('click', '#btn-create-position',function(){
-                // clear form
-                $('#form-create-position').trigger('reset');
-
                 // show modal create
-                $('#modal-create-position').modal('show');
+                $('#modal-create').modal('show');
             });
 
             // store button action
@@ -98,8 +95,16 @@
                             timer: 2000
                         });
 
-                        // hide create modal
-                        $('#modal-create-position').modal('hide');
+                        // clear form
+                        $('#form-create-position').trigger('reset');
+
+                        // clear alert
+                        $('input').removeClass('is-invalid');
+                        $('.invalid-feedback').addClass('d-none');
+                        $('.invalid-feedback').removeClass('d-block');
+
+                        // close modal
+                        $('#modal-create').modal('hide');
 
                         // draw table
                         table.draw();
@@ -122,6 +127,11 @@
 
                             // show message
                             $('#alert-name').html(error.responseJSON.name);
+                        } else {
+                            // remove alert
+                            $('#name').removeClass('is-invalid');
+                            $('#alert-name').removeClass('d-block');
+                            $('#alert-name').addClass('d-none');
                         }
                     }
                 });
@@ -150,7 +160,7 @@
                 });
 
                 // show modal
-                $('#modal-edit-position').modal('show');
+                $('#modal-edit').modal('show');
             });
 
             // update button action
@@ -193,11 +203,16 @@
                             timer: false
                         });
 
-                        // hide modal edit
-                        $('#modal-edit-position').modal('hide');
+                        // clear form
+                        $('#form-edit-position').trigger('reset');
 
-                        // reset form
-                        $('body').trigger('reset', '#form-edit-position');
+                        // clear alert
+                        $('input').removeClass('is-invalid');
+                        $('.invalid-feedback').addClass('d-none');
+                        $('.invalid-feedback').removeClass('d-block');
+
+                        // close modal
+                        $('#modal-edit').modal('hide');
 
                         // draw table
                         table.draw();
@@ -220,6 +235,11 @@
 
                             // show message
                             $('#alert-name-edit').html(error.responseJSON.name);
+                        } else {
+                            // remove alert
+                            $('#name-edit').removeClass('is-invalid');
+                            $('#alert-name-edit').removeClass('d-block');
+                            $('#alert-name-edit').addClass('d-none');
                         }
                     }
                 });
@@ -235,7 +255,7 @@
                 Swal.fire({
                     icon: 'warning',
                     title: 'Are you sure?',
-                    text: 'This action will delete all employees in this position as well',
+                    text: 'All employees in this position will be deleted as well.',
                     showCancelButton: true,
                     cancelButtonText: 'No',
                     confirmButtonText: 'Yes',

@@ -52,9 +52,6 @@
                 // define variable
                 let nik = $(this).data('id');
 
-                // clear form
-                $('#form-user-request').trigger('reset');
-
                 // get employee data
                 $.ajax({
                     url: `user-request/${nik}`,
@@ -74,9 +71,8 @@
             // request button event
             $('#request').click(function(e){
                 e.preventDefault();
-
-                // show loader
-                // $('#myloader').show();
+                
+                // show loading
                 Swal.fire({
                     title: "Please wait",
                     text: "Sending request...",
@@ -92,7 +88,7 @@
                 // define variable
                 let nik = $('#nik').val();
                 let name = $('#name').val();
-                let email = $('#email').val() + '@example.com';
+                let email = $('#email').val() + $('#domain-name').text();
                 let username = $('#username').val();
                 let password = $('#password').val();
                 let confirm = $('#confirm').val();
@@ -131,10 +127,6 @@
                             },
                             success:function(response1){
                                 console.log(response1.message);
-
-                                // hide loader
-                                // $('#myloader').hide();
-
                                 // show message
                                 Swal.fire({
                                     icon: 'success',
@@ -145,18 +137,25 @@
                             },
                             error:function(error1){
                                 console.log(error1.responseJSON.message);
-                                // hide loader
-                                // $('#myloader').hide();
 
                                 // show message
                                 Swal.fire({
                                     icon: 'warning',
-                                    title: "Can't send user account email request",
+                                    title: "User account request has been requested but email notification failed to be sent to admin",
                                     text: `${error1.responseJSON.message}`,
                                     showConfirmButton: false,
                                 });
                             }
                         });
+
+                        // clear form
+                        $('#form-user-request').trigger('reset');
+
+                        // clear alert
+                        $('input').removeClass('is-invalid');
+                        $('select').removeClass('is-invalid');
+                        $('.invalid-feedback').removeClass('d-block');
+                        $('.invalid-feedback').addClass('d-none');
 
                         // close modal
                         $('#modal-user-request').modal('hide');
@@ -165,8 +164,7 @@
                         table.draw();
                     }, 
                     error:function(error){
-                        // hide loader
-                        // $('#myloader').hide();
+                        // show message
                         Swal.fire({
                             icon: 'warning',
                             title: 'Please check again', 
@@ -183,6 +181,11 @@
 
                             // show message
                             $('#alert-email').html(error.responseJSON.email);
+                        } else {
+                            // remove alert
+                            $('#email').removeClass('is-invalid');
+                            $('#alert-email').removeClass('d-block');
+                            $('#alert-email').addClass('d-none');
                         }
 
                         // check if username field has error
@@ -194,6 +197,11 @@
 
                             // show message
                             $('#alert-username').html(error.responseJSON.username);
+                        } else {
+                            // remove alert
+                            $('#username').removeClass('is-invalid');
+                            $('#alert-username').removeClass('d-block');
+                            $('#alert-username').addClass('d-none');
                         }
 
                         // check if password field has error
@@ -205,6 +213,11 @@
 
                             // show message
                             $('#alert-password').html(error.responseJSON.password);
+                        } else {
+                            // remove alert
+                            $('#password').removeClass('is-invalid');
+                            $('#alert-password').removeClass('d-block');
+                            $('#alert-password').addClass('d-none');
                         }
 
                         // check if role field has error
@@ -216,6 +229,11 @@
 
                             // show message
                             $('#alert-role').html(error.responseJSON.role);
+                        } else {
+                            // remove alert
+                            $('#role').removeClass('is-invalid');
+                            $('#alert-role').removeClass('d-block');
+                            $('#alert-role').addClass('d-none');
                         }
                     }
                 });

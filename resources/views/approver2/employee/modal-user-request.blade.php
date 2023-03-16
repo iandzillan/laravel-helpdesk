@@ -10,38 +10,38 @@
                 <div class="modal-body">
                     <div class="form-group">
                         <label for="nik">NIK</label>
-                        <input type="text" class="form-control bg-white" id="nik" name="nik" readonly>
+                        <input type="text" class="form-control" id="nik" name="nik" readonly>
                     </div>
                     <div class="form-group">
                         <label for="name">Name</label>
-                        <input type="text" class="form-control bg-white" id="name" name="name" readonly>
+                        <input type="text" class="form-control" id="name" name="name" readonly>
                     </div>
                     <div class="form-group">
                         <label for="email">Email</label>
                         <div class="input-group mb-3">
                             <input type="text" class="form-control" name="email" id="email"> 
-                            <span class="input-group-text" id="basic-addon2">@example.com</span>
+                            <span class="input-group-text" id="domain-name">@example.com</span>
                         </div>
                         <div class="invalid-feedback d-none" role="alert" id="alert-email"></div>
                     </div>
                     <div class="form-group">
                         <label for="username">Username</label>
-                        <input type="text" class="form-control bg-white" id="username" name="username">
+                        <input type="text" class="form-control" id="username" name="username">
                         <div class="invalid-feedback d-none" role="alert" id="alert-username"></div>
                     </div>
                     <div class="form-group">
                         <label for="password">Password</label>
-                        <input type="password" class="form-control bg-white" id="password" name="password">
+                        <input type="password" class="form-control" id="password" name="password">
                         <div class="invalid-feedback d-none" role="alert" id="alert-password"></div>
                     </div>
                     <div class="form-group">
                         <label for="password_confirmation">Confirm Password</label>
-                        <input type="password" class="form-control bg-white" id="confirm" name="password_confirmation">
+                        <input type="password" class="form-control" id="confirm" name="password_confirmation">
                         <div class="invalid-feedback d-none" role="alert" id="alert-confirm"></div>
                     </div>
                     <div class="form-group">
                         <label for="role">Role</label>
-                        <select id="role" name="category" class="form-select mb-3 bg-white shadow-none select-modal">
+                        <select id="role" name="category" class="form-select mb-3 shadow-none select-modal">
                             <option selected>-- Choose --</option>
                             <option value="User">User</option>
                             <option value="Technician">Technician</option>

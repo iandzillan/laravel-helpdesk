@@ -1,7 +1,7 @@
 <nav class="nav navbar navbar-expand-lg navbar-light iq-navbar">
     <div class="container-fluid navbar-inner">
         <a href="#" class="navbar-brand">
-            <i class="fa-solid fa-screwdriver-wrench"></i>
+            <i class="fa-solid fa-screwdriver-wrench text-primary"></i>
 
             <h2 class="logo-title">Helpdesk</h2>
         </a>

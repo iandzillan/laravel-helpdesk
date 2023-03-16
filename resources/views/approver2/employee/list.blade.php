@@ -55,7 +55,7 @@
                 Swal.fire({
                     icon: 'warning',
                     title: 'Are you sure?',
-                    text: 'All ticket data owned by this employee will be deleted as well.',
+                    text: 'All data related to this employee will be deleted as well.',
                     showCancelButton: true,
                     cancelButtonText: 'No',
                     confirmButtonText: 'Yes'

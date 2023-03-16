@@ -296,7 +296,7 @@
                 // confirmation
                 Swal.fire({
                     title: "Are you sure?",
-                    text: "This urgency will be deleted",
+                    text: "All tickets that related to this urgency will be deleted as well.",
                     icon: "warning",
                     showCancelButton: true,
                     cancelButtonText: "No",

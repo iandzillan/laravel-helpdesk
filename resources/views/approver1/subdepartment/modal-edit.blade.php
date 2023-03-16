@@ -1,5 +1,5 @@
 {{-- Modal edit --}}
-<div class="modal fade" id="modal-edit-subdept" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal fade" id="modal-edit" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -11,7 +11,7 @@
                     <input type="hidden" id="subdept-id">
                     <div class="form-group">
                         <label for="subdept-name-edit">Name</label>
-                        <input type="text" class="form-control bg-white" id="subdept-name-edit">
+                        <input type="text" class="form-control" id="subdept-name-edit">
                         <div class="invalid-feedback d-none" role="alert" id="alert-subdept-name-edit"></div>
                     </div>
                 </div>

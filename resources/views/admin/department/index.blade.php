@@ -50,11 +50,8 @@
 
             // add button event
             $('body').on('click', '#btn-create-department', function(){
-                // reset form create
-                $('#form-create-department').trigger('reset');
-
                 // show modal
-                $('#modal-create-department').modal('show');
+                $('#modal-create').modal('show');
             });
 
             // store button event
@@ -99,8 +96,13 @@
                         // form reset
                         $('#form-create-department').trigger('reset');
 
+                        // clear alert
+                        $('input').removeClass('is-invalid');
+                        $('.invalid-feedback').removeClass('d-block');
+                        $('.invalid-feedback').addClass('d-none');
+
                         // close modal
-                        $('#modal-create-department').modal('hide');
+                        $('#modal-create').modal('hide');
 
                         // drar table
                         table.draw();
@@ -112,7 +114,7 @@
                             title: 'Something wrong',
                             text: 'Please check again',
                             showConfirmButton:false,
-                            timer:1000
+                            timer: 1000
                         });
                         
                         // if error on name field
@@ -124,6 +126,11 @@
 
                             // show message 
                             $('#alert-department-name').html(error.responseJSON.name);
+                        } else {
+                            // remove alert
+                            $('#alert-department-name').removeClass('d-block');
+                            $('#alert-department-name').addClass('d-none');
+                            $('#department-name').removeClass('is-invalid');
                         }
                     }
                 });
@@ -147,7 +154,7 @@
                 });
 
                 // show edit modal
-                $('#modal-edit-department').modal('show');
+                $('#modal-edit').modal('show');
             });
 
             // update button event
@@ -174,19 +181,33 @@
                             icon: "success",
                             title: "The department has been updated",
                             showConfirmButton: false,
-                            timer: 3000
+                            timer: 2000
                         });
 
                         // reset form
                         $('#form-edit-department').trigger('reset');
 
+                        // clear alert
+                        $('input').removeClass('is-invalid');
+                        $('.invalid-feedback').removeClass('d-block');
+                        $('.invalid-feedback').addClass('d-none');
+
                         // close modal
-                        $('#modal-edit-department').modal('hide');
+                        $('#modal-edit').modal('hide');
 
                         // draw table
                         table.draw();
                     }, 
                     error:function(error){
+                        // show message
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Something wrong',
+                            text: 'Please check again',
+                            showConfirmButton: false,
+                            timer: 1000
+                        });
+
                         // if error on name field
                         if (error.responseJSON.name) {
                             // show alert
@@ -196,6 +217,10 @@
 
                             // show message 
                             $('#alert-department-name-edit').html(error.responseJSON.name);
+                        } else {
+                            $('#alert-department-name-edit').removeClass('d-block');
+                            $('#alert-department-name-edit').addClass('d-none');
+                            $('#department-name-edit').removeClass('is-invalid');
                         }
                     }
                 });
@@ -211,7 +236,7 @@
                 Swal.fire({
                     icon: 'warning', 
                     title: 'Are you sure?',
-                    text: 'This department will be deleted',
+                    text: 'All data related to this department will be deleted',
                     showCancelButton: true,
                     cancelButtonText: "No", 
                     confirmButtonText: "Yes"

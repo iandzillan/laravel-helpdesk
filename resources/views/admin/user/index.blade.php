@@ -38,22 +38,6 @@
 
     <script>
         $(document).ready(function(){
-            // select2 modal 
-            $('.select2').select2({
-                theme: "bootstrap-5",
-                width: $(this).data('width') ? $(this).data('width') : $(this).hasClass('w-100') ? '100%' : 'style',
-                placeholder: $(this).data('placeholder'),
-                dropdownParent: $('#modal-create-user')
-            });
-
-            // role-edit select
-            $('.select2-edit').select2({
-                theme: "bootstrap-5",
-                width: $(this).data('width') ? $(this).data('width') : $(this).hasClass('w-100') ? '100%' : 'style',
-                placeholder: $(this).data('placeholder'),
-                dropdownParent: $('#modal-edit-user')
-            }); 
-
             // draw table
             let table = $('.data-table').DataTable({
                 responsive: true,
@@ -72,9 +56,6 @@
 
             // add button action
             $('#btn-create-user').click(function(){
-                // reset form
-                $('#form-create-user').trigger('reset');
-
                 // get all employee
                 $.ajax({
                     url: "{{ route('admin.users.getEmployee') }}",
@@ -99,7 +80,7 @@
                 $('#role').append('<option value="Technician"> Technician </option>')
 
                 // show modal
-                $('#modal-create-user').modal('show');
+                $('#modal-create').modal('show');
             });
 
             // store button action
@@ -176,9 +157,17 @@
                                 });
                             }
                         });
+                        // reset form
+                        $('#form-create-user').trigger('reset');
 
-                        // clode modal
-                        $('#modal-create-user').modal('hide');
+                        // remove alert
+                        $('input').removeClass('is-invalid');
+                        $('select').removeClass('is-invalid');
+                        $('.invalid-feedback').removeClass('d-block');
+                        $('.invalid-feedback').removeClass('d-none');
+
+                        // close modal
+                        $('#modal-create').modal('hide');
 
                         // draw table
                         table.draw();
@@ -310,7 +299,7 @@
                 $('#form-edit-user').trigger('reset');
 
                 // show modal
-                $('#modal-edit-user').modal('show');
+                $('#modal-edit').modal('show');
             });
 
             // update button action
@@ -364,8 +353,14 @@
                         // clear form
                         $('#form-edit-user').trigger('reset');
 
+                        // clear alert
+                        $('input').removeClass('is-invalid');
+                        $('select').removeClass('is-invalid');
+                        $('.invalid-feedback').removeClass('d-block');
+                        $('.invalid-feedback').removeClass('d-none');
+
                         // close modal
-                        $('#modal-edit-user').modal('hide');
+                        $('#modal-edit').modal('hide');
 
                         // draw table
                         table.draw();
@@ -484,7 +479,7 @@
                 Swal.fire({
                     icon: 'warning',
                     title: 'Are you sure?',
-                    text: 'This user will be deleted',
+                    text: 'This employee will not be able to access this system.',
                     showCancelButton: true,
                     cancelButtonText: 'No',
                     confirmButtonText: 'Yes'

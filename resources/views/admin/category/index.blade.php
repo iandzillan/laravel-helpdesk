@@ -245,7 +245,7 @@
                 // Confirmation 
                 Swal.fire({
                     title: "Are you sure?",
-                    text: "This category will be deleted",
+                    text: "All data related to this category will be deleted as well.",
                     icon: "warning",
                     showCancelButton: true,
                     cancelButtonText: "No",

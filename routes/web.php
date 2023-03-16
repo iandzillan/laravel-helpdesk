@@ -10,6 +10,8 @@ use App\Http\Controllers\SubCategoryController;
 use App\Http\Controllers\SubDepartmentController;
 use App\Http\Controllers\UrgencyController;
 use App\Http\Controllers\UserController;
+use App\Models\Employee;
+use Database\Factories\EmployeeFactory;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -82,14 +84,22 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/dept/sub-departments/{subdept}/edit', [SubDepartmentController::class, 'show'])->name('dept.subdepartments.show');
         Route::patch('/dept/sub-departments/{subdept}', [SubDepartmentController::class, 'update'])->name('dept.subdepartments.update');
         Route::delete('/dept/sub-departments/{subdept}', [SubDepartmentController::class, 'destroy'])->name('dept.subdepartments.destroy');
+
+        Route::get('/dept/new-employees', [EmployeeController::class, 'index'])->name('dept.employees.new');
+        Route::get('dept/new-employees/subdept', [EmployeeController::class, 'getSubdepts'])->name('dept.employees.subdepts');
+        Route::get('dept/new-employees/position', [EmployeeController::class, 'getPositions'])->name('dept.employees.positions');
+        Route::post('/dept/employees', [EmployeeController::class, 'store'])->name('dept.employees.store');
+
+        Route::get('/dept/employees', [EmployeeController::class, 'list'])->name('dept.employees.list');
+        Route::get('/dept/employees/{employee}/edit', [EmployeeController::class, 'deptEmployeeShow'])->name('dept.employees.show');
+        Route::patch('/dept/employees/{employee}', [EmployeeController::class, 'deptEmployeeUpdate'])->name('dept.employees.update');
+        Route::delete('/dept/employees/{employee}', [EmployeeFactory::class, 'deptEmployeeDestroy'])->name('dept.employees.destroy');
     });
 
     Route::group(['middleware' => ['role:Approver2']], function () {
         Route::get('/subdept/dashboard', [DashboardController::class, 'subdeptHome'])->name('subdept.dashboard');
 
         Route::get('/subdept/new-employee', [EmployeeController::class, 'index'])->name('subdept.employees.index');
-        Route::get('/subdept/new-employee/dept', [EmployeeController::class, 'getDepts'])->name('subdept.employees.depts');
-        Route::get('/subdept/new-employee/subdept', [EmployeeController::class, 'getSubDepts'])->name('subdept.employees.subdepts');
         Route::get('/subdept/new-employee/position', [EmployeeController::class, 'getPositions'])->name('subdept.employees.positions');
         Route::post('/subdept/new-employee', [EmployeeController::class, 'store'])->name('subdept.employees.store');
 

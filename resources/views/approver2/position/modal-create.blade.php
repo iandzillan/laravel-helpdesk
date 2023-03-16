@@ -1,5 +1,5 @@
 {{-- Modal add --}}
-<div class="modal fade" id="modal-create-position" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal fade" id="modal-create" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -10,7 +10,7 @@
                 <div class="modal-body">
                     <div class="form-group">
                         <label for="name">Name</label>
-                        <input type="text" class="form-control bg-white" id="name" name="name">
+                        <input type="text" class="form-control" id="name" name="name">
                         <div class="invalid-feedback d-none" role="alert" id="alert-name"></div>
                     </div>
                 </div>

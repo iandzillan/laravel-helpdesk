@@ -43,7 +43,7 @@
                                     </div>
                                     <div class="form-group">
                                         <label for="employee-position" class="form-label">Position</label>
-                                        <select id="employee-position" name="position_id" class="selectpicker form-control basic-usage"></select>
+                                        <select id="employee-position" name="position_id" class="form-control form-select2"></select>
                                         <div class="invalid-feedback d-none" role="alert" id="alert-employee-position"></div>
                                     </div>
                                 </div>
@@ -58,11 +58,17 @@
 
     <script>
         $(document).ready(function(){
+            // get sub dept id employee
+            let id = "{{ Auth::user()->employee->position->sub_department_id }}";
+
             // get position
             $.ajax({
                 url: "{{ route('subdept.employees.positions') }}",
                 type: "get",
                 cache: false,
+                data:{
+                    'id': id
+                },
                 success:function(response){
                     if (response) {
                         // empty select option
@@ -149,6 +155,11 @@
 
                             // show message
                             $('#alert-employee-image').html(error.responseJSON.image);
+                        } else {
+                            // remove alert
+                            $('#employee-image').removeClass('is-invalid');
+                            $('#alert-employee-image').removeClass('d-block');
+                            $('#alert-employee-image').addClass('d-none');
                         }
 
                         // check if nik field error
@@ -160,6 +171,11 @@
 
                             // show message
                             $('#alert-employee-nik').html(error.responseJSON.nik);
+                        } else {
+                            // remove alert
+                            $('#employee-nik').removeClass('is-invalid');
+                            $('#alert-employee-nik').removeClass('d-block');
+                            $('#alert-employee-nik').addClass('d-none');
                         }
 
                         // check if name field error
@@ -171,6 +187,11 @@
 
                             // show message
                             $('#alert-employee-name').html(error.responseJSON.name);
+                        } else {
+                            // remove alert
+                            $('#employee-name').removeClass('is-invalid');
+                            $('#alert-employee-name').removeClass('d-block');
+                            $('#alert-employee-name').addClass('d-none');
                         }
 
                         // check if position field error
@@ -182,6 +203,11 @@
 
                             // show message
                             $('#alert-employee-position').html(error.responseJSON.position_id);
+                        } else {
+                            // remove alert
+                            $('#employee-position').removeClass('is-invalid');
+                            $('#alert-employee-position').removeClass('d-block');
+                            $('#alert-employee-position').addClass('d-none');
                         }
                     }
                 });

@@ -160,7 +160,7 @@ class UserController extends Controller
     public function update(User $user, Request $request)
     {
         // get employee
-        $employee = Employee::where('id', $user->id)->first();
+        $employee = Employee::where('id', $user->employee_id)->first();
 
         // set validation
         $validator = Validator::make($request->all(), [

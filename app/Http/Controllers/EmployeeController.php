@@ -9,7 +9,6 @@ use App\Models\Position;
 use App\Models\SubDepartment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
@@ -19,19 +18,50 @@ class EmployeeController extends Controller
 {
     public function index()
     {
-        return view('approver2.employee.index', [
-            'title' => 'New employee - Helpdesk Ticketing System',
-            'name'  => Auth::user()->employee->name
-        ]);
+        // get user role in session
+        $role = Auth::user()->role;
+
+        switch ($role) {
+            case 'Admin':
+                return view('admin.employee.index', [
+                    'title' => 'New employee - Helpdesk Ticketing System',
+                    'name'  => Auth::user()->employee->name
+                ]);
+                break;
+
+            case 'Approver1':
+                return view('approver1.employee.index', [
+                    'title' => 'New employee - Helpdesk Ticketing System',
+                    'name'  => Auth::user()->employee->name
+                ]);
+                break;
+
+            case 'Approver2':
+                return view('approver2.employee.index', [
+                    'title' => 'New employee - Helpdesk Ticketing System',
+                    'name'  => Auth::user()->employee->name
+                ]);
+                break;
+
+            default:
+                return abort(404);
+                break;
+        }
     }
 
-    public function getPositions()
+    public function getSubdepts(Request $request)
     {
-        // get sub dept id
-        $subdept = Auth::user()->employee->position->sub_department_id;
+        // get all subdept
+        $subdept = SubDepartment::where('department_id', $request->id)->get();
 
+        // return response
+        return response()->json($subdept);
+    }
+
+    public function getPositions(Request $request)
+    {
         // gel all position based on sub department
-        $positions = Position::where('sub_department_id', $subdept)->get();
+        $positions = Position::where('sub_department_id', $request->id)->get();
 
         // return response
         return response()->json($positions);
@@ -39,13 +69,47 @@ class EmployeeController extends Controller
 
     public function store(Request $request)
     {
-        // set validation
-        $validator = Validator::make($request->all(), [
-            'nik'         => 'required|min_digits:6|max_digits:6|integer|unique:employees',
-            'name'        => 'required',
-            'image'       => 'sometimes|image|mimes:jpeg,png,jpg|max:1024',
-            'position_id' => 'required'
-        ]);
+        // get user role
+        $role = Auth::user()->role;
+
+        switch ($role) {
+            case 'Admin':
+                // set validation
+                $validator = Validator::make($request->all(), [
+                    'nik'               => 'required|min_digits:6|max_digits:6|integer|unique:employees',
+                    'name'              => 'required',
+                    'image'             => 'sometimes|image|mimes:jpeg,png,jpg|max:1024',
+                    'department_id'     => 'required',
+                    'sub_department_id' => 'required',
+                    'position_id'       => 'required'
+                ]);
+                break;
+
+            case 'Approver1':
+                // set validation
+                $validator = Validator::make($request->all(), [
+                    'nik'               => 'required|min_digits:6|max_digits:6|integer|unique:employees',
+                    'name'              => 'required',
+                    'image'             => 'sometimes|image|mimes:jpeg,png,jpg|max:1024',
+                    'sub_department_id' => 'required',
+                    'position_id'       => 'required'
+                ]);
+                break;
+
+            case 'Approver2':
+                // set validation
+                $validator = Validator::make($request->all(), [
+                    'nik'         => 'required|min_digits:6|max_digits:6|integer|unique:employees',
+                    'name'        => 'required',
+                    'image'       => 'sometimes|image|mimes:jpeg,png,jpg|max:1024',
+                    'position_id' => 'required'
+                ]);
+                break;
+
+            default:
+                abort(404);
+                break;
+        }
 
         // check if validation fails
         if ($validator->fails()) {
@@ -83,31 +147,59 @@ class EmployeeController extends Controller
 
     public function list(Request $request)
     {
+        // get user role 
+        $role = Auth::user()->role;
+
         // query has many through employees
         $subdept =  SubDepartment::where('id', Auth::user()->employee->position->sub_department_id)->first();
         $employees = $subdept->employees->sortByDesc('id');
 
-        // draw table
-        if ($request->ajax()) {
-            return DataTables::of($employees)
-                ->addIndexColumn()
-                ->addColumn('position', function ($row) {
-                    return $row->position->name;
-                })
-                ->addColumn('action', function ($row) {
-                    $btn = '<a href="' . route('subdept.employees.show', $row->nik) . '" class="btn btn-primary btn-sm" title="Edit this employee"> <i class="fa-solid fa-pen-to-square"></i> </a>';
-                    $btn = $btn . ' ' . '<a href="javascript:void(0)" id="btn-delete-employee" data-id="' . $row->nik . '" class="btn btn-danger btn-sm" title="Delete this employee"> <i class="fa-solid fa-eraser"></i> </a>';
-                    return $btn;
-                })
-                ->rawColumns(['action'])
-                ->make(true);
-        }
+        switch ($role) {
+            case 'Admin':
+                # code...
+                break;
 
-        // return to view
-        return view('approver2.employee.list', [
-            'title' => 'List Employess - Helpdesk Ticketing System',
-            'name'  => Auth::user()->employee->name
-        ]);
+            case 'Approver1':
+                $employees = Employee::with(['position', 'position.subDepartment', 'position.subDepartment.department'])->whereHas('position.subDepartment.department', function ($query) {
+                    $query->where('id', Auth::user()->employee->position->subDepartment->department_id);
+                })->get();
+                dump($employees);
+
+                // return to view
+                return view('approver1.employee.list', [
+                    'title' => 'List Employess - Helpdesk Ticketing System',
+                    'name'  => Auth::user()->employee->name
+                ]);
+                break;
+
+            case 'Approver2':
+                // draw table
+                if ($request->ajax()) {
+                    return DataTables::of($employees)
+                        ->addIndexColumn()
+                        ->addColumn('position', function ($row) {
+                            return $row->position->name;
+                        })
+                        ->addColumn('action', function ($row) {
+                            $btn = '<a href="' . route('subdept.employees.show', $row->nik) . '" class="btn btn-primary btn-sm" title="Edit this employee"> <i class="fa-solid fa-pen-to-square"></i> </a>';
+                            $btn = $btn . ' ' . '<a href="javascript:void(0)" id="btn-delete-employee" data-id="' . $row->nik . '" class="btn btn-danger btn-sm" title="Delete this employee"> <i class="fa-solid fa-eraser"></i> </a>';
+                            return $btn;
+                        })
+                        ->rawColumns(['action'])
+                        ->make(true);
+                }
+
+                // return to view
+                return view('approver2.employee.list', [
+                    'title' => 'List Employess - Helpdesk Ticketing System',
+                    'name'  => Auth::user()->employee->name
+                ]);
+                break;
+
+            default:
+                abort(404);
+                break;
+        }
     }
 
     public function show($employee)
@@ -275,7 +367,7 @@ class EmployeeController extends Controller
 
     public function sendRequest(Request $request)
     {
-        $email_admin = 'iandzillanm@gmail.com';
+        $email_admin = 'admin@example.com';
         $data = [
             'nik'      => $request->nik,
             'name'     => $request->name,

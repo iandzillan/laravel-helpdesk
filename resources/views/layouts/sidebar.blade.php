@@ -234,6 +234,25 @@
                             <span class="mini-icon">-</span>
                         </a>
                     </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link {{(request()->segment(2) == 'employee') ? 'active' : ''}}" aria-current="page" href="{{ route('dept.employees.new') }}">
+                            <i class="icon">
+                                <i class="fa-solid fa-address-card"></i>
+                            </i>
+                            <span class="item-name">Add employee</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link {{(request()->segment(2) == 'employees') ? 'active' : ''}}" aria-current="page" href="{{ route('dept.employees.list') }}">
+                            <i class="icon">
+                                <i class="fa-solid fa-id-card-clip"></i>
+                            </i>
+                            <span class="item-name">Employees List</span>
+                        </a>
+                    </li>
+
                     <li class="nav-item">
                         <a class="nav-link {{(request()->segment(2) == 'sub-departments') ? 'active' : ''}}" aria-current="page" href="{{route('dept.subdepartments')}}">
                             <i class="icon">
