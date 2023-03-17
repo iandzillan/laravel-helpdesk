@@ -254,11 +254,29 @@
                     </li>
 
                     <li class="nav-item">
+                        <a class="nav-link {{(request()->segment(2) == 'user-request') ? 'active' : ''}}" aria-current="page" href="{{ route('dept.userrequestlist') }}">
+                            <i class="icon">
+                                <i class="fa-solid fa-chalkboard-user"></i>
+                            </i>
+                            <span class="item-name">Account Request</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
                         <a class="nav-link {{(request()->segment(2) == 'sub-departments') ? 'active' : ''}}" aria-current="page" href="{{route('dept.subdepartments')}}">
                             <i class="icon">
                                 <i class="fa-solid fa-code-fork"></i>
                             </i>
                             <span class="item-name">Sub Departments</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link {{(request()->segment(2) == 'positions') ? 'active' : ''}}" aria-current="page" href="{{ route('dept.positions') }}">
+                            <i class="icon">
+                                <i class="fa-solid fa-sitemap"></i>
+                            </i>
+                            <span class="item-name">Positions</span>
                         </a>
                     </li>
                     <br>

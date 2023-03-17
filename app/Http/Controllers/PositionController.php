@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Position;
+use App\Models\SubDepartment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -13,15 +14,47 @@ class PositionController extends Controller
 {
     public function index(Request $request)
     {
-        // get position
-        $positions = Position::whereHas('subDepartment', function ($query) {
-            $query->where('name', Auth::user()->employee->position->subDepartment->name);
-        })->withCount('employees')->latest()->get();
+        // get user role
+        $role = Auth::user()->role;
+
+        // check role
+        switch ($role) {
+            case 'Admin':
+                # code...
+                break;
+
+            case 'Approver1':
+                // get position
+                $positions = Position::whereHas('subDepartment', function ($query) {
+                    $query->where('department_id', Auth::user()->employee->position->subDepartment->department_id);
+                })->withCount('employees')->latest()->get();
+
+                // define view
+                $view = 'approver1.position.index';
+                break;
+
+            case 'Approver2':
+                // get position
+                $positions = Position::whereHas('subDepartment', function ($query) {
+                    $query->where('id', Auth::user()->employee->position->sub_department_id);
+                })->withCount('employees')->latest()->get();
+
+                // define view
+                $view = 'approver2.position.index';
+                break;
+
+            default:
+                abort(404);
+                break;
+        }
 
         // draw table
         if ($request->ajax()) {
             return DataTables::of($positions)
                 ->addIndexColumn()
+                ->addColumn('subdept', function ($row) {
+                    return $row->subDepartment->name;
+                })
                 ->addColumn('total', function ($row) {
                     return $row->employees_count;
                 })
@@ -34,24 +67,63 @@ class PositionController extends Controller
                 ->make(true);
         }
 
-        return view('approver2.position.index', [
+        return view($view, [
             'title' => 'Positions - Helpdesk Ticketing System',
             'name'  => Auth::user()->employee->name
         ]);
     }
 
+    public function getSubdept()
+    {
+        // query sub dept in user dept
+        $subdept = SubDepartment::where('department_id', Auth::user()->employee->position->subDepartment->department_id)->get();
+
+        // return response
+        return response()->json($subdept);
+    }
+
     public function store(Request $request)
     {
-        // get subdept id
-        $subdept = Auth::user()->employee->position->subDepartment->id;
+        // get user role
+        $role = Auth::user()->role;
 
-        // set validation
-        $validator = Validator::make($request->all(), [
-            'name' => [
-                'required',
-                Rule::unique('positions')->where('sub_department_id', $subdept)
-            ]
-        ]);
+        // check role 
+        switch ($role) {
+            case 'Admin':
+                # code...
+                break;
+
+            case 'Approver1':
+                // get subdept id
+                $subdept = $request->sub_department_id;
+
+                // set validation
+                $validator = Validator::make($request->all(), [
+                    'sub_department_id' => 'required',
+                    'name' => [
+                        'required',
+                        Rule::unique('positions')->where('sub_department_id', $subdept)
+                    ]
+                ]);
+                break;
+
+            case 'Approver2':
+                // get subdept id
+                $subdept = Auth::user()->employee->position->subDepartment->id;
+
+                // set validation
+                $validator = Validator::make($request->all(), [
+                    'name' => [
+                        'required',
+                        Rule::unique('positions')->where('sub_department_id', $subdept)
+                    ]
+                ]);
+                break;
+
+            default:
+                abort(404);
+                break;
+        }
 
         // check if validation fails
         if ($validator->fails()) {

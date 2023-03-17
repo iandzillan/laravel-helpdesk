@@ -11,7 +11,7 @@
                 </div>
                 <div class="card-body">
                     <form id="form-update-employee" enctype="multipart/form-data" method="post">
-                        @method('put')
+                        @method('patch')
                         @csrf
                         <div class="new-user info">
                             <input type="hidden" id="employee-id" name="id" value="{{ $employee->id }}">
@@ -61,6 +61,7 @@
     <script>
         $(document).ready(function(){
             // define varibale
+            let subdept_id = "{{ $employee->position->sub_department_id }}";
             let position_id = "{{ $employee->position_id }}";
 
             // get all position
@@ -68,17 +69,14 @@
                 url: "{{ route('subdept.employees.positions') }}",
                 type: 'get',
                 cache: false,
+                data: {'id': subdept_id},
                 success:function(response){
-                    if (response) {
-                        // fill dept select option
-                        $('#employee-position').append('<option selected> -- Choose -- </option>');
-                        $.each(response, function(code, position){
-                            $('#employee-position').append('<option value="'+position.id+'">'+position.name+'</option>');
-                            $('#employee-position option[value='+position_id+']').attr('selected', 'selected');
-                        });
-                    } else {
-                        $('#employee-position').empty();
-                    }
+                    // fill position select option
+                    $('#employee-position').append('<option selected> -- Choose -- </option>');
+                    $.each(response, function(code, position){
+                        $('#employee-position').append('<option value="'+position.id+'">'+position.name+'</option>');
+                        $('#employee-position option[value='+position_id+']').attr('selected', 'selected');
+                    });
                 }
             });
 
@@ -111,14 +109,15 @@
                 });
 
                 // define form variable
-                let formData = this;
+                let formData = new FormData(this);
+                let nik      = formData.get('nik');
 
                 // ajax update
                 $.ajax({
-                    url: "{{ route('subdept.employees.update') }}",
+                    url: "{{ route('subdept.employees.update', '') }}" + '/' + nik,
                     type: "post",
                     cache: false,
-                    data: new FormData(formData), 
+                    data: formData, 
                     processData:false,
                     dataType:'json',
                     contentType:false,

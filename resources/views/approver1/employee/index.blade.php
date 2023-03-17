@@ -83,8 +83,8 @@
                 success:function(response){
                     // fill the subdept select option
                     $('#employee-subdept').empty();
-                    $('#employee-subdept').append('<option selected> -- Choose -- </option>');
-                    $('#employee-position').append('<option selected> -- Choose -- </option>');
+                    $('#employee-subdept').append('<option disabled selected> -- Choose -- </option>');
+                    $('#employee-position').append('<option disabled selected> -- Choose -- </option>');
                     $.each(response, function(code, subdept){
                         $('#employee-subdept').append(`<option value="${subdept.id}">${subdept.name}</option>`);
                     });
@@ -109,7 +109,7 @@
                     success:function(response){
                         // fill the position select option
                         $('#employee-position').empty();
-                        $('#employee-position').append('<option selected> -- Choose -- </option>');
+                        $('#employee-position').append('<option disabled selected> -- Choose -- </option>');
                         $.each(response, function(code, position){
                             $('#employee-position').append(`<option value="${position.id}">${position.name}</option>`);
                         });
@@ -234,14 +234,14 @@
                         }
 
                         // check if subdept employee has error
-                        if (error.responseJSON.subdept_id) {
+                        if (error.responseJSON.sub_department_id) {
                             // show alert
                             $('#employee-subdept').addClass('is-invalid');
                             $('#alert-employee-subdept').addClass('d-block');
                             $('#alert-employee-subdept').removeClass('d-none');
 
                             // show message
-                            $('#alert-employee-subdept').html(error.responseJSON.subdept_id);
+                            $('#alert-employee-subdept').html(error.responseJSON.sub_department_id);
                         } else {
                             // remove alert
                             $('#employee-subdept').removeClass('is-invalid');

@@ -21,6 +21,7 @@ class EmployeeController extends Controller
         // get user role in session
         $role = Auth::user()->role;
 
+        // check role
         switch ($role) {
             case 'Admin':
                 return view('admin.employee.index', [
@@ -72,6 +73,7 @@ class EmployeeController extends Controller
         // get user role
         $role = Auth::user()->role;
 
+        // check role
         switch ($role) {
             case 'Admin':
                 // set validation
@@ -82,6 +84,10 @@ class EmployeeController extends Controller
                     'department_id'     => 'required',
                     'sub_department_id' => 'required',
                     'position_id'       => 'required'
+                ], [
+                    'department_id.required'     => 'The department field is required',
+                    'sub_department_id.required' => 'The sub department field is required',
+                    'position_id.required'       => 'The position field is required'
                 ]);
                 break;
 
@@ -93,6 +99,9 @@ class EmployeeController extends Controller
                     'image'             => 'sometimes|image|mimes:jpeg,png,jpg|max:1024',
                     'sub_department_id' => 'required',
                     'position_id'       => 'required'
+                ], [
+                    'sub_department_id.required' => 'The sub department field is required',
+                    'position_id.required'       => 'The position field is required'
                 ]);
                 break;
 
@@ -103,6 +112,8 @@ class EmployeeController extends Controller
                     'name'        => 'required',
                     'image'       => 'sometimes|image|mimes:jpeg,png,jpg|max:1024',
                     'position_id' => 'required'
+                ], [
+                    'position_id.required'       => 'The position field is required'
                 ]);
                 break;
 
@@ -150,65 +161,98 @@ class EmployeeController extends Controller
         // get user role 
         $role = Auth::user()->role;
 
-        // query has many through employees
-        $subdept =  SubDepartment::where('id', Auth::user()->employee->position->sub_department_id)->first();
-        $employees = $subdept->employees->sortByDesc('id');
-
+        // check role
         switch ($role) {
             case 'Admin':
                 # code...
                 break;
 
             case 'Approver1':
-                $employees = Employee::with(['position', 'position.subDepartment', 'position.subDepartment.department'])->whereHas('position.subDepartment.department', function ($query) {
-                    $query->where('id', Auth::user()->employee->position->subDepartment->department_id);
-                })->get();
-                dump($employees);
+                // query employee edger loading
+                $employees = Employee::with(['position', 'position.subDepartment'])->whereHas('position.subDepartment', function ($query) {
+                    $query->where('department_id', Auth::user()->employee->position->subDepartment->department_id);
+                })->where('id', '!=', Auth::user()->employee_id)->latest()->get();
 
-                // return to view
-                return view('approver1.employee.list', [
-                    'title' => 'List Employess - Helpdesk Ticketing System',
-                    'name'  => Auth::user()->employee->name
-                ]);
+                // route show employee
+                $route = 'dept.employees.show';
+
+                // view approver1
+                $view = 'approver1.employee.list';
                 break;
 
             case 'Approver2':
-                // draw table
-                if ($request->ajax()) {
-                    return DataTables::of($employees)
-                        ->addIndexColumn()
-                        ->addColumn('position', function ($row) {
-                            return $row->position->name;
-                        })
-                        ->addColumn('action', function ($row) {
-                            $btn = '<a href="' . route('subdept.employees.show', $row->nik) . '" class="btn btn-primary btn-sm" title="Edit this employee"> <i class="fa-solid fa-pen-to-square"></i> </a>';
-                            $btn = $btn . ' ' . '<a href="javascript:void(0)" id="btn-delete-employee" data-id="' . $row->nik . '" class="btn btn-danger btn-sm" title="Delete this employee"> <i class="fa-solid fa-eraser"></i> </a>';
-                            return $btn;
-                        })
-                        ->rawColumns(['action'])
-                        ->make(true);
-                }
+                // query employee edger loading
+                $employees = Employee::with(['position', 'position.subDepartment'])->whereHas('position.subDepartment', function ($query) {
+                    $query->where('id', Auth::user()->employee->position->sub_department_id);
+                })->where('id', '!=', Auth::user()->employee_id)->latest()->get();
 
-                // return to view
-                return view('approver2.employee.list', [
-                    'title' => 'List Employess - Helpdesk Ticketing System',
-                    'name'  => Auth::user()->employee->name
-                ]);
+                // route show employee
+                $route = 'subdept.employees.show';
+
+                // view approver1
+                $view = 'approver2.employee.list';
                 break;
 
             default:
                 abort(404);
                 break;
         }
+
+        // draw table
+        if ($request->ajax()) {
+            return DataTables::of($employees)
+                ->addIndexColumn()
+                ->addColumn('subdept', function ($row) {
+                    return $row->position->subDepartment->name;
+                })
+                ->addColumn('position', function ($row) {
+                    return $row->position->name;
+                })
+                ->addColumn('action', function ($row) use ($route) {
+                    $btn = '<a href="' . route($route, $row->nik) . '" class="btn btn-primary btn-sm" title="Edit this employee"> <i class="fa-solid fa-pen-to-square"></i> </a>';
+                    $btn = $btn . ' ' . '<a href="javascript:void(0)" data-id="' . $row->nik . '" id="btn-delete-employee" class="btn btn-danger btn-sm" title="Delete this employee"> <i class="fa-solid fa-eraser"></i> </a>';
+                    return $btn;
+                })
+                ->rawColumns(['action'])
+                ->make(true);
+        }
+
+        // return to view
+        return view($view, [
+            'title' => 'List Employess - Helpdesk Ticketing System',
+            'name'  => Auth::user()->employee->name
+        ]);
     }
 
     public function show($employee)
     {
+        // get user role
+        $role = Auth::user()->role;
+
         // get employee
         $employee = Employee::where('nik', $employee)->first();
 
+        // check role
+        switch ($role) {
+            case 'Admin':
+                $view = 'admin.employee.edit';
+                break;
+
+            case 'Approver1':
+                $view = 'approver1.employee.edit';
+                break;
+
+            case 'Approver2':
+                $view = 'approver2.employee.edit';
+                break;
+
+            default:
+                abort(404);
+                break;
+        }
+
         // return view
-        return view('approver2.employee.edit', [
+        return view($view, [
             'title'    => "$employee->name - Helpdesk Ticketing System",
             'name'     => Auth::user()->employee->name,
             'employee' => $employee
@@ -217,15 +261,47 @@ class EmployeeController extends Controller
 
     public function update(Request $request)
     {
-        // get employe
+        // get user role
+        $role = Auth::user()->role;
+
+        // get employee
         $employee = Employee::where('nik', $request->nik)->first();
 
-        // set validation
-        $validator = Validator::make($request->all(), [
-            'name'        => 'required',
-            'position_id' => 'required',
-            'image'       => 'sometimes|image|mimes:jpeg,png,jpg|max:1024',
-        ]);
+        // check role
+        switch ($role) {
+            case 'Admin':
+                # code...
+                break;
+
+            case 'Approver1':
+                // set validation
+                $validator = Validator::make($request->all(), [
+                    'name'              => 'required',
+                    'position_id'       => 'required',
+                    'sub_department_id' => 'required',
+                    'image'             => 'sometimes|image|mimes:jpeg,png,jpg|max:1024',
+                ], [
+                    'sub_department_id.required' => 'The sub department field is required',
+                    'position_id.required'       => 'The position field is required'
+                ]);
+                break;
+
+            case 'Approver2':
+                // set validation
+                $validator = Validator::make($request->all(), [
+                    'name'        => 'required',
+                    'position_id' => 'required',
+                    'image'       => 'sometimes|image|mimes:jpeg,png,jpg|max:1024',
+                ], [
+                    'position_id.required'       => 'The position field is required'
+                ]);
+                break;
+
+            default:
+                abort(404);
+                break;
+        }
+
 
         // check if validation fails
         if ($validator->fails()) {
@@ -292,14 +368,43 @@ class EmployeeController extends Controller
 
     public function userRequestList(Request $request)
     {
-        // query has many through employees
-        $subdept =  SubDepartment::where('id', Auth::user()->employee->position->sub_department_id)->first();
-        $employees = $subdept->employees->where('isRequest', 0)->sortByDesc('id');
+        // get user role
+        $role = Auth::user()->role;
+
+        // check role
+        switch ($role) {
+            case 'Approver1':
+                // query employee with edger loading
+                $employees = Employee::with(['position', 'position.subDepartment'])->whereHas('position.subDepartment', function ($query) {
+                    $query->where('department_id', Auth::user()->employee->position->subDepartment->department_id);
+                })->where('isRequest', 0)->latest()->get();
+
+                // define view
+                $view = 'approver1.employee.user-request';
+                break;
+
+            case 'Approver2':
+                // query employee with edger loading
+                $employees = Employee::with('position')->whereHas('position', function ($query) {
+                    $query->where('sub_department_id', Auth::user()->employee->position->sub_department_id);
+                })->where('isRequest', 0)->latest()->get();
+
+                // defien view 
+                $view = 'approver2.employee.user-request';
+                break;
+
+            default:
+                abort(404);
+                break;
+        }
 
         // draw table
         if ($request->ajax()) {
             return DataTables::of($employees)
                 ->addIndexColumn()
+                ->addColumn('subdept', function ($row) {
+                    return $row->position->subDepartment->name;
+                })
                 ->addColumn('position', function ($row) {
                     return $row->position->name;
                 })
@@ -312,7 +417,7 @@ class EmployeeController extends Controller
         }
 
         // return view
-        return view('approver2.employee.user-request', [
+        return view($view, [
             'title' => 'User Account Request - Helpdesk Ticketing System',
             'name'  => Auth::user()->employee->name
         ]);

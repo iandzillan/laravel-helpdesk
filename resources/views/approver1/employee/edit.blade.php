@@ -6,18 +6,20 @@
             <div class="card">
                 <div class="card-header d-flex justify-content-between">
                     <div class="header-title">
-                        <h4 class="card-title text-bold">New Employee Information</h4>
+                        <h4 class="card-title text-bold">Edit {{ $employee->name }}'s Information</h4>
                     </div>
                 </div>
                 <div class="card-body">
-                    <form id="form-create-employee" enctype="multipart/form-data">
+                    <form id="form-update-employee" enctype="multipart/form-data" method="post">
+                        @method('patch')
                         @csrf
                         <div class="new-user info">
+                            <input type="hidden" id="employee-id" name="id" value="{{ $employee->id }}">
                             <div class="row">
                                 <div class="col-xl-6 col-lg-6">
                                     <div class="form-group">
                                         <div class="profile-img-edit position relative mb-3">
-                                            <img src="{{ asset('assets/images/avatars/avtar_1.png') }}" id="employee-image-preview" alt="profile-pic" class="theme-color-default-img profile-pic rounded avatar-100">
+                                            <img src="{{ asset('storage/uploads/photo-profile/'.$employee->image) }}" id="employee-image-preview" alt="profile-pic" class="theme-color-default-img profile-pic rounded avatar-100">
                                         </div>
                                         <input type="file" class="form-control" id="employee-image" name="image">
                                         <div class="invalid-feedback d-none" role="alert" id="alert-employee-image"></div>
@@ -33,14 +35,25 @@
                                 <div class="col-xl-6 col-lg-6">
                                     <div class="form-group">
                                         <label for="employee-nik" class="form-label">NIK</label>
-                                        <input type="text" class="form-control" id="employee-nik" name="nik" placeholder="Employee's nik">
+                                        <input type="text" class="form-control" id="employee-nik" name="nik" placeholder="Employee's nik" value="{{ $employee->nik }}" readonly>
                                         <div class="invalid-feedback d-none" role="alert" id="alert-employee-nik"></div>
                                     </div>
                                     <div class="form-group">
                                         <label for="employee-name" class="form-label">Full Name</label>
-                                        <input type="text" class="form-control" id="employee-name" name="name" placeholder="Employee's name">
+                                        <input type="text" class="form-control" id="employee-name" name="name" placeholder="Employee's name" value="{{ $employee->name }}">
                                         <div class="invalid-feedback d-none" role="alert" id="alert-employee-name"></div>
                                     </div>
+                                </div>
+                            </div>
+                            <div class="row d-felx justify-content-end">
+                                <div class="col-xl-6 col-lg-6">
+                                    <div class="form-group">
+                                        <label for="employee-subdept" class="form-label">Sub Department</label>
+                                        <select id="employee-subdept" name="sub_department_id" class="form-control form-select2"></select>
+                                        <div class="invalid-feedback d-none" role="alert" id="alert-employee-subdept"></div>
+                                    </div>
+                                </div>
+                                <div class="col-xl-6 col-lg-6">
                                     <div class="form-group">
                                         <label for="employee-position" class="form-label">Position</label>
                                         <select id="employee-position" name="position_id" class="form-control form-select2"></select>
@@ -48,7 +61,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <button type="subtmit" class="btn btn-primary mt-3" id="store-employee">Save</button>
+                            <button type="subtmit" class="btn btn-primary mt-3" id="update-employee">Save</button>
                         </div>
                     </form>
                 </div>
@@ -58,30 +71,65 @@
 
     <script>
         $(document).ready(function(){
-            // get sub dept id employee
-            let id = "{{ Auth::user()->employee->position->sub_department_id }}";
+            // define varibale
+            let dept_id     = "{{ $employee->position->subDepartment->department_id }}";
+            let subdept_id  = "{{ $employee->position->sub_department_id }}";
+            let position_id = "{{ $employee->position_id }}";
 
-            // get position
+            // get all sub dept
             $.ajax({
-                url: "{{ route('subdept.employees.positions') }}",
+                url: "{{ route('dept.employees.subdepts') }}",
                 type: "get",
                 cache: false,
-                data:{
-                    'id': id
-                },
+                data: {'id': dept_id},
                 success:function(response){
-                    if (response) {
-                        // empty select option
+                    // fill subdept select option
+                    $('#employee-subdept').append('<option disabled selected> -- Choose -- </option>');
+                    $.each(response, function(code, subdept){
+                        $('#employee-subdept').append('<option value="'+subdept.id+'">'+subdept.name+'</option>');
+                        $('#employee-subdept option[value="'+subdept_id+'"]').attr('selected', 'selected');
+                    });
+                }
+            });
+
+            // get all position
+            $.ajax({
+                url: "{{ route('dept.employees.positions') }}",
+                type: "get",
+                cache: false,
+                data: {'id': subdept_id},
+                success:function(response){
+                    // fill position select option
+                    $('#employee-position').append('<option disabled selected> -- Choose -- </option>');
+                    $.each(response, function(code, position){
+                        $('#employee-position').append('<option value="'+position.id+'">'+position.name+'</option>');
+                        $('#employee-position option[value="'+position_id+'"]').attr('selected', 'selected');
+                    });
+                },
+                error:function(error){
+                    console.log(error.responseJSON.message);
+                }
+            });
+
+            // get all position when sub dept val change
+            $('#employee-subdept').change(function(){
+                // get sub dept id
+                let id = $('#employee-subdept').val();
+
+                // get position
+                $.ajax({
+                    url: "{{ route('dept.employees.positions') }}",
+                    type: "get",
+                    cache: false,
+                    data: {'id': id},
+                    success:function(response){
                         $('#employee-position').empty();
                         $('#employee-position').append('<option disabled selected> -- Choose -- </option>');
-                        // fill position select option
                         $.each(response, function(code, position){
                             $('#employee-position').append('<option value="'+position.id+'">'+position.name+'</option>');
                         });
-                    } else {
-                        $('#employee-position').empty();
                     }
-                }
+                });
             });
 
             // preview image
@@ -94,8 +142,8 @@
                 reader.readAsDataURL(this.files[0]);
             });
 
-            // store button event
-            $('#form-create-employee').on('submit', function(e){
+            // update button event
+            $('#form-update-employee').on('submit', function(e){
                 e.preventDefault();
 
                 // show loading
@@ -104,22 +152,23 @@
                     text: 'Sending request...',
                     showConfirmButton: false,
                     allowOutsideClick: false,
-                    allowEscapeKey: false, 
                     allowEnterKey: false,
-                    didOpen: ()=>{
+                    allowEscapeKey: false, 
+                    didOpen: () => {
                         Swal.showLoading();
                     }
                 });
 
-                // define variable form
-                let formData = this;
+                // define form variable
+                let formData = new FormData(this);
+                let nik = formData.get('nik');
 
-                // ajax create
+                // ajax update
                 $.ajax({
-                    url: "{{ route('subdept.employees.store') }}",
+                    url: "{{route('dept.employees.update', '')}}"+"/"+nik,
                     type: "post",
                     cache: false,
-                    data: new FormData(formData), 
+                    data: formData, 
                     processData:false,
                     dataType:'json',
                     contentType:false,
@@ -131,24 +180,25 @@
                             showConfirmButton: false,
                             timer: 2000
                         });
-                        
+
                         // reload page
-                        setTimeout(() => {
+                        setTimeout(function(){
                             location.reload();
                         }, 2000);
-                    },
+                    }, 
                     error:function(error){
+                        console.log(error.responseJSON.message);
                         // show message
                         Swal.fire({
                             icon: 'warning',
-                            title: 'Please check again',
+                            title: 'Something wrong',
+                            text: 'Please check again',
                             showConfirmButton: false,
-                            timer: 2000
+                            timer: 1000
                         });
 
                         // check if photo profile field error
                         if (error.responseJSON.image) {
-                            // show alert
                             $('#employee-image').addClass('is-invalid');
                             $('#alert-employee-image').removeClass('d-none');
                             $('#alert-employee-image').addClass('d-block');
@@ -156,26 +206,9 @@
                             // show message
                             $('#alert-employee-image').html(error.responseJSON.image);
                         } else {
-                            // remove alert
                             $('#employee-image').removeClass('is-invalid');
                             $('#alert-employee-image').removeClass('d-block');
                             $('#alert-employee-image').addClass('d-none');
-                        }
-
-                        // check if nik field error
-                        if (error.responseJSON.nik) {
-                            // show alert
-                            $('#employee-nik').addClass('is-invalid');
-                            $('#alert-employee-nik').removeClass('d-none');
-                            $('#alert-employee-nik').addClass('d-block');
-
-                            // show message
-                            $('#alert-employee-nik').html(error.responseJSON.nik);
-                        } else {
-                            // remove alert
-                            $('#employee-nik').removeClass('is-invalid');
-                            $('#alert-employee-nik').removeClass('d-block');
-                            $('#alert-employee-nik').addClass('d-none');
                         }
 
                         // check if name field error
@@ -209,10 +242,25 @@
                             $('#alert-employee-position').removeClass('d-block');
                             $('#alert-employee-position').addClass('d-none');
                         }
+
+                        // check if position field error
+                        if (error.responseJSON.sub_department_id) {
+                            // show alert
+                            $('#employee-subdept').addClass('is-invalid');
+                            $('#alert-employee-subdept').removeClass('d-none');
+                            $('#alert-employee-subdept').addClass('d-block');
+
+                            // show message
+                            $('#alert-employee-subdept').html(error.responseJSON.sub_department_id);
+                        } else {
+                            // remove alert
+                            $('#employee-subdept').removeClass('is-invalid');
+                            $('#alert-employee-subdept').removeClass('d-block');
+                            $('#alert-employee-subdept').addClass('d-none');
+                        }
                     }
                 });
             });
         });
     </script>
-
 @endsection

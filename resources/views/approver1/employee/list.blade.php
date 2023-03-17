@@ -28,4 +28,79 @@
             </div>
         </div>
     </div>
+
+    <script>
+        $(document).ready(function(){
+            // draw table
+            let table = $('.data-table').DataTable({
+                responsive: true,
+                processing: true,
+                serverSide: true,
+                ajax: "{{ route('dept.employees.list') }}",
+                columns: [
+                    {data: 'DT_RowIndex', name: 'DT_RowIndex'},
+                    {data: 'nik', name: 'nik'},
+                    {data: 'name', name: 'name'},
+                    {data: 'subdept', name: 'subdept'},
+                    {data: 'position', name: 'position'},
+                    {data: 'action', name: 'action', orderable: false, searchable: false},
+                ]
+            });
+
+            // delete button action
+            $('body').on('click', '#btn-delete-employee', function(){
+                // define variable
+                let nik   = $(this).data('id');
+                let token = $('meta[name="csrf-token"]').attr('content');
+
+                // show confirmation
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Are you sure?',
+                    text: 'All data related to this employee will be deleted as well.',
+                    showCancelButton: true,
+                    cancelButtonText: 'No',
+                    confirmButtonText: 'Yes'
+                }).then((result) => {
+                    if(result.isConfirmed){
+                        // show loading
+                        Swal.fire({
+                            title: 'Please wait',
+                            text: 'Sending request...',
+                            showConfirmButton: false,
+                            allowOutsideClick: false,
+                            allowEscapeKey: false, 
+                            allowEnterKey: false,
+                            didOpen: ()=>{
+                                Swal.showLoading();
+                            }
+                        });
+
+                        // ajax delete
+                        $.ajax({
+                            url: `employees/${nik}`,
+                            type: 'delete',
+                            cache: false,
+                            data: {
+                                '_token': token
+                            },
+                            success:function(response){
+                                // show message
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: `${response.message}`,
+                                    showConfirmButton: false,
+                                    timer: 3000
+                                });
+
+                                // draw table
+                                table.draw();
+                            }
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+
 @endsection

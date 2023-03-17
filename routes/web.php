@@ -10,8 +10,6 @@ use App\Http\Controllers\SubCategoryController;
 use App\Http\Controllers\SubDepartmentController;
 use App\Http\Controllers\UrgencyController;
 use App\Http\Controllers\UserController;
-use App\Models\Employee;
-use Database\Factories\EmployeeFactory;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -91,9 +89,21 @@ Route::group(['middleware' => ['auth']], function () {
         Route::post('/dept/employees', [EmployeeController::class, 'store'])->name('dept.employees.store');
 
         Route::get('/dept/employees', [EmployeeController::class, 'list'])->name('dept.employees.list');
-        Route::get('/dept/employees/{employee}/edit', [EmployeeController::class, 'deptEmployeeShow'])->name('dept.employees.show');
-        Route::patch('/dept/employees/{employee}', [EmployeeController::class, 'deptEmployeeUpdate'])->name('dept.employees.update');
-        Route::delete('/dept/employees/{employee}', [EmployeeFactory::class, 'deptEmployeeDestroy'])->name('dept.employees.destroy');
+        Route::get('/dept/employees/{employee}/edit', [EmployeeController::class, 'show'])->name('dept.employees.show');
+        Route::patch('/dept/employees/{employee}', [EmployeeController::class, 'update'])->name('dept.employees.update');
+        Route::delete('/dept/employees/{employee}', [EmployeeController::class, 'destroy'])->name('dept.employees.destroy');
+
+        Route::get('/dept/user-request', [EmployeeController::class, 'userRequestList'])->name('dept.userrequestlist');
+        Route::get('/dept/user-request/{employee}', [EmployeeController::class, 'userRequest'])->name('dept.userrequest');
+        Route::patch('/dept/is-request', [EmployeeController::class, 'isRequest'])->name('dept.isRequest');
+        Route::get('/dept/send-request', [EmployeeController::class, 'sendRequest'])->name('dept.sendRequest');
+
+        Route::get('/dept/positions', [PositionController::class, 'index'])->name('dept.positions');
+        Route::get('/dept/positions/getSubdept', [PositionController::class, 'getSubdept'])->name('dept.positions.getSubdept');
+        Route::post('/dept/positions', [PositionController::class, 'store'])->name('dept.positions.store');
+        Route::get('/dept/positions/{position}/edit', [PositionController::class, 'show'])->name('dept.positions.show');
+        Route::patch('/dept/positions/{position}', [PositionController::class, 'update'])->name('dept.positions.update');
+        Route::delete('/dept/positions/{position}', [PositionController::class, 'destroy'])->name('dept.positions.destroy');
     });
 
     Route::group(['middleware' => ['role:Approver2']], function () {
@@ -105,7 +115,7 @@ Route::group(['middleware' => ['auth']], function () {
 
         Route::get('/subdept/employees', [EmployeeController::class, 'list'])->name('subdept.employees.list');
         Route::get('/subdept/employees/{employee}/edit', [EmployeeController::class, 'show'])->name('subdept.employees.show');
-        Route::put('/subdept/employees/update', [EmployeeController::class, 'update'])->name('subdept.employees.update');
+        Route::patch('/subdept/employees/{employee}', [EmployeeController::class, 'update'])->name('subdept.employees.update');
         Route::delete('/subdept/employees/{employee}', [EmployeeController::class, 'destroy'])->name('subdept.employees.destroy');
 
         Route::get('/subdept/user-request', [EmployeeController::class, 'userRequestList'])->name('subdept.userrequestlist');
