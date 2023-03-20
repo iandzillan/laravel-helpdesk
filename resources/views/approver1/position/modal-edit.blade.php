@@ -15,6 +15,12 @@
                         <input type="text" class="form-control" id="name-edit" name="name">
                         <div class="invalid-feedback d-none" role="alert" id="alert-name-edit"></div>
                     </div>
+
+                    <div class="form-group">
+                        <label for="subdept-edit" class="form-label">Sub Department</label>
+                        <select id="subdept-edit" name="subdept-edit" class="form-control select2-edit"></select>
+                        <div class="invalid-feedback d-none" role="alert" id="alert-subdept-edit"></div>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>

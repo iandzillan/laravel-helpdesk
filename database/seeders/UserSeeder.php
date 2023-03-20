@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Employee;
+use App\Models\Manager;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -18,9 +19,19 @@ class UserSeeder extends Seeder
     {
         $faker = Faker::create('id_ID');
 
-        $role = [
+        $managers = Manager::all();
+
+        foreach ($managers as $manager) {
+            $user = new User;
+            $user->username = strtolower(str_replace(" ", "", $manager->name));
+            $user->email    = strtolower(str_replace(" ", "", $manager->name)) . "@example.com";
+            $user->role     = 'Approver1';
+            $user->password = Hash::make('password');
+            $manager->user()->save($user);
+        }
+
+        $role_employee = [
             'Admin',
-            'Approver1',
             'Approver2',
             'User',
             'Technician',
@@ -29,13 +40,12 @@ class UserSeeder extends Seeder
         $employees = Employee::all();
 
         foreach ($employees as $employee) {
-            User::create([
-                'employee_id'   => $employee->id,
-                'username'      => strtolower(str_replace(" ", "", $employee->name)),
-                'email'         => strtolower(str_replace(" ", "", $employee->name)) . "@example.com",
-                'role'          => $faker->randomElement($role),
-                'password'      => Hash::make('password')
-            ]);
+            $user = new User;
+            $user->username = strtolower(str_replace(" ", "", $employee->name));
+            $user->email    = strtolower(str_replace(" ", "", $employee->name)) . "@example.com";
+            $user->role     = $faker->randomElement($role_employee);
+            $user->password = Hash::make('password');
+            $employee->user()->save($user);
         }
     }
 }

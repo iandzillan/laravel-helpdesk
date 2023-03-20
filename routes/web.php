@@ -38,7 +38,7 @@ Route::get('/logout', [LoginController::class, 'logout'])->name('logout');
 
 Route::group(['middleware' => ['auth']], function () {
     Route::group(['middleware' => ['role:Admin']], function () {
-        Route::get('/admin/dashboard', [DashboardController::class, 'adminHome'])->name('admin.dashboard');
+        Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
 
         Route::get('/admin/categories', [CategoryController::class, 'index'])->name('admin.categories');
         Route::post('/admin/categories', [CategoryController::class, 'store'])->name('admin.categories.store');
@@ -60,12 +60,24 @@ Route::group(['middleware' => ['auth']], function () {
         Route::delete('/admin/urgencies/{urgency}', [UrgencyController::class, 'destroy'])->name('admin.urgencies.destroy');
 
         Route::get('/admin/users', [UserController::class, 'index'])->name('admin.users');
-        Route::get('/admin/users/get-employee', [UserController::class, 'getEmployee'])->name('admin.users.getEmployee');
         Route::post('/admin/users', [UserController::class, 'store'])->name('admin.users.store');
-        Route::get('/admin/users/account-active', [UserController::class, 'accountActive'])->name('admin.users.accountActive');
         Route::get('/admin/users/{user}/edit', [UserController::class, 'show'])->name('admin.users.show');
         Route::patch('/admin/users/{user}', [UserController::class, 'update'])->name('admin.users.update');
         Route::delete('/admin/users/{user}', [UserController::class, 'destroy'])->name('admin.users.destroy');
+
+
+        Route::post('/admin/users-request/', [UserController::class, 'request'])->name('admin.users.request');
+        Route::get('/admin/users-request/get-employee', [UserController::class, 'getEmployee'])->name('admin.users.getEmployee');
+        Route::get('/admin/users-request/account-active', [UserController::class, 'accountActive'])->name('admin.users.accountActive');
+
+        Route::get('/admin/new-employees', [EmployeeController::class, 'index'])->name('admin.employees.new');
+        Route::get('/admin/new-employees/position', [EmployeeController::class, 'getPositions'])->name('admin.employees.positions');
+        Route::post('/admin/employees', [EmployeeController::class, 'store'])->name('admin.employees.store');
+
+        Route::get('/admin/employees', [EmployeeController::class, 'list'])->name('admin.employees.list');
+        Route::get('/admin/employees/{employee}/edit', [EmployeeController::class, 'show'])->name('admin.employees.show');
+        Route::patch('/admin/employees/{employee}', [EmployeeController::class, 'update'])->name('admin.employees.update');
+        Route::delete('/admin/employees/{employee}', [EmployeeController::class, 'destroy'])->name('admin.employees.destroy');
 
         Route::get('/admin/departments', [DepartmentController::class, 'index'])->name('admin.departments');
         Route::post('/admin/departments', [DepartmentController::class, 'store'])->name('admin.departments.store');
@@ -75,7 +87,7 @@ Route::group(['middleware' => ['auth']], function () {
     });
 
     Route::group(['middleware' => ['role:Approver1']], function () {
-        Route::get('/dept/dashboard', [DashboardController::class, 'deptHome'])->name('dept.dashboard');
+        Route::get('/dept/dashboard', [DashboardController::class, 'index'])->name('dept.dashboard');
 
         Route::get('/dept/sub-departments', [SubDepartmentController::class, 'index'])->name('dept.subdepartments');
         Route::post('/dept/sub-departments', [SubDepartmentController::class, 'store'])->name('dept.subdepartments.store');
@@ -84,8 +96,8 @@ Route::group(['middleware' => ['auth']], function () {
         Route::delete('/dept/sub-departments/{subdept}', [SubDepartmentController::class, 'destroy'])->name('dept.subdepartments.destroy');
 
         Route::get('/dept/new-employees', [EmployeeController::class, 'index'])->name('dept.employees.new');
-        Route::get('dept/new-employees/subdept', [EmployeeController::class, 'getSubdepts'])->name('dept.employees.subdepts');
-        Route::get('dept/new-employees/position', [EmployeeController::class, 'getPositions'])->name('dept.employees.positions');
+        Route::get('/dept/new-employees/subdept', [EmployeeController::class, 'getSubdepts'])->name('dept.employees.subdepts');
+        Route::get('/dept/new-employees/position', [EmployeeController::class, 'getPositions'])->name('dept.employees.positions');
         Route::post('/dept/employees', [EmployeeController::class, 'store'])->name('dept.employees.store');
 
         Route::get('/dept/employees', [EmployeeController::class, 'list'])->name('dept.employees.list');
@@ -107,7 +119,7 @@ Route::group(['middleware' => ['auth']], function () {
     });
 
     Route::group(['middleware' => ['role:Approver2']], function () {
-        Route::get('/subdept/dashboard', [DashboardController::class, 'subdeptHome'])->name('subdept.dashboard');
+        Route::get('/subdept/dashboard', [DashboardController::class, 'index'])->name('subdept.dashboard');
 
         Route::get('/subdept/new-employee', [EmployeeController::class, 'index'])->name('subdept.employees.index');
         Route::get('/subdept/new-employee/position', [EmployeeController::class, 'getPositions'])->name('subdept.employees.positions');

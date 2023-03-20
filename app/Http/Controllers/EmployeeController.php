@@ -21,26 +21,29 @@ class EmployeeController extends Controller
         // get user role in session
         $role = Auth::user()->role;
 
+        // get latest nik
+        $employee = Employee::latest('nik')->first();
+
         // check role
         switch ($role) {
             case 'Admin':
                 return view('admin.employee.index', [
                     'title' => 'New employee - Helpdesk Ticketing System',
-                    'name'  => Auth::user()->employee->name
+                    'name'  => Auth::user()->userable->name,
                 ]);
                 break;
 
             case 'Approver1':
                 return view('approver1.employee.index', [
                     'title' => 'New employee - Helpdesk Ticketing System',
-                    'name'  => Auth::user()->employee->name
+                    'name'  => Auth::user()->userable->name,
                 ]);
                 break;
 
             case 'Approver2':
                 return view('approver2.employee.index', [
                     'title' => 'New employee - Helpdesk Ticketing System',
-                    'name'  => Auth::user()->employee->name
+                    'name'  => Auth::user()->userable->name,
                 ]);
                 break;
 
@@ -170,8 +173,8 @@ class EmployeeController extends Controller
             case 'Approver1':
                 // query employee edger loading
                 $employees = Employee::with(['position', 'position.subDepartment'])->whereHas('position.subDepartment', function ($query) {
-                    $query->where('department_id', Auth::user()->employee->position->subDepartment->department_id);
-                })->where('id', '!=', Auth::user()->employee_id)->latest()->get();
+                    $query->where('department_id', Auth::user()->userable->department_id);
+                })->latest()->get();
 
                 // route show employee
                 $route = 'dept.employees.show';
@@ -184,7 +187,7 @@ class EmployeeController extends Controller
                 // query employee edger loading
                 $employees = Employee::with(['position', 'position.subDepartment'])->whereHas('position.subDepartment', function ($query) {
                     $query->where('id', Auth::user()->employee->position->sub_department_id);
-                })->where('id', '!=', Auth::user()->employee_id)->latest()->get();
+                })->latest()->get();
 
                 // route show employee
                 $route = 'subdept.employees.show';
@@ -220,7 +223,7 @@ class EmployeeController extends Controller
         // return to view
         return view($view, [
             'title' => 'List Employess - Helpdesk Ticketing System',
-            'name'  => Auth::user()->employee->name
+            'name'  => Auth::user()->userable->name
         ]);
     }
 
@@ -254,7 +257,7 @@ class EmployeeController extends Controller
         // return view
         return view($view, [
             'title'    => "$employee->name - Helpdesk Ticketing System",
-            'name'     => Auth::user()->employee->name,
+            'name'     => Auth::user()->userable->name,
             'employee' => $employee
         ]);
     }
@@ -376,7 +379,7 @@ class EmployeeController extends Controller
             case 'Approver1':
                 // query employee with edger loading
                 $employees = Employee::with(['position', 'position.subDepartment'])->whereHas('position.subDepartment', function ($query) {
-                    $query->where('department_id', Auth::user()->employee->position->subDepartment->department_id);
+                    $query->where('department_id', Auth::user()->userable->department_id);
                 })->where('isRequest', 0)->latest()->get();
 
                 // define view
@@ -386,7 +389,7 @@ class EmployeeController extends Controller
             case 'Approver2':
                 // query employee with edger loading
                 $employees = Employee::with('position')->whereHas('position', function ($query) {
-                    $query->where('sub_department_id', Auth::user()->employee->position->sub_department_id);
+                    $query->where('sub_department_id', Auth::user()->userable->position->sub_department_id);
                 })->where('isRequest', 0)->latest()->get();
 
                 // defien view 
@@ -419,7 +422,7 @@ class EmployeeController extends Controller
         // return view
         return view($view, [
             'title' => 'User Account Request - Helpdesk Ticketing System',
-            'name'  => Auth::user()->employee->name
+            'name'  => Auth::user()->userable->name
         ]);
     }
 

@@ -14,7 +14,7 @@ class SubDepartmentController extends Controller
 {
     public function index(Request $request)
     {
-        $sub_departments = SubDepartment::where('department_id', Auth::user()->employee->position->subDepartment->department_id)->withCount('employees')->latest()->get();
+        $sub_departments = SubDepartment::where('department_id', Auth::user()->userable->department_id)->withCount('employees')->latest()->get();
 
         if ($request->ajax()) {
             return DataTables::of($sub_departments)
@@ -33,14 +33,14 @@ class SubDepartmentController extends Controller
 
         return view('approver1.subdepartment.index', [
             'title' => 'Sub Departments - Helpdesk Ticketing System',
-            'name'  => Auth::user()->employee->name,
+            'name'  => Auth::user()->userable->name,
         ]);
     }
 
     public function store(Request $request)
     {
         // get dept id
-        $dept = Auth::user()->employee->position->subDepartment->department_id;
+        $dept = Auth::user()->userable->department_id;
         // set validation
         $validator = Validator::make($request->all(), [
             'name' => [
@@ -56,7 +56,7 @@ class SubDepartmentController extends Controller
         }
 
         // create sub department
-        $dept = Department::where('id', Auth::user()->employee->position->subDepartment->department_id)->first();
+        $dept = Department::where('id', Auth::user()->userable->department_id)->first();
         $subdept = new SubDepartment;
         $subdept->name = $request->name;
         $subdept->department()->associate($dept);
@@ -82,7 +82,7 @@ class SubDepartmentController extends Controller
     public function update(Request $request, SubDepartment $subdept)
     {
         // get dept id
-        $dept = Auth::user()->employee->position->subDepartment->department_id;
+        $dept = Auth::user()->userable->department_id;
 
         // set validation
         $validator = Validator::make($request->all(), [

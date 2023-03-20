@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Category;
+use App\Models\Employee;
 use App\Models\SubCategory;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -30,9 +31,14 @@ class SubCategorySeeder extends Seeder
 
         $faker = Faker::create('id_ID');
 
-        for ($i=0; $i < count($sub_category); $i++) { 
+        $technicians = Employee::whereHas('user', function ($query) {
+            $query->where('role', 'Technician');
+        })->pluck('id')->toArray();
+
+        for ($i = 0; $i < count($sub_category); $i++) {
             SubCategory::create([
                 'category_id' => $faker->numberBetween(1, Category::count()),
+                'technician_id' => $faker->randomElement($technicians),
                 'name' => $sub_category[$i],
             ]);
         }

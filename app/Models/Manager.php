@@ -5,15 +5,15 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Employee extends Model
+class Manager extends Model
 {
     use HasFactory;
 
     protected $fillable = [
         'nik',
         'name',
+        'position',
         'image',
-        'position_id',
         'isRequest'
     ];
 
@@ -22,13 +22,13 @@ class Employee extends Model
         return $this->morphOne('App\Models\User', 'userable');
     }
 
+    public function department()
+    {
+        return $this->belongsTo('App\Models\Department');
+    }
+
     public function tickets()
     {
         return $this->hasMany('App\Models\ticket');
-    }
-
-    public function position()
-    {
-        return $this->belongsTo('App\Models\Position');
     }
 }

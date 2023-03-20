@@ -43,8 +43,8 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    public function employee()
+    public function userable()
     {
-        return $this->belongsTo('App\Models\Employee');
+        return $this->morphTo();
     }
 }

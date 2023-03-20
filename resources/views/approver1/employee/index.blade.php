@@ -70,7 +70,7 @@
     <script>
         $(document).ready(function(){
             // get employee dept id
-            let id = "{{ Auth::user()->employee->position->subDepartment->department_id }}";
+            let id = "{{ Auth::user()->userable->department->id }}";
 
             // get subdept based on dept id 
             $.ajax({

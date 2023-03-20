@@ -5,7 +5,7 @@
         <div class="card">
             <div class="card-header d-flex justify-content-between">
                 <div class="header-title">
-                    <h4 class="card-title">Users</h4>
+                    <h4 class="card-title">Users List</h4>
                 </div>
                 <a href="javascript:void(0)" class="btn btn-primary mb-2" id="btn-create-user">
                     <i class="fa-solid fa-folder-plus"></i>

@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Department;
 use App\Models\Position;
 use App\Models\SubDepartment;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -40,10 +41,11 @@ class PositionSeeder extends Seeder
 
         $faker = Faker::create('id_ID');
 
-        for ($i=0; $i < count($position); $i++) { 
+        for ($i = 0; $i < count($position); $i++) {
+
             Position::create([
                 'name' => $position[$i],
-                'sub_department_id' => $faker->numberBetween(1, SubDepartment::count())
+                'sub_department_id' => $faker->numberBetween(1, SubDepartment::count()),
             ]);
         }
     }

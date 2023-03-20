@@ -13,6 +13,11 @@
                         <input type="text" class="form-control" id="name" name="name">
                         <div class="invalid-feedback d-none" role="alert" id="alert-name"></div>
                     </div>
+                    <div class="form-group">
+                        <label for="subdept" class="form-label">Sub Department</label>
+                        <select id="subdept" name="subdept" class="form-control select2"></select>
+                        <div class="invalid-feedback d-none" role="alert" id="alert-subdept"></div>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>

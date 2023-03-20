@@ -2,13 +2,13 @@
 
 namespace Database\Seeders;
 
-use App\Models\Employee;
-use App\Models\Position;
+use App\Models\Department;
+use App\Models\Manager;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Faker\Factory as Faker;
 
-class EmployeeSeeder extends Seeder
+class ManagerSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -17,13 +17,16 @@ class EmployeeSeeder extends Seeder
     {
         $faker = Faker::create('id_ID');
 
-        for ($i = 0; $i < 25; $i++) {
-            Employee::create([
-                'nik'           => $faker->unique()->numerify('11####'),
+        $departments = Department::all();
+
+        foreach ($departments as $department) {
+            Manager::create([
+                'nik'           => $faker->unique()->numerify('10####'),
                 'name'          => $faker->firstName . " " . $faker->lastName,
-                'position_id'   => $faker->numberBetween(1, Position::count()),
+                'position'      => "Head of $department->name",
                 'image'         => 'avtar_1.png',
-                'isRequest'     => 2
+                'isRequest'     => 2,
+                'department_id' => $department->id
             ]);
         }
     }
