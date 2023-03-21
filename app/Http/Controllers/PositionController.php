@@ -37,7 +37,7 @@ class PositionController extends Controller
                 // get position
                 $positions = Position::whereHas('subDepartment', function ($query) {
                     $query->where('id', Auth::user()->userable->position->sub_department_id);
-                })->withCount('employees')->latest()->get();
+                })->withCount('employees')->where('id', '!=', Auth::user()->userable->position_id)->latest()->get();
 
                 // define view
                 $view = 'approver2.position.index';

@@ -31,8 +31,8 @@ class UserSeeder extends Seeder
         }
 
         $role_employee = [
-            'Admin',
             'Approver2',
+            'Admin',
             'User',
             'Technician',
         ];

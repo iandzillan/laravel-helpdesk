@@ -207,6 +207,15 @@
                     </li>
 
                     <li class="nav-item">
+                        <a class="nav-link {{(request()->segment(2) == 'managers') ? 'active' : ''}}" aria-current="page" href="{{route('admin.managers')}}">
+                            <i class="icon">
+                                <i class="fa-regular fa-id-badge"></i>
+                            </i>
+                            <span class="item-name">Managers</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
                         <a class="nav-link {{(request()->segment(2) == 'users') ? 'active' : ''}}" aria-current="page" href="{{route('admin.users')}}">
                             <i class="icon">
                                 <i class="fa-solid fa-user"></i>

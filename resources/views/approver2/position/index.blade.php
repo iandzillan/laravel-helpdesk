@@ -5,7 +5,7 @@
         <div class="card">
             <div class="card-header d-flex justify-content-between">
                 <div class="header-title">
-                    <h4 class="card-title">{{ Auth::user()->employee->position->subDepartment->name }}'s Position List</h4>
+                    <h4 class="card-title">{{ Auth::user()->userable->position->subDepartment->name }}'s Position List</h4>
                 </div>
                 <a href="javascript:void(0)" class="btn btn-primary mb-2" id="btn-create-position">
                     <i class="fa-solid fa-folder-plus"></i>

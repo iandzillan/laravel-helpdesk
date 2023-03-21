@@ -14,7 +14,8 @@ class Manager extends Model
         'name',
         'position',
         'image',
-        'isRequest'
+        'isRequest',
+        'department_id'
     ];
 
     public function user()

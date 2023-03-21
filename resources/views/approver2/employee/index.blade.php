@@ -59,7 +59,7 @@
     <script>
         $(document).ready(function(){
             // get sub dept id employee
-            let id = "{{ Auth::user()->employee->position->sub_department_id }}";
+            let id = "{{ Auth::user()->userable->position->sub_department_id }}";
 
             // get position
             $.ajax({

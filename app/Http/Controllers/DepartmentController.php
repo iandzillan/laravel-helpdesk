@@ -28,7 +28,7 @@ class DepartmentController extends Controller
 
         return view('admin.department.index', [
             'title'         => 'Departments - Helpdesk Ticketing System',
-            'name'          => Auth::user()->employee->name,
+            'name'          => Auth::user()->userable->name,
             'departments'   => $departments
         ]);
     }

@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             $table->char('ticket_number')->unique();
             $table->unsignedBigInteger('urgency_id');
-            $table->unsignedBigInteger('employee_id');
-            $table->unsignedBigInteger('technician_id');
+            $table->unsignedBigInteger('user_id')->nullable();
+            $table->unsignedBigInteger('technician_id')->nullable();
             $table->unsignedBigInteger('sub_category_id');
             $table->text('image');
             $table->text('description');
@@ -25,8 +25,8 @@ return new class extends Migration
             $table->timestamps();
 
             $table->foreign('urgency_id')->references('id')->on('urgencies')->onDelete('cascade');
-            $table->foreign('employee_id')->references('id')->on('employees')->onDelete('cascade');
-            $table->foreign('technician_id')->references('id')->on('employees')->onDelete('cascade');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('set null');
+            $table->foreign('technician_id')->references('id')->on('users')->onDelete('set null');
             $table->foreign('sub_category_id')->references('id')->on('sub_categories')->onDelete('cascade');
         });
     }

@@ -4,12 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Mail\MailAccountActive;
 use App\Models\Employee;
+use App\Models\Manager;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -25,10 +25,10 @@ class UserController extends Controller
             return DataTables::of($users)
                 ->addIndexColumn()
                 ->addColumn('nik', function ($row) {
-                    return $row->employee->nik;
+                    return $row->userable->nik;
                 })
                 ->addColumn('name', function ($row) {
-                    return $row->employee->name;
+                    return $row->userable->name;
                 })
                 ->editColumn('role', function ($row) {
                     $role = $row->role;
@@ -64,7 +64,7 @@ class UserController extends Controller
 
         return view('admin.user.index', [
             'title' => 'Users - Helpdesk Ticketing System',
-            'name'  => Auth::user()->employee->name,
+            'name'  => Auth::user()->userable->name,
         ]);
     }
 
@@ -74,14 +74,17 @@ class UserController extends Controller
         return response()->json($employee);
     }
 
+    public function getManagers()
+    {
+        $managers = Manager::where('isRequest', 1)->get();
+        return response()->json($managers);
+    }
+
     public function store(Request $request)
     {
-        // get employee id
-        $employee = Employee::where('nik', $request->employee)->first();
-
         // set validation
         $validator = Validator::make($request->all(), [
-            'employee'              => 'required',
+            'user'                  => 'required',
             'email'                 => 'required|unique:users|email',
             'username'              => 'required|unique:users',
             'password'              => 'required|confirmed',
@@ -97,19 +100,36 @@ class UserController extends Controller
             return response()->json($validator->errors(), 422);
         }
 
-        // create user
-        $user = new User;
-        $user->email    = $request->email;
-        $user->username = $request->username;
-        $user->password = Hash::make($request->password);
-        $user->role     = $request->role;
-        $user->employee()->associate($employee);
-        $user->save();
+        // check if the request is employee or manager
+        if (Employee::where('nik', $request->user)->count() > 0) {
+            // if employee, then create user for employee
+            $employee = Employee::where('nik', $request->user)->first();
+            $user = new User;
+            $user->email    = $request->email;
+            $user->username = $request->username;
+            $user->password = Hash::make($request->password);
+            $user->role     = $request->role;
+            $employee->user()->save($user);
 
-        // update employee isRequest
-        $employee->update([
-            'isRequest' => 2
-        ]);
+            // update employee isRequest
+            $employee->update([
+                'isRequest' => 2
+            ]);
+        } elseif (Manager::where('nik', $request->user)->count() > 0) {
+            // if manager, then create user for manager
+            $manager = Manager::where('nik', $request->user)->first();
+            $user = new User;
+            $user->email    = $request->email;
+            $user->username = $request->username;
+            $user->password = Hash::make($request->password);
+            $user->role     = $request->role;
+            $manager->user()->save($user);
+
+            // update manager isRequest
+            $manager->update([
+                'isRequest' => 2
+            ]);
+        }
 
         // return success response
         return response()->json([
@@ -121,14 +141,21 @@ class UserController extends Controller
 
     public function accountActive(Request $request)
     {
-        // get data employee
-        $employee = Employee::where('nik', $request->employee)->first();
+        // check if the request is employee or manager
+        if (Employee::where('nik', $request->user)->count() > 0) {
+            // if employee, data email
+            $employee = Employee::where('nik', $request->user)->first();
+            $name = $employee->name;
+        } elseif (Manager::where('nik', $request->user)->count() > 0) {
+            $manager = Manager::where('nik', $request->user)->first();
+            $name = $manager->name;
+        }
 
         // get email user
         $email = $request->email;
 
         $data = [
-            'name'     => $employee->name,
+            'name'     => $name,
             'email'    => $email,
             'username' => $request->username,
             'password' => $request->password,
@@ -152,16 +179,13 @@ class UserController extends Controller
         return response()->json([
             'success'      => true,
             'message'      => 'Detail user',
-            'dataUser'     => $user,
-            'dataEmployee' => $user->employee
+            'data'         => $user,
+            'dataRelation' => $user->userable
         ]);
     }
 
     public function update(User $user, Request $request)
     {
-        // get employee
-        $employee = Employee::where('id', $user->employee_id)->first();
-
         // set validation
         $validator = Validator::make($request->all(), [
             'email'                 => 'required|email|unique:users,email,' . $user->id,
@@ -182,11 +206,12 @@ class UserController extends Controller
         }
 
         // update user
-        $user->email    = $request->email;
-        $user->username = $request->username;
-        $user->role     = $request->role;
-        $user->employee()->associate($employee);
-        $user->save();
+        $user->update([
+            'email'    => $request->email,
+            'username' => $request->username,
+            'password' => $user->password,
+            'role'     => $request->role
+        ]);
 
         // return response
         return response()->json([
@@ -198,9 +223,7 @@ class UserController extends Controller
 
     public function destroy(User $user)
     {
-        // update isRequest employee to 1 again
-        $employee = Employee::where('id', $user->employee_id)->first();
-        $employee->update([
+        $user->userable()->update([
             'isRequest' => 1
         ]);
 

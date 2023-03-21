@@ -5,7 +5,7 @@
         <div class="card">
             <div class="card-header d-flex justify-content-between">
                 <div class="header-title">
-                    <h4 class="card-title">{{ Auth::user()->userable->position->subDepartment->name }}'s Employess</h4>
+                    <h4 class="card-title">Managers List</h4>
                 </div>
             </div>
             <div class="card-body">
@@ -14,9 +14,8 @@
                         <thead>
                             <tr>
                                 <th>#</th>
-                                <th>NIK</th>
                                 <th>Name</th>
-                                <th>Position</th>
+                                <th>Department</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -29,54 +28,55 @@
     </div>
 
     <script>
-        $(function(){
+        $(document).ready(function(){
             // draw table
             let table = $('.data-table').DataTable({
                 responsive: true,
                 processing: true,
                 serverSide: true,
-                ajax: "{{ route('subdept.employees.list') }}",
+                ajax: "{{ route('admin.managers.list') }}",
                 columns: [
                     {data: 'DT_RowIndex', name: 'DT_RowIndex'},
-                    {data: 'nik', name: 'nik'},
                     {data: 'name', name: 'name'},
-                    {data: 'position', name: 'position'},
-                    {data: 'action', name: 'action', orderable: false, searchable: false},
+                    {data: 'dept', name: 'dept'},
+                    {data: 'action', name: 'action', orderable: false, searchable: false}
                 ]
             });
 
-            // delete  button event
-            $('body').on('click', '#btn-delete-employee', function(){
+            // destroy button action
+            $('body').on('click', '#btn-delete-manager', function(){
                 // define variable
-                let nik   = $(this).data('id');
+                let id    = $(this).data('id');
                 let token = $('meta[name="csrf-token"]').attr('content');
+                let url   = "{{ route('admin.managers.destroy', ":id") }}";
+                url       = url.replace(':id', id);
 
                 // show confirmation
-                Swal.fire({
+                swal.fire({
                     icon: 'warning',
                     title: 'Are you sure?',
-                    text: 'All data related to this employee will be deleted as well.',
+                    text: 'All data related to this manager will be deleted',
                     showCancelButton: true,
                     cancelButtonText: 'No',
-                    confirmButtonText: 'Yes'
+                    confirmButtonText: 'Yes',
                 }).then((result) => {
-                    if(result.isConfirmed){
+                    if (result.isConfirmed) {
                         // show loading
-                        Swal.fire({
+                        swal.fire({
                             title: 'Please wait',
                             text: 'Sending request...',
                             showConfirmButton: false,
                             allowOutsideClick: false,
-                            allowEscapeKey: false, 
                             allowEnterKey: false,
-                            didOpen: ()=>{
-                                Swal.showLoading();
+                            allowEscapeKey: false,
+                            didOpen: () => {
+                                swal.showLoading();
                             }
                         });
 
                         // ajax delete
                         $.ajax({
-                            url: `employees/${nik}`,
+                            url: url,
                             type: 'delete',
                             cache: false,
                             data: {
@@ -84,19 +84,23 @@
                             },
                             success:function(response){
                                 // show message
-                                Swal.fire({
+                                swal.fire({
                                     icon: 'success',
                                     title: `${response.message}`,
                                     showConfirmButton: false,
-                                    timer: 3000
+                                    timer: 2000
                                 });
 
-                                // draw table
+                                // table draw
                                 table.draw();
+                            }, 
+                            error:function(error){
+                                console.log(error.responseJSON.message);
                             }
                         });
                     }
                 });
+
             });
         });
     </script>

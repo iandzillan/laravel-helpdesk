@@ -34,7 +34,7 @@ class SubCategoryController extends Controller
 
         return view('admin.subcategory.index', [
             'title'             => 'Sub Categories - Helpdesk Ticketing System',
-            'name'              => Auth::user()->employee->name
+            'name'              => Auth::user()->userable->name
         ]);
     }
 

@@ -28,8 +28,7 @@ class CategoryController extends Controller
 
         return view('admin.category.index', [
             'title'         => 'Categories - Helpdesk Ticketing System',
-            'name'          => Auth::user()->employee->name,
-            'categories'    => $categories
+            'name'          => Auth::user()->userable->name,
         ]);
     }
 

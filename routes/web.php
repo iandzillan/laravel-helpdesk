@@ -5,6 +5,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\LoginController;
+use App\Http\Controllers\ManagerController;
 use App\Http\Controllers\PositionController;
 use App\Http\Controllers\SubCategoryController;
 use App\Http\Controllers\SubDepartmentController;
@@ -68,22 +69,22 @@ Route::group(['middleware' => ['auth']], function () {
 
         Route::post('/admin/users-request/', [UserController::class, 'request'])->name('admin.users.request');
         Route::get('/admin/users-request/get-employee', [UserController::class, 'getEmployee'])->name('admin.users.getEmployee');
+        Route::get('/admin/users-request/get-manager', [UserController::class, 'getManagers'])->name('admin.users.getManagers');
         Route::get('/admin/users-request/account-active', [UserController::class, 'accountActive'])->name('admin.users.accountActive');
-
-        Route::get('/admin/new-employees', [EmployeeController::class, 'index'])->name('admin.employees.new');
-        Route::get('/admin/new-employees/position', [EmployeeController::class, 'getPositions'])->name('admin.employees.positions');
-        Route::post('/admin/employees', [EmployeeController::class, 'store'])->name('admin.employees.store');
-
-        Route::get('/admin/employees', [EmployeeController::class, 'list'])->name('admin.employees.list');
-        Route::get('/admin/employees/{employee}/edit', [EmployeeController::class, 'show'])->name('admin.employees.show');
-        Route::patch('/admin/employees/{employee}', [EmployeeController::class, 'update'])->name('admin.employees.update');
-        Route::delete('/admin/employees/{employee}', [EmployeeController::class, 'destroy'])->name('admin.employees.destroy');
 
         Route::get('/admin/departments', [DepartmentController::class, 'index'])->name('admin.departments');
         Route::post('/admin/departments', [DepartmentController::class, 'store'])->name('admin.departments.store');
         Route::get('/admin/departments/{department}/edit', [DepartmentController::class, 'show'])->name('admin.departments.show');
         Route::patch('/admin/departments/{department}', [DepartmentController::class, 'update'])->name('admin.departments.update');
         Route::delete('/admin/departments/{department}', [DepartmentController::class, 'destroy'])->name('admin.departments.destroy');
+
+        Route::get('/admin/managers', [ManagerController::class, 'index'])->name('admin.managers');
+        Route::get('/admin/managers/dept', [ManagerController::class, 'getDepts'])->name('admin.managers.depts');
+        Route::get('/admin/managers/list', [ManagerController::class, 'list'])->name('admin.managers.list');
+        Route::post('/admin/managers', [ManagerController::class, 'store'])->name('admin.managers.store');
+        Route::get('/admin/managers/{manager}/edit', [ManagerController::class, 'show'])->name('admin.managers.show');
+        Route::patch('/admin/managers/{manager}', [ManagerController::class, 'update'])->name('admin.managers.update');
+        Route::delete('/admin/managers/{manager}', [ManagerController::class, 'destroy'])->name('admin.managers.destroy');
     });
 
     Route::group(['middleware' => ['role:Approver1']], function () {

@@ -10,9 +10,9 @@
                 <div class="modal-body">
                     <div class="row">
                         <div class="form-group col-md-6">
-                            <label for="employee" class="form-label">Employee</label>
-                            <select id="employee" name="employee" class="selectpicker form-control select2"></select>
-                            <div class="invalid-feedback d-none" role="alert" id="alert-employee"></div>
+                            <label for="user" class="form-label">User</label>
+                            <select id="user" name="user" class="selectpicker form-control select2"></select>
+                            <div class="invalid-feedback d-none" role="alert" id="alert-user"></div>
                         </div>
                         <div class="form-group col-md-6">
                             <label for="role" class="form-label">Role</label>

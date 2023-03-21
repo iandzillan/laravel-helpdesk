@@ -30,8 +30,7 @@ class UrgencyController extends Controller
 
         return view('admin.urgency.index', [
             'title'     => 'Urgencies - Helpdesk Ticketing System',
-            'name'      => Auth::user()->employee->name,
-            'urgencies' => $urgencies
+            'name'      => Auth::user()->userable->name,
         ]);
     }
 

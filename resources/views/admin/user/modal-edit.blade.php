@@ -11,19 +11,13 @@
                     <div class="row">
                         <input type="hidden" id="id" name="id">
                         <div class="form-group col-md-6">
-                            <label for="employee-edit" class="form-label">Employee</label>
-                            <input type="text" class="form-control" id="employee-edit" name="employee" readonly>
-                            <div class="invalid-feedback d-none" role="alert" id="alert-employee-edit"></div>
+                            <label for="user-edit" class="form-label">user</label>
+                            <input type="text" class="form-control" id="user-edit" name="user" readonly>
+                            <div class="invalid-feedback d-none" role="alert" id="alert-user-edit"></div>
                         </div>
                         <div class="form-group col-md-6">
                             <label for="role-edit" class="form-label">Role</label>
-                            <select id="role-edit" name="role" class="selectpicker form-control select2-edit">
-                                <option>-- Choose --</option>
-                                <option value="Approver1">Approver Lv.1 (Dept Head)</option>
-                                <option value="Approver2">Approver Lv.2 (Sub Dept Head)</option>
-                                <option value="User">User</option>
-                                <option value="Technician">Technician</option>
-                            </select>
+                            <select id="role-edit" name="role" class="selectpicker form-control select2-edit"></select>
                             <div class="invalid-feedback d-none" role="alert" id="alert-role-edit"></div>
                         </div>
                         <div class="form-group col-md-6">
