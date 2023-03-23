@@ -9,6 +9,12 @@ class Tracking extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'ticket_id',
+        'note',
+        'status'
+    ];
+
     public function ticket()
     {
         return $this->belongsTo('App\Models\Ticket');

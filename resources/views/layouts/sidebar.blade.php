@@ -54,6 +54,45 @@
                     </a>
                 </li>
 
+                <li><hr class="hr-horizontal"></li>
+                <li class="nav-item static-item">
+                    <a class="nav-link static-item disabled" href="#" tabindex="-1">
+                        <span class="default-icon">Ticket</span>
+                        <span class="mini-icon">-</span>
+                    </a>
+                </li>
+
+                @if (Auth::user()->role == 'Approver1')
+                    <li class="nav-item">
+                        <a class="nav-link {{(request()->segment(2) == 'new-tickets') ? 'active' : ''}}" aria-current="page" href="#">
+                            <i class="icon">
+                                <i class="fa-solid fa-arrow-right-to-bracket"></i>
+                            </i>
+                            <span class="item-name">New Tickets</span>
+                        </a>
+                    </li>
+                @endif
+                @if (Auth::user()->role == 'Approver2')
+                    <li class="nav-item">
+                        <a class="nav-link {{(request()->segment(2) == 'new-tickets') ? 'active' : ''}}" aria-current="page" href="#">
+                            <i class="icon">
+                                <i class="fa-solid fa-arrow-right-to-bracket"></i>
+                            </i>
+                            <span class="item-name">New Tickets</span>
+                        </a>
+                    </li>
+                @endif
+                @if (Auth::user()->role == 'User')
+                    <li class="nav-item">
+                        <a class="nav-link {{(request()->segment(2) == 'new-tickets') ? 'active' : ''}}" aria-current="page" href="{{ route('user.new.ticket') }}">
+                            <i class="icon">
+                                <i class="fa-solid fa-arrow-right-to-bracket"></i>
+                            </i>
+                            <span class="item-name">New Tickets</span>
+                        </a>
+                    </li>
+                @endif
+
                 <li class="nav-item">
                 @if (Auth::user()->role == 'Admin')
                     <a class="nav-link {{(request()->segment(2) == 'all-tickets') ? 'active' : ''}}" aria-current="page" href="#">
@@ -62,10 +101,10 @@
                     <a class="nav-link {{(request()->segment(2) == 'all-tickets') ? 'active' : ''}}" aria-current="page" href="#">
                 @endif
                 @if (Auth::user()->role == 'Approver2')
-                    <a class="nav-link {{(request()->segment(2) == 'all-tickets') ? 'active' : ''}}" aria-current="page" href="#">
+                    <a class="nav-link {{(request()->segment(2) == 'all-tickets') ? 'active' : ''}}" aria-current="page" href="{{ route('subdept.all.ticket') }}">
                 @endif
                 @if (Auth::user()->role == 'User')
-                    <a class="nav-link {{(request()->segment(2) == 'all-tickets') ? 'active' : ''}}" aria-current="page" href="#">
+                    <a class="nav-link {{(request()->segment(2) == 'all-tickets') ? 'active' : ''}}" aria-current="page" href="{{ route('user.all.ticket') }}">
                 @endif
                 @if (Auth::user()->role == 'Technician')
                     <a class="nav-link {{(request()->segment(2) == 'all-tickets') ? 'active' : ''}}" aria-current="page" href="#">
@@ -74,29 +113,6 @@
                             <i class="fa-solid fa-ticket"></i>
                         </i>
                         <span class="item-name">All Tickets</span>
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                @if (Auth::user()->role == 'Admin')
-                    <a class="nav-link {{(request()->segment(2) == 'new-tickets') ? 'active' : ''}}" aria-current="page" href="#">
-                @endif
-                @if (Auth::user()->role == 'Approver1')
-                    <a class="nav-link {{(request()->segment(2) == 'new-tickets') ? 'active' : ''}}" aria-current="page" href="#">
-                @endif
-                @if (Auth::user()->role == 'Approver2')
-                    <a class="nav-link {{(request()->segment(2) == 'new-tickets') ? 'active' : ''}}" aria-current="page" href="#">
-                @endif
-                @if (Auth::user()->role == 'User')
-                    <a class="nav-link {{(request()->segment(2) == 'new-tickets') ? 'active' : ''}}" aria-current="page" href="#">
-                @endif
-                @if (Auth::user()->role == 'Technician')
-                    <a class="nav-link {{(request()->segment(2) == 'new-tickets') ? 'active' : ''}}" aria-current="page" href="#">
-                @endif
-                        <i class="icon">
-                            <i class="fa-solid fa-arrow-right-to-bracket"></i>
-                        </i>
-                        <span class="item-name">New Tickets</span>
                     </a>
                 </li>
 
@@ -121,6 +137,9 @@
                 @if (Auth::user()->role == 'Approver2')
                     <a class="nav-link {{(request()->segment(2) == 'onwork-tickets') ? 'active' : ''}}" aria-current="page" href="#" title="On Work Ticket">
                 @endif
+                @if (Auth::user()->role == 'User')
+                    <a class="nav-link {{(request()->segment(2) == 'onwork-tickets') ? 'active' : ''}}" aria-current="page" href="#" title="On Work Ticket">
+                @endif
                         <i class="icon">
                             <i class="fa-solid fa-hammer"></i>
                         </i>
@@ -138,6 +157,9 @@
                 @if (Auth::user()->role == 'Approver2')
                     <a class="nav-link {{(request()->segment(2) == 'complete-tickets') ? 'active' : ''}}" aria-current="page" href="#" title="Completed Ticket">
                 @endif
+                @if (Auth::user()->role == 'User')
+                    <a class="nav-link {{(request()->segment(2) == 'complete-tickets') ? 'active' : ''}}" aria-current="page" href="#" title="Completed Ticket">
+                @endif
                         <i class="icon">
                             <i class="fa-solid fa-circle-check"></i>
                         </i>
@@ -153,6 +175,9 @@
                     <a class="nav-link {{(request()->segment(2) == 'reject-tickets') ? 'active' : ''}}" aria-current="page" href="#" title="Rejected Ticket">
                 @endif
                 @if (Auth::user()->role == 'Approver2')
+                    <a class="nav-link {{(request()->segment(2) == 'reject-tickets') ? 'active' : ''}}" aria-current="page" href="#" title="Rejected Ticket">
+                @endif
+                @if (Auth::user()->role == 'User')
                     <a class="nav-link {{(request()->segment(2) == 'reject-tickets') ? 'active' : ''}}" aria-current="page" href="#" title="Rejected Ticket">
                 @endif
                         <i class="icon">
