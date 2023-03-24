@@ -23,8 +23,6 @@ class Ticket extends Model
         'progress'
     ];
 
-    protected $dates = ['created_at', 'updated_at'];
-
     public function user()
     {
         return $this->belongsTo('App\Models\User');
@@ -53,5 +51,49 @@ class Ticket extends Model
     public function getUpdatedAtAttribute()
     {
         return Carbon::parse($this->attributes['updated_at'])->tz('Asia/Jakarta')->format('Y-m-d H:i:s');
+    }
+
+    public function getStatusAttribute()
+    {
+        $status = $this->attributes['status'];
+        switch ($status) {
+            case 1:
+                $status = 'Open';
+                break;
+
+            case 2:
+                $status = 'Approved by supervisor';
+                break;
+
+            case 3:
+                $status = 'Approved by Manager';
+                break;
+
+            case 4:
+                $status = 'Waiting to be assigned';
+                break;
+
+            case 5:
+                $status = 'On work';
+                break;
+
+            case 6:
+                $status = 'Pending';
+                break;
+
+            case 7:
+                $status = 'Closed';
+                break;
+
+            case 8:
+                $status = 'Rejected';
+                break;
+
+            default:
+                $status = 'Undefined';
+                break;
+        }
+
+        return $status;
     }
 }

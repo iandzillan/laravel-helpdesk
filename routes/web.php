@@ -142,18 +142,26 @@ Route::group(['middleware' => ['auth']], function () {
         Route::patch('/subdept/positions/{position}', [PositionController::class, 'update'])->name('subdept.positions.update');
         Route::delete('/subdept/positions/{position}', [PositionController::class, 'destroy'])->name('subdept.positions.destroy');
 
-        Route::get('/subdept/all-tickets', [TicketController::class, 'allTicket'])->name('subdept.all.ticket');
+        Route::get('/subdept/create-ticket', [TicketController::class, 'createTicket'])->name('subdept.create.ticket');
+        Route::get('/subdept/create-ticket/category', [TicketController::class, 'getCategory'])->name('subdept.get.category');
+        Route::get('/subdept/create-ticket/sub-category/{category}', [TicketController::class, 'getSubCategory'])->name('subdept.get.subCategory');
+        Route::post('/subdept/create-ticket', [TicketController::class, 'store'])->name('subdept.ticket.store');
+
+        Route::get('/subdept/my-tickets', [TicketController::class, 'myTicket'])->name('subdept.my.ticket');
+        Route::get('/subdept/my-tickets/{ticket}', [TicketController::class, 'show'])->name('subdept.show.ticket');
+        Route::get('/subdept/all-tickets/', [TicketController::class, 'allTicket'])->name('subdept.all.ticket');
+        Route::get('/subdept/all-tickets/{ticket}', [TicketController::class, 'show'])->name('subdept.all.ticket.show');
     });
 
     Route::group(['middleware' => ['role:User']], function () {
         Route::get('/user/dashboard', [DashboardController::class, 'index'])->name('user.dashboard');
 
-        Route::get('/user/new-ticket', [TicketController::class, 'newTicket'])->name('user.new.ticket');
-        Route::get('/user/new-ticket/category', [TicketController::class, 'getCategory'])->name('user.get.category');
-        Route::get('/user/new-ticket/sub-category/{category}', [TicketController::class, 'getSubCategory'])->name('user.get.subCategory');
-        Route::post('/user/new-ticket', [TicketController::class, 'store'])->name('user.ticket.store');
+        Route::get('/user/create-ticket', [TicketController::class, 'createTicket'])->name('user.create.ticket');
+        Route::get('/user/create-ticket/category', [TicketController::class, 'getCategory'])->name('user.get.category');
+        Route::get('/user/create-ticket/sub-category/{category}', [TicketController::class, 'getSubCategory'])->name('user.get.subCategory');
+        Route::post('/user/create-ticket', [TicketController::class, 'store'])->name('user.ticket.store');
 
-        Route::get('/user/all-tickets', [TicketController::class, 'allTicket'])->name('user.all.ticket');
-        Route::get('/user/all-tickets/{ticket}', [TicketController::class, 'show'])->name('user.show.ticket');
+        Route::get('/user/my-tickets', [TicketController::class, 'myTicket'])->name('user.my.ticket');
+        Route::get('/user/my-tickets/{ticket}', [TicketController::class, 'show'])->name('user.show.ticket');
     });
 });

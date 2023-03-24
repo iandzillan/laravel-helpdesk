@@ -22,4 +22,9 @@ class Position extends Model
     {
         return $this->belongsTo('App\Models\SubDepartment');
     }
+
+    public function users()
+    {
+        return $this->hasManyThrough('App\Models\user', 'App\Models\Employee');
+    }
 }

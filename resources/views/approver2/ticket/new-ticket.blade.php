@@ -84,7 +84,7 @@
 
             // get all category
             $.ajax({
-                url: "{{ route('user.get.category') }}",
+                url: "{{ route('subdept.get.category') }}",
                 type: "get",
                 cache: false,
                 success:function(response){
@@ -94,6 +94,9 @@
                     $.each(response, function(code, category){
                         $('#category_id').append(`<option value="${category.id}">${category.name}</option>`);
                     });
+                }, 
+                error:function(error){
+                    console.log(error.responseJSON.message);
                 }
             });
 
@@ -101,7 +104,7 @@
             $('#category_id').change(function(){
                 // define varible
                 let category_id = $('#category_id').val();
-                let url = "{{ route('user.get.subCategory', ":id") }}";
+                let url = "{{ route('subdept.get.subCategory', ":id") }}";
                 url = url.replace(':id', category_id);
 
                 // get sub category
@@ -142,7 +145,7 @@
 
                 // ajax store
                 $.ajax({
-                    url: "{{ route('user.ticket.store') }}",
+                    url: "{{ route('subdept.ticket.store') }}",
                     type: "post",
                     cache: false,
                     data: formData,

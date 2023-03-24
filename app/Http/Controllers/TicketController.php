@@ -3,20 +3,44 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use App\Models\Employee;
+use App\Models\Position;
 use App\Models\SubCategory;
 use App\Models\Ticket;
 use App\Models\Tracking;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Yajra\DataTables\Facades\DataTables;
 
 class TicketController extends Controller
 {
-    public function newTicket()
+    public function createTicket()
     {
+        // get role
+        $role = Auth::user()->role;
+
+        switch ($role) {
+            case 'Approver1':
+                $view = 'approver1.ticket.new-ticket';
+                break;
+
+            case 'Approver2':
+                $view = 'approver2.ticket.new-ticket';
+                break;
+
+            case 'User':
+                $view = 'user.ticket.new-ticket';
+                break;
+
+            default:
+                abort(404);
+                break;
+        }
+
         // return view
-        return view('ticket.new-ticket', [
+        return view($view, [
             'title' => 'Create New Ticket - Helpdesk Ticketing System',
             'name'  => Auth::user()->userable->name
         ]);
@@ -105,7 +129,7 @@ class TicketController extends Controller
         $ticket->image           = $img_name;
         $ticket->description     = $request->description;
         $ticket->status          = 1;
-        $ticket->progress        = 1;
+        $ticket->progress        = 0;
         $ticket->user()->associate(Auth::user()->id);
         $ticket->save();
 
@@ -114,7 +138,7 @@ class TicketController extends Controller
 
         // store tracking
         $tracking         = new Tracking;
-        $tracking->status = "Ticket has been created";
+        $tracking->status = "Ticket created";
         $ticket->trackings()->save($tracking);
 
         // return response
@@ -125,32 +149,30 @@ class TicketController extends Controller
         ]);
     }
 
-    public function allTicket(Request $request)
+    public function myTicket(Request $request)
     {
         // get user role 
         $role = Auth::user()->role;
 
         // check role
         switch ($role) {
-            case 'Admin':
-                # code...
-                break;
-
             case 'Approver1':
-                # code...
+                // define vie & route
+                $view  = 'approver1.ticket.my-ticket';
+                $route = 'dept.show.ticket';
+                break;
                 break;
 
             case 'Approver2':
-                # code...
+                // define vie & route
+                $view  = 'approver2.ticket.my-ticket';
+                $route = 'subdept.show.ticket';
                 break;
 
             case 'User':
-                // define route for user
+                // define view & route 
+                $view  = 'user.ticket.my-ticket';
                 $route = 'user.show.ticket';
-                break;
-
-            case 'Technician':
-                # code...
                 break;
 
             default:
@@ -169,40 +191,40 @@ class TicketController extends Controller
                     // get status
                     $status = $row->status;
                     switch ($status) {
-                        case 1:
-                            $status = '<span class="badge bg-light text-dark">Open</span>';
+                        case 'Open':
+                            $status = '<span class="badge bg-light text-dark">' . $status . '</span>';
                             break;
 
-                        case 2:
-                            $status = '<span class="badge bg-secondary">Approved by supervisor</span>';
+                        case 'Approved by supervisor':
+                            $status = '<span class="badge bg-secondary">' . $status . '</span>';
                             break;
 
-                        case 3:
-                            $status = '<span class="badge bg-success">Approved by Manager</span>';
+                        case 'Approved by Manager':
+                            $status = '<span class="badge bg-success">' . $status . '</span>';
                             break;
 
-                        case 4:
-                            $status = '<span class="badge bg-dark">Waiting to be assigned</span>';
+                        case 'Waiting to be assigned':
+                            $status = '<span class="badge bg-dark">' . $status . '</span>';
                             break;
 
-                        case 5:
-                            $status = '<span class="badge bg-info">On work</span>';
+                        case 'On work':
+                            $status = '<span class="badge bg-info">' . $status . '</span>';
                             break;
 
-                        case 6:
-                            $status = '<span class="badge bg-warning">Pending</span>';
+                        case 'Pending':
+                            $status = '<span class="badge bg-warning">' . $status . '</span>';
                             break;
 
-                        case 7:
-                            $status = '<span class="badge bg-primary">Closed</span>';
+                        case 'Closed':
+                            $status = '<span class="badge bg-primary">' . $status . '</span>';
                             break;
 
-                        case 8:
-                            $status = '<span class="badge bg-danger">Rejected</span>';
+                        case 'Rejected':
+                            $status = '<span class="badge bg-danger">' . $status . '</span>';
                             break;
 
                         default:
-                            $status = '<span class="badge bg-danger">Undefined</span>';
+                            $status = '<span class="badge bg-danger">' . $status . '</span>';
                             break;
                     }
 
@@ -217,21 +239,159 @@ class TicketController extends Controller
         }
 
         // return view
-        return view('ticket.all-ticket', [
-            'title'  => 'All Tickets - Helpdesk Ticketing System',
+        return view($view, [
+            'title'  => 'My Tickets - Helpdesk Ticketing System',
             'name'   => Auth::user()->userable->name
         ]);
     }
 
     public function show($ticket)
     {
-        $ticket = Ticket::where('ticket_number', $ticket)->first();
+        // get user role
+        $role = Auth::user()->role;
+
+        // check role
+        switch ($role) {
+            case 'Admin':
+                // define view
+                $view = 'admin.ticket.show-ticket';
+                break;
+
+            case 'Approver1':
+                // define view
+                $view = 'approver1.ticket.show-ticket';
+                break;
+
+            case 'Approver2':
+                // define view
+                $view = 'approver2.ticket.show-ticket';
+                // query ticket based on sub department
+                break;
+
+            case 'User':
+                // define view
+                $view = 'user.ticket.show-ticket';
+                $ticket = Ticket::whereHas('user', function ($query) {
+                    $query->where('user_id', Auth::user()->id);
+                })->where('ticket_number', $ticket)->first();
+                break;
+
+            case 'Technician':
+                // define view
+                $view = 'technician.ticket.show-ticket';
+                break;
+
+            default:
+                abort(404);
+                break;
+        }
 
         // return view
-        return view('ticket.show-ticket', [
-            'title'  => "$ticket->ticket_number - Helpdesk Ticketing System",
-            'name'   => Auth::user()->userable->name,
-            'ticket' => $ticket
+        return view($view, [
+            'title'     => "$ticket->ticket_number - Helpdesk Ticketing System",
+            'name'      => Auth::user()->userable->name,
+            'ticket'    => $ticket,
+            'trackings' => $ticket->trackings
+        ]);
+    }
+
+    public function allTicket(Request $request)
+    {
+        // get user role
+        $role = Auth::user()->role;
+
+        // check role
+        switch ($role) {
+            case 'Admin':
+                # code...
+                break;
+
+            case 'Approver1':
+                # code...
+                break;
+
+            case 'Approver2':
+                // query ticket based on sub department
+                $tickets = Ticket::select(DB::raw('tickets.ticket_number, employees.nik as nik, employees.name as name, tickets.subject, tickets.status, tickets.created_at, tickets.updated_at'))
+                    ->leftJoin('users', 'user_id', '=', 'users.id')
+                    ->leftJoin('employees', 'employees.id', '=', 'users.userable_id')
+                    ->leftJoin('positions', 'positions.id', '=', 'employees.position_id')
+                    ->leftJoin('sub_departments', 'sub_departments.id', '=', 'positions.sub_department_id')
+                    ->where('users.userable_type', '=', 'App\Models\Employee')
+                    ->where('sub_departments.id', '=', Auth::user()->userable->position->sub_department_id)
+                    ->get();
+
+                $view  = 'approver2.ticket.all-ticket';
+                $route = 'subdept.all.ticket.show';
+                break;
+
+            case 'Technician':
+                # code...
+                break;
+
+            default:
+                # code...
+                break;
+        }
+
+        // draw table
+        if ($request->ajax()) {
+            return DataTables::of($tickets)
+                ->addIndexColumn()
+                ->addColumn('status', function ($row) {
+                    // get status
+                    $status = $row->status;
+                    switch ($status) {
+                        case 'Open':
+                            $status = '<span class="badge bg-light text-dark">' . $status . '</span>';
+                            break;
+
+                        case 'Approved by supervisor':
+                            $status = '<span class="badge bg-secondary">' . $status . '</span>';
+                            break;
+
+                        case 'Approved by Manager':
+                            $status = '<span class="badge bg-success">' . $status . '</span>';
+                            break;
+
+                        case 'Waiting to be assigned':
+                            $status = '<span class="badge bg-dark">' . $status . '</span>';
+                            break;
+
+                        case 'On work':
+                            $status = '<span class="badge bg-info">' . $status . '</span>';
+                            break;
+
+                        case 'Pending':
+                            $status = '<span class="badge bg-warning">' . $status . '</span>';
+                            break;
+
+                        case 'Closed':
+                            $status = '<span class="badge bg-primary">' . $status . '</span>';
+                            break;
+
+                        case 'Rejected':
+                            $status = '<span class="badge bg-danger">' . $status . '</span>';
+                            break;
+
+                        default:
+                            $status = '<span class="badge bg-danger">' . $status . '</span>';
+                            break;
+                    }
+
+                    return $status;
+                })
+                ->addColumn('action', function ($row) use ($route) {
+                    $btn = '<a href="' . route($route, $row->ticket_number) . '" class="btn btn-primary btn-sm" title="Show this ticket"> <i class="fa-solid fa-magnifying-glass"></i> </a>';
+                    return $btn;
+                })
+                ->rawColumns(['status', 'action'])
+                ->make(true);
+        }
+
+        return view($view, [
+            'title'  => 'All Tickets - Helpdesk Ticketing System',
+            'name'   => Auth::user()->userable->name
         ]);
     }
 }
