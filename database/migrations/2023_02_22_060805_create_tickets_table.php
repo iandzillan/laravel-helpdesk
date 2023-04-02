@@ -14,19 +14,21 @@ return new class extends Migration
         Schema::create('tickets', function (Blueprint $table) {
             $table->id();
             $table->char('ticket_number')->unique();
-            $table->unsignedBigInteger('urgency_id');
+            $table->string('subject');
+            $table->unsignedBigInteger('urgency_id')->nullable();
+            $table->unsignedBigInteger('sub_category_id');
             $table->unsignedBigInteger('user_id')->nullable();
             $table->unsignedBigInteger('technician_id')->nullable();
-            $table->unsignedBigInteger('sub_category_id');
             $table->text('image');
             $table->text('description');
             $table->integer('status');
-            $table->integer('progress');
+            $table->integer('progress')->nullable();
+            $table->timestamp('progress_at')->nullable();
             $table->timestamps();
 
             $table->foreign('urgency_id')->references('id')->on('urgencies')->onDelete('cascade');
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('set null');
-            $table->foreign('technician_id')->references('id')->on('users')->onDelete('set null');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('no action');
+            $table->foreign('technician_id')->references('id')->on('users')->onDelete('no action');
             $table->foreign('sub_category_id')->references('id')->on('sub_categories')->onDelete('cascade');
         });
     }

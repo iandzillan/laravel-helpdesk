@@ -25,10 +25,10 @@ class UserController extends Controller
             return DataTables::of($users)
                 ->addIndexColumn()
                 ->addColumn('nik', function ($row) {
-                    return $row->userable->nik;
+                    return $row->employee->nik;
                 })
                 ->addColumn('name', function ($row) {
-                    return $row->userable->name;
+                    return $row->employee->name;
                 })
                 ->editColumn('role', function ($row) {
                     $role = $row->role;
@@ -64,20 +64,20 @@ class UserController extends Controller
 
         return view('admin.user.index', [
             'title' => 'Users - Helpdesk Ticketing System',
-            'name'  => Auth::user()->userable->name,
+            'name'  => Auth::user()->employee->name,
         ]);
     }
 
-    public function getEmployee()
+    public function getEmployees()
     {
-        $employee = Employee::where('isRequest', 1)->get();
-        return response()->json($employee);
+        $employees = Employee::where('isRequest', 1)->get();
+        return response()->json($employees);
     }
 
-    public function getManagers()
+    public function getEmployee($nik)
     {
-        $managers = Manager::where('isRequest', 1)->get();
-        return response()->json($managers);
+        $employee = Employee::where('nik', $nik)->first();
+        return response()->json($employee);
     }
 
     public function store(Request $request)
@@ -100,36 +100,19 @@ class UserController extends Controller
             return response()->json($validator->errors(), 422);
         }
 
-        // check if the request is employee or manager
-        if (Employee::where('nik', $request->user)->count() > 0) {
-            // if employee, then create user for employee
-            $employee = Employee::where('nik', $request->user)->first();
-            $user = new User;
-            $user->email    = $request->email;
-            $user->username = $request->username;
-            $user->password = Hash::make($request->password);
-            $user->role     = $request->role;
-            $employee->user()->save($user);
+        // create user 
+        $employee = Employee::where('nik', $request->user)->first();
+        $user = new User;
+        $user->email    = $request->email;
+        $user->username = $request->username;
+        $user->password = Hash::make($request->password);
+        $user->role     = $request->role;
+        $employee->user()->save($user);
 
-            // update employee isRequest
-            $employee->update([
-                'isRequest' => 2
-            ]);
-        } elseif (Manager::where('nik', $request->user)->count() > 0) {
-            // if manager, then create user for manager
-            $manager = Manager::where('nik', $request->user)->first();
-            $user = new User;
-            $user->email    = $request->email;
-            $user->username = $request->username;
-            $user->password = Hash::make($request->password);
-            $user->role     = $request->role;
-            $manager->user()->save($user);
-
-            // update manager isRequest
-            $manager->update([
-                'isRequest' => 2
-            ]);
-        }
+        // update employee isRequest
+        $employee->update([
+            'isRequest' => 2
+        ]);
 
         // return success response
         return response()->json([
@@ -141,18 +124,10 @@ class UserController extends Controller
 
     public function accountActive(Request $request)
     {
-        // check if the request is employee or manager
-        if (Employee::where('nik', $request->user)->count() > 0) {
-            // if employee, data email
-            $employee = Employee::where('nik', $request->user)->first();
-            $name = $employee->name;
-        } elseif (Manager::where('nik', $request->user)->count() > 0) {
-            $manager = Manager::where('nik', $request->user)->first();
-            $name = $manager->name;
-        }
-
-        // get email user
-        $email = $request->email;
+        // get data name and email 
+        $employee = Employee::where('nik', $request->user)->first();
+        $name     = $employee->name;
+        $email    = $request->email;
 
         $data = [
             'name'     => $name,
@@ -180,7 +155,7 @@ class UserController extends Controller
             'success'      => true,
             'message'      => 'Detail user',
             'data'         => $user,
-            'dataRelation' => $user->userable
+            'dataRelation' => $user->employee
         ]);
     }
 
@@ -223,7 +198,7 @@ class UserController extends Controller
 
     public function destroy(User $user)
     {
-        $user->userable()->update([
+        $user->employee()->update([
             'isRequest' => 1
         ]);
 

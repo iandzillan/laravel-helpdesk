@@ -23,8 +23,6 @@ class DatabaseSeeder extends Seeder
 
         $this->call(DepartmentSeeder::class);
         $this->call(SubDepartmentSeeder::class);
-        $this->call(PositionSeeder::class);
-        $this->call(ManagerSeeder::class);
         $this->call(EmployeeSeeder::class);
         $this->call(UserSeeder::class);
         $this->call(CategorySeeder::class);

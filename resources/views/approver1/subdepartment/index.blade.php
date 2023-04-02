@@ -35,7 +35,7 @@
     @include('approver1.subdepartment.modal-edit')
 
     <script>
-        $(function(){
+        $(document).ready(function(){
             // draw table
             let table = $('.data-table').DataTable({
                 responsive: true,

@@ -14,16 +14,22 @@ class Ticket extends Model
         'ticket_number',
         'subject',
         'urgency_id',
+        'sub_category_id',
         'user_id',
         'technician_id',
-        'sub_category_id',
         'image',
         'description',
         'status',
-        'progress'
+        'progress',
+        'progress_at'
     ];
 
     public function user()
+    {
+        return $this->belongsTo('App\Models\User');
+    }
+
+    public function technician()
     {
         return $this->belongsTo('App\Models\User');
     }
@@ -53,6 +59,15 @@ class Ticket extends Model
         return Carbon::parse($this->attributes['updated_at'])->tz('Asia/Jakarta')->format('Y-m-d H:i:s');
     }
 
+    public function getProgressAtAttribute()
+    {
+        if ($this->attributes['progress_at'] == null) {
+            return "--";
+        } else {
+            return Carbon::parse($this->attributes['progress_at'])->tz('Asia/Jakarta')->format('Y-m-d H:i:s');
+        }
+    }
+
     public function getStatusAttribute()
     {
         $status = $this->attributes['status'];
@@ -62,7 +77,7 @@ class Ticket extends Model
                 break;
 
             case 2:
-                $status = 'Approved by supervisor';
+                $status = 'Approved by Team Leader';
                 break;
 
             case 3:

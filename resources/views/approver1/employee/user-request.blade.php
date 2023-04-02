@@ -53,17 +53,30 @@
             $('body').on('click', '#user-request-button', function(){
                 // define variable
                 let nik = $(this).data('id');
+                let url = "{{route('dept.userrequest', ":nik")}}";
+                url     = url.replace(':nik', nik);
 
                 // get employee data
                 $.ajax({
-                    url: "{{ route('dept.userrequest', '') }}/" + nik,
+                    url: url,
                     type: 'get',
                     cache: false,
                     success:function(response){
-
                         // fill nik and name
                         $('#nik').val(response.data.nik);
                         $('#name').val(response.data.name);
+                        $('#role').empty();
+                        $('#role').append('<option selected disabled> -- Choose -- </option>');
+                        switch (response.data.position) {
+                            case 'Team Leader':
+                                $('#role').append('<option value="Approver2">Approver Lv.2 (Team Leader)</option>');
+                                break;
+                        
+                            default:
+                                $('#role').append('<option value="User">User</option>');
+                                $('#role').append('<option value="Technician">Technician</option>');
+                                break;
+                        }
                     }
                 });
 
@@ -89,14 +102,14 @@
                 });
 
                 // define variable
-                let nik = $('#nik').val();
-                let name = $('#name').val();
-                let email = $('#email').val() + $('#domain-name').text();
+                let nik      = $('#nik').val();
+                let name     = $('#name').val();
+                let email    = $('#email').val() + $('#domain-name').text();
                 let username = $('#username').val();
                 let password = $('#password').val();
-                let confirm = $('#confirm').val();
-                let role = $('#role').val();
-                let token = $('meta[name="csrf-token"]').attr('content');
+                let confirm  = $('#confirm').val();
+                let role     = $('#role').val();
+                let token    = $('meta[name="csrf-token"]').attr('content');
 
                 // ajax update isRequest
                 $.ajax({

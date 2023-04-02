@@ -13,11 +13,11 @@ class Department extends Model
 
     public function subDepartments()
     {
-        return $this->hasMany('App\Models\SubDepartment');
+        return $this->hasMany(Department::class);
     }
 
-    public function positions()
+    public function employees()
     {
-        return $this->hasManyThrough('App\Models\Position', 'App\Models\SubDepartment');
+        return $this->hasMany(Employee::class);
     }
 }

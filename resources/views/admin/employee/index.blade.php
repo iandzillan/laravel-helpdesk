@@ -57,7 +57,7 @@
                                 <div class="col-xl-6 col-lg-6">
                                     <div class="form-group">
                                         <label for="manager-position" class="form-label">Position</label>
-                                        <input type="text" class="form-control" id="manager-position" name="position" placeholder="Manager's position" readonly>
+                                        <input type="text" class="form-control" id="manager-position" name="position" placeholder="Manager's position" readonly value="Manager">
                                         <div class="invalid-feedback d-none" role="alert" id="alert-manager-position"></div>
                                     </div>
                                 </div>
@@ -83,14 +83,17 @@
                     $.each(response, function(code, dept){
                         $('#manager-department').append(`<option value="${dept.id}">${dept.name}</option>`);
                     });
+                },
+                error:function(error){
+                    console.log(error.responseJSON.message);
                 }
             });
 
             // when dept change
-            $('#manager-department').change(function(){
-                $('#manager-position').val('');
-                $('#manager-position').val('Head of ' + $('#manager-department').find('option:selected').text());
-            });
+            // $('#manager-department').change(function(){
+            //     $('#manager-position').val('');
+            //     $('#manager-position').val('Head of ' + $('#manager-department').find('option:selected').text());
+            // });
 
             // preview image
             $('#manager-image').change(function(){

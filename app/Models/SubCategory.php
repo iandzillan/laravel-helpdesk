@@ -11,16 +11,23 @@ class SubCategory extends Model
 
     protected $fillable = [
         'category_id',
+        'technician_id',
         'name'
     ];
 
     public function category()
     {
-        return $this->belongsTo('App\Models\Category');
+        return $this->belongsTo(Category::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'technician_id');
     }
 
     public function tickets()
     {
-        return $this->hasMany('App\Models\Ticket');
+        return $this->hasMany(Ticket::class);
     }
+
 }

@@ -17,10 +17,10 @@
         });
 
         // add user employee button action
-        $('#add-user-employee').click(function(){
+        $('#btn-add-user').click(function(){
             // get all employee
             $.ajax({
-                url: "{{ route('admin.users.getEmployee') }}",
+                url: "{{ route('admin.users.getEmployees') }}",
                 type: "get",
                 cache: false,
                 success:function(response){
@@ -30,43 +30,39 @@
                     $.each(response, function(code, employee){
                         $('#user').append('<option value="'+employee.nik+'">'+employee.nik+' - '+employee.name+'</option>')
                     });
+                    $('#role').empty();
+                    $('#role').append('<option disabled selected> -- Choose -- </option>')
                 }
             });
-
-            // append role
-            $('#role').empty();
-            $('#role').append('<option selected> -- Choose -- </option>')
-            $('#role').append('<option value="Approver2"> Approver Lv.2 (Sub Dept Head) </option>')
-            $('#role').append('<option value="User"> User </option>')
-            $('#role').append('<option value="Technician"> Technician </option>')
 
             // show modal
             $('#modal-create').modal('show');
         });
 
-        // add user manager button action
-        $('#add-user-manager').click(function(){
-            // get all Manager
+        // get role when employee change
+        $('body').on('change', '#user', function(){
+            // define variabel
+            nik = $('#user').val();
+            url = "{{route('admin.users.getEmployee', ":nik")}}";
+            url = url.replace(':nik', nik);
+
             $.ajax({
-                url: "{{ route('admin.users.getManagers') }}",
+                url: url,
                 type: "get",
                 cache: false,
                 success:function(response){
-                    // fill user select
-                    $('#user').empty();
-                    $('#user').append('<option selected> -- Choose -- </option>');
-                    $.each(response, function(code, managers){
-                        $('#user').append('<option value="'+managers.nik+'">'+managers.nik+' - '+managers.name+'</option>')
-                    });
+                    $('#role').empty();
+                    $('#role').append('<option disabled selected> -- Choose -- </option>')
+                    if (response.position == 'Manager') {
+                        $('#role').append('<option value="Approver1"> Approver Lv.1 (Manager) </option>');
+                    } else if (response.position == 'Team Leader') {
+                        $('#role').append('<option value="Approver2"> Approver Lv.2 (Team Leader) </option>');
+                    } else {
+                        $('#role').append('<option value="User"> User </option>');
+                        $('#role').append('<option value="Technician"> Technician </option>');
+                    }
                 }
             });
-
-            // append role
-            $('#role').empty();
-            $('#role').append('<option selected readonly value="Approver1"> Approver Lv.1 (Manager) </option>');
-
-            // show modal
-            $('#modal-create').modal('show');
         });
 
         // store button action
@@ -133,7 +129,6 @@
                             });
                         },
                         error:function(error1){
-                            console.log(error1.responseJSON.message);
                             // show message
                             Swal.fire({
                                 icon: 'warning',
@@ -265,12 +260,13 @@
         $('body').on('click', '#btn-edit-user', function(){
             // get id
             let id = $(this).data('id');
-
-            // 
+            // set url
+            let url = "{{route('admin.users.show', ":id")}}";
+            url = url.replace(':id', id);
 
             // ajax show
             $.ajax({
-                url: `users/${id}/edit`,
+                url: url,
                 type: 'get',
                 cache: false,
                 success:function(response){
@@ -306,13 +302,15 @@
             e.preventDefault();
 
             // define variable
-            let id = $('#id').val();
-            let role = $('#role-edit').val();
-            let email = $('#email-edit').val() + $('#domain-name-edit').text();
-            let username = $('#username-edit').val();
-            let password = $('#password-edit').val();
+            let id               = $('#id').val();
+            let role             = $('#role-edit').val();
+            let email            = $('#email-edit').val() + $('#domain-name-edit').text();
+            let username         = $('#username-edit').val();
+            let password         = $('#password-edit').val();
             let password_confirm = $('#password-confirm-edit').val();
-            let token = $('meta[name="csrf-token"]').attr('content');
+            let token            = $('meta[name="csrf-token"]').attr('content');
+            let url              = "{{route('admin.users.update', ":id")}}";
+            url                  = url.replace(':id', id);
 
             // show loading
             Swal.fire({
@@ -329,7 +327,7 @@
 
             // Ajax update
             $.ajax({
-                url: `users/${id}`,
+                url: url,
                 type: 'patch',
                 cache: false,
                 data: {
@@ -456,8 +454,10 @@
         // delete button action
         $('body').on('click', '#btn-delete-user', function(){
             // define variable
-            let id = $(this).data('id');
+            let id    = $(this).data('id');
             let token = $('meta[name="csrf-token"]').attr('content');
+            let url   = "{{route('admin.users.destroy', ":id")}}";
+            url       = url.replace(':id', id);
 
             // show confirmation
             Swal.fire({
@@ -484,7 +484,7 @@
 
                     // ajax delete
                     $.ajax({
-                        url: `users/${id}`,
+                        url: url,
                         type: "delete",
                         cache: false,
                         data:{

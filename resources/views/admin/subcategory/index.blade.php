@@ -20,6 +20,7 @@
                                 <th>#</th>
                                 <th>Name</th>
                                 <th>Category</th>
+                                <th>Technician</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -35,7 +36,7 @@
     @include('admin.subcategory.modal-edit')
 
     <script>
-        $(function(){
+        $('body').ready(function(){
 
             // draw table
             let table = $('.data-table').DataTable({
@@ -47,6 +48,7 @@
                     {data: 'DT_RowIndex', name: 'DT_RowIndex'},
                     {data: 'name', name: 'name'},
                     {data: 'category', name: 'category'},
+                    {data: 'technician', name: 'technician'},
                     {data: 'action', name: 'action', orderable: false, searchable: false},
                 ]
             });
@@ -61,15 +63,35 @@
                     success:function(response){
                         if(response){
                             // fill select options with categories
-                            $('#subcategory-categoryid').empty();
-                            $('#subcategory-categoryid').append(`
-                                <option selected>-- Choose Category --</option>
+                            $('#category-id').empty();
+                            $('#category-id').append(`
+                                <option disabled selected> -- Choose -- </option>
                             `);
                             $.each(response, function(code, category){
-                                $('#subcategory-categoryid').append('<option value="'+category.id+'">'+category.name+'</option>'); 
+                                $('#category-id').append('<option value="'+category.id+'">'+category.name+'</option>'); 
                             });
                         } else {
-                            $('#subcategory-categoryid').empty();
+                            $('#category-id').empty();
+                        }
+                    }
+                });
+
+                // fetch technician to select option
+                $.ajax({
+                    url: "{{ route('admin.subcategories.technicians') }}",
+                    type: "get",
+                    cache: false,
+                    success:function(response){
+                        if (response) {
+                            $('#technician-id').empty();
+                            $('#technician-id').append(`
+                                <option disabled selected> -- Choose -- </option>
+                            `);
+                            $.each(response, function(code, technician){
+                                $('#technician-id').append('<option value="'+technician.id+'">'+technician.name+'</option>'); 
+                            });
+                        } else {
+                            $('#technician-id').empty();
                         }
                     }
                 });
@@ -96,9 +118,10 @@
                 });
 
                 // define variable
-                let name        = $('#subcategory-name').val();
-                let category_id = $('#subcategory-categoryid').val();
-                let token       = $('meta[name="csrf-token"]').attr('content');
+                let name          = $('#name').val();
+                let category_id   = $('#category-id').val();
+                let technician_id = $('#technician-id').val();
+                let token         = $('meta[name="csrf-token"]').attr('content');
 
                 // ajax
                 $.ajax({
@@ -108,6 +131,7 @@
                     data: {
                         "name": name,
                         "category_id": category_id,
+                        "technician_id": technician_id,
                         "_token": token
                     },
                     success:function(response){
@@ -123,12 +147,9 @@
                         $('#form-create-subcategory').trigger('reset');
 
                         // clear alert
-                        $('#subcategory-name').removeClass('is-invalid');
-                        $('#alert-subcategory-name').addClass('d-none');
-                        $('#alert-subcategory-name').removeClass('d-block');
-                        $('#subcategory-categoryid').removeClass('is-invalid');
-                        $('#subcategory-categoryid').addClass('d-none');
-                        $('#subcategory-categoryid').removeClass('d-block');
+                        $('input').removeClass('is-invalid');
+                        $('select').removeClass('is-invalid');
+                        $('.invalid-feedback').removeClass('d-block');
 
                         // close modal
                         $('#modal-create').modal('hide');
@@ -149,33 +170,49 @@
                         // check if sub category name error
                         if(error.responseJSON.name){
                             // show alert
-                            $('#subcategory-name').addClass('is-invalid');
-                            $('#alert-subcategory-name').removeClass('d-none');
-                            $('#alert-subcategory-name').addClass('d-block');
+                            $('#name').addClass('is-invalid');
+                            $('#alert-name').removeClass('d-none');
+                            $('#alert-name').addClass('d-block');
 
                             // add message to alert
-                            $('#alert-subcategory-name').html(error.responseJSON.name);
+                            $('#alert-name').html(error.responseJSON.name);
                         } else {
                             // remove alert
-                            $('#subcategory-name').removeClass('is-invalid');
-                            $('#alert-subcategory-name').addClass('d-none');
-                            $('#alert-subcategory-name').removeClass('d-block');
+                            $('#name').removeClass('is-invalid');
+                            $('#alert-name').addClass('d-none');
+                            $('#alert-name').removeClass('d-block');
                         }
 
                         // check if category option error
                         if (error.responseJSON.category_id){
                             // show alert
-                            $('#subcategory-categoryid').addClass('is-invalid');
-                            $('#subcategory-categoryid').removeClass('d-none');
-                            $('#subcategory-categoryid').addClass('d-block');
+                            $('#category-id').addClass('is-invalid');
+                            $('#category-id').removeClass('d-none');
+                            $('#category-id').addClass('d-block');
 
                             // add message to alert
-                            $('#alert-subcategory-categoryid').html(error.responeJSON.category_id);
+                            $('#alert-categoryid').html(error.responseJSON.category_id);
                         } else {
                             // remove alert
-                            $('#subcategory-categoryid').removeClass('is-invalid');
-                            $('#subcategory-categoryid').addClass('d-none');
-                            $('#subcategory-categoryid').removeClass('d-block');
+                            $('#category-id').removeClass('is-invalid');
+                            $('#category-id').addClass('d-none');
+                            $('#category-id').removeClass('d-block');
+                        }
+
+                        // check if technician option error
+                        if (error.responseJSON.technician_id){
+                            // show alert
+                            $('#technician-id').addClass('is-invalid');
+                            $('#technician-id').removeClass('d-none');
+                            $('#technician-id').addClass('d-block');
+
+                            // add message to alert
+                            $('#alert-technicianid').html(error.responseJSON.technician_id);
+                        } else {
+                            // remove alert
+                            $('#technician-id').removeClass('is-invalid');
+                            $('#technician-id').addClass('d-none');
+                            $('#technician-id').removeClass('d-block');
                         }
                     }
                 });

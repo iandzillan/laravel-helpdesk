@@ -56,7 +56,11 @@
                                 <div class="col-xl-6 col-lg-6">
                                     <div class="form-group">
                                         <label for="employee-position" class="form-label">Position</label>
-                                        <select id="employee-position" name="position_id" class="form-control form-select2"></select>
+                                        <select id="employee-position" name="position" class="form-control form-select2">
+                                            <option selected disabled> -- Choose -- </option>
+                                            <option value="Team Leader" {{$employee->position == 'Team Leader' ? 'selected' : ''}}>Team Leader</option>
+                                            <option value="Team Member" {{$employee->position == 'Team Member' ? 'selected' : ''}}>Team Member</option>
+                                        </select>
                                         <div class="invalid-feedback d-none" role="alert" id="alert-employee-position"></div>
                                     </div>
                                 </div>
@@ -72,9 +76,8 @@
     <script>
         $(document).ready(function(){
             // define varibale
-            let dept_id     = "{{ $employee->position->subDepartment->department_id }}";
-            let subdept_id  = "{{ $employee->position->sub_department_id }}";
-            let position_id = "{{ $employee->position_id }}";
+            let dept_id     = "{{ $employee->subDepartment->department_id }}";
+            let subdept_id  = "{{ $employee->sub_department_id }}";
 
             // get all sub dept
             $.ajax({
@@ -84,52 +87,11 @@
                 data: {'id': dept_id},
                 success:function(response){
                     // fill subdept select option
-                    $('#employee-subdept').append('<option disabled selected> -- Choose -- </option>');
                     $.each(response, function(code, subdept){
                         $('#employee-subdept').append('<option value="'+subdept.id+'">'+subdept.name+'</option>');
                         $('#employee-subdept option[value="'+subdept_id+'"]').attr('selected', 'selected');
                     });
                 }
-            });
-
-            // get all position
-            $.ajax({
-                url: "{{ route('dept.employees.positions') }}",
-                type: "get",
-                cache: false,
-                data: {'id': subdept_id},
-                success:function(response){
-                    // fill position select option
-                    $('#employee-position').append('<option disabled selected> -- Choose -- </option>');
-                    $.each(response, function(code, position){
-                        $('#employee-position').append('<option value="'+position.id+'">'+position.name+'</option>');
-                        $('#employee-position option[value="'+position_id+'"]').attr('selected', 'selected');
-                    });
-                },
-                error:function(error){
-                    console.log(error.responseJSON.message);
-                }
-            });
-
-            // get all position when sub dept val change
-            $('#employee-subdept').change(function(){
-                // get sub dept id
-                let id = $('#employee-subdept').val();
-
-                // get position
-                $.ajax({
-                    url: "{{ route('dept.employees.positions') }}",
-                    type: "get",
-                    cache: false,
-                    data: {'id': id},
-                    success:function(response){
-                        $('#employee-position').empty();
-                        $('#employee-position').append('<option disabled selected> -- Choose -- </option>');
-                        $.each(response, function(code, position){
-                            $('#employee-position').append('<option value="'+position.id+'">'+position.name+'</option>');
-                        });
-                    }
-                });
             });
 
             // preview image
@@ -161,11 +123,14 @@
 
                 // define form variable
                 let formData = new FormData(this);
-                let nik = formData.get('nik');
+                let nik      = formData.get('nik');
+                let position = formData.get('position');
+                let url      = "{{route('dept.employees.update', ":nik")}}";
+                url          = url.replace(':nik', nik);
 
                 // ajax update
                 $.ajax({
-                    url: "{{route('dept.employees.update', '')}}"+"/"+nik,
+                    url: url,
                     type: "post",
                     cache: false,
                     data: formData, 
@@ -228,14 +193,14 @@
                         }
 
                         // check if position field error
-                        if (error.responseJSON.position_id) {
+                        if (error.responseJSON.position) {
                             // show alert
                             $('#employee-position').addClass('is-invalid');
                             $('#alert-employee-position').removeClass('d-none');
                             $('#alert-employee-position').addClass('d-block');
 
                             // show message
-                            $('#alert-employee-position').html(error.responseJSON.position_id);
+                            $('#alert-employee-position').html(error.responseJSON.position);
                         } else {
                             // remove alert
                             $('#employee-position').removeClass('is-invalid');

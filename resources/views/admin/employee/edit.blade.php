@@ -6,7 +6,7 @@
             <div class="card">
                 <div class="card-header d-flex justify-content-between">
                     <div class="header-title">
-                        <h4 class="card-title text-bold">New {{ $manager->name }} Information</h4>
+                        <h4 class="card-title text-bold">New {{ $employee->name }} Information</h4>
                     </div>
                     <a href="{{ route('admin.managers.list') }}" class="btn btn-primary">
                         <i class="fa-solid fa-table-list"></i> List Managers
@@ -18,11 +18,11 @@
                         @csrf
                         <div class="new-user info">
                             <div class="row">
-                                <input type="hidden" id="employee-id" name="id" value="{{ $manager->id }}">
+                                <input type="hidden" id="employee-id" name="id" value="{{ $employee->id }}">
                                 <div class="col-xl-6 col-lg-6">
                                     <div class="form-group">
                                         <div class="profile-img-edit position relative mb-3">
-                                            <img src="{{ asset('storage/uploads/photo-profile/'.$manager->image) }}" id="manager-image-preview" alt="profile-pic" class="theme-color-default-img profile-pic rounded avatar-100">
+                                            <img src="{{ asset('storage/uploads/photo-profile/'.$employee->image) }}" id="manager-image-preview" alt="profile-pic" class="theme-color-default-img profile-pic rounded avatar-100">
                                         </div>
                                         <input type="file" class="form-control" id="manager-image" name="image">
                                         <div class="invalid-feedback d-none" role="alert" id="alert-manager-image"></div>
@@ -38,12 +38,12 @@
                                 <div class="col-xl-6 col-lg-6">
                                     <div class="form-group">
                                         <label for="manager-nik" class="form-label">NIK</label>
-                                        <input type="text" class="form-control" id="manager-nik" name="nik" placeholder="Manager's nik" value="{{ $manager->nik }}" readonly>
+                                        <input type="text" class="form-control" id="manager-nik" name="nik" placeholder="Manager's nik" value="{{ $employee->nik }}" readonly>
                                         <div class="invalid-feedback d-none" role="alert" id="alert-manager-nik"></div>
                                     </div>
                                     <div class="form-group">
                                         <label for="manager-name" class="form-label">Full Name</label>
-                                        <input type="text" class="form-control" id="manager-name" name="name" placeholder="Manager's name" value="{{ $manager->name }}">
+                                        <input type="text" class="form-control" id="manager-name" name="name" placeholder="Manager's name" value="{{ $employee->name }}">
                                         <div class="invalid-feedback d-none" role="alert" id="alert-manager-name"></div>
                                     </div>
                                 </div>
@@ -59,7 +59,7 @@
                                 <div class="col-xl-6 col-lg-6">
                                     <div class="form-group">
                                         <label for="manager-position" class="form-label">Position</label>
-                                        <input type="text" class="form-control" id="manager-position" name="position" placeholder="Manager's position" value="{{ $manager->position }}" readonly>
+                                        <input type="text" class="form-control" id="manager-position" name="position" placeholder="Manager's position" value="{{ $employee->position }}" readonly>
                                         <div class="invalid-feedback d-none" role="alert" id="alert-manager-position"></div>
                                     </div>
                                 </div>
@@ -75,7 +75,7 @@
     <script>
         $(document).ready(function(){
             // define variable 
-            let dept_id = "{{ $manager->department_id }}";
+            let dept_id = "{{ $employee->department_id }}";
 
             // get all dept
             $.ajax({
@@ -93,10 +93,10 @@
             });
 
             // position field when dept change
-            $('#manager-department').change(function(){
-                $('#manager-position').val('');
-                $('#manager-position').val('Head of ' + $('#manager-department').find('option:selected').text());
-            });
+            // $('#manager-department').change(function(){
+            //     $('#manager-position').val('');
+            //     $('#manager-position').val('Head of ' + $('#manager-department').find('option:selected').text());
+            // });
 
             // preview image
             $('#manager-image').change(function(){
@@ -155,6 +155,7 @@
                         }, 2000);
                     },
                     error:function(error){
+                        console.log(error.responseJSON.message);
                         // show message
                         swal.fire({
                             icon: 'warning',

@@ -44,7 +44,7 @@
             });
 
             // destroy button action
-            $('body').on('click', '#btn-delete-manager', function(){
+            $('body').on('click', '#btn-delete-employee', function(){
                 // define variable
                 let id    = $(this).data('id');
                 let token = $('meta[name="csrf-token"]').attr('content');

@@ -12,23 +12,25 @@ class Employee extends Model
     protected $fillable = [
         'nik',
         'name',
+        'position',
+        'sub_department_id',
+        'department_id',
         'image',
-        'position_id',
         'isRequest'
     ];
 
     public function user()
     {
-        return $this->morphOne('App\Models\User', 'userable');
+        return $this->hasOne(User::class);
     }
 
-    public function tickets()
+    public function subDepartment()
     {
-        return $this->hasMany('App\Models\ticket');
+        return $this->belongsTo(SubDepartment::class);
     }
 
-    public function position()
+    public function department()
     {
-        return $this->belongsTo('App\Models\Position');
+        return $this->belongsTo(Department::class);
     }
 }

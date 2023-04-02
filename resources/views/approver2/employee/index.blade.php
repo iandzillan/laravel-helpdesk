@@ -43,7 +43,7 @@
                                     </div>
                                     <div class="form-group">
                                         <label for="employee-position" class="form-label">Position</label>
-                                        <select id="employee-position" name="position_id" class="form-control form-select2"></select>
+                                        <input type="text" class="form-control" id="position" name="position" value="Team Member" readonly>
                                         <div class="invalid-feedback d-none" role="alert" id="alert-employee-position"></div>
                                     </div>
                                 </div>
@@ -59,30 +59,7 @@
     <script>
         $(document).ready(function(){
             // get sub dept id employee
-            let id = "{{ Auth::user()->userable->position->sub_department_id }}";
-
-            // get position
-            $.ajax({
-                url: "{{ route('subdept.employees.positions') }}",
-                type: "get",
-                cache: false,
-                data:{
-                    'id': id
-                },
-                success:function(response){
-                    if (response) {
-                        // empty select option
-                        $('#employee-position').empty();
-                        $('#employee-position').append('<option disabled selected> -- Choose -- </option>');
-                        // fill position select option
-                        $.each(response, function(code, position){
-                            $('#employee-position').append('<option value="'+position.id+'">'+position.name+'</option>');
-                        });
-                    } else {
-                        $('#employee-position').empty();
-                    }
-                }
-            });
+            let id = "{{ Auth::user()->employee->sub_department_id }}";
 
             // preview image
             $('#employee-image').change(function(){
@@ -195,14 +172,14 @@
                         }
 
                         // check if position field error
-                        if (error.responseJSON.position_id) {
+                        if (error.responseJSON.position) {
                             // show alert
                             $('#employee-position').addClass('is-invalid');
                             $('#alert-employee-position').removeClass('d-none');
                             $('#alert-employee-position').addClass('d-block');
 
                             // show message
-                            $('#alert-employee-position').html(error.responseJSON.position_id);
+                            $('#alert-employee-position').html(error.responseJSON.position);
                         } else {
                             // remove alert
                             $('#employee-position').removeClass('is-invalid');

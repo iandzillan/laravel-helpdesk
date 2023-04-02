@@ -5,7 +5,7 @@
         <div class="card">
             <div class="card-header d-flex justify-content-between">
                 <div class="header-title">
-                    <h4 class="card-title">All {{ Auth::user()->employee->subDepartment->name }}'s Tickets</h4>
+                    <h4 class="card-title">{{ Auth::user()->employee->subDepartment->name }} sub department new entry tickets</h4>
                 </div>
             </div>
             <div class="card-body">
@@ -39,7 +39,7 @@
                 responsive: true,
                 processing: true,
                 serverSide: true,
-                ajax: "{{ route('subdept.all.ticket') }}",
+                ajax: "{{ route('subdept.entry.tickets') }}",
                 columns: [
                     {data: 'DT_RowIndex', name: 'DT_RowIndex'},
                     {data: 'ticket_number', name: 'ticket_number'},

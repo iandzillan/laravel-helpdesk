@@ -44,8 +44,8 @@
                                         <div class="invalid-feedback d-none" role="alert" id="alert-employee-name"></div>
                                     </div>
                                     <div class="form-group">
-                                    <label for="employee-position" class="form-label">Position</label>
-                                    <select id="employee-position" name="position_id" class="form-control form-select2"></select>
+                                        <label for="employee-position" class="form-label">Position</label>
+                                        <input type="text" class="form-control" id="position" name="position" value="{{ $employee->position }}" readonly>
                                     <div class="invalid-feedback d-none" role="alert" id="alert-employee-position"></div>
                                 </div>
                                 </div>
@@ -61,24 +61,7 @@
     <script>
         $(document).ready(function(){
             // define varibale
-            let subdept_id = "{{ $employee->position->sub_department_id }}";
-            let position_id = "{{ $employee->position_id }}";
-
-            // get all position
-            $.ajax({
-                url: "{{ route('subdept.employees.positions') }}",
-                type: 'get',
-                cache: false,
-                data: {'id': subdept_id},
-                success:function(response){
-                    // fill position select option
-                    $('#employee-position').append('<option selected> -- Choose -- </option>');
-                    $.each(response, function(code, position){
-                        $('#employee-position').append('<option value="'+position.id+'">'+position.name+'</option>');
-                        $('#employee-position option[value='+position_id+']').attr('selected', 'selected');
-                    });
-                }
-            });
+            let subdept_id = "{{ $employee->sub_department_id }}";
 
             // preview image
             $('#employee-image').change(function(){
@@ -111,10 +94,12 @@
                 // define form variable
                 let formData = new FormData(this);
                 let nik      = formData.get('nik');
+                let url      = "{{route('subdept.employees.update', ":nik")}}";
+                url          = url.replace(':nik', nik);
 
                 // ajax update
                 $.ajax({
-                    url: "{{ route('subdept.employees.update', '') }}" + '/' + nik,
+                    url: url,
                     type: "post",
                     cache: false,
                     data: formData, 
@@ -176,14 +161,14 @@
                         }
 
                         // check if position field error
-                        if (error.responseJSON.position_id) {
+                        if (error.responseJSON.position) {
                             // show alert
                             $('#employee-position').addClass('is-invalid');
                             $('#alert-employee-position').removeClass('d-none');
                             $('#alert-employee-position').addClass('d-block');
 
                             // show message
-                            $('#alert-employee-position').html(error.responseJSON.position_id);
+                            $('#alert-employee-position').html(error.responseJSON.position);
                         } else {
                             // remove alert
                             $('#employee-position').removeClass('is-invalid');
@@ -193,7 +178,6 @@
                     }
                 });
             });
-
         });
     </script>
 

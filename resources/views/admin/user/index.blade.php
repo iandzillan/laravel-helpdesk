@@ -8,14 +8,10 @@
                     <h4 class="card-title">Users List</h4>
                 </div>
                 <div class="dropdown">
-                    <a href="#" class="btn btn-primary mb-2 dropdown-toggle" role="button" id="dropdownUserMenu" data-bs-toggle="dropdown" aria-expanded="false">
+                    <a href="javascript:void(0)" class="btn btn-primary mb-2" role="button" id="btn-add-user">
                         <i class="fa-solid fa-folder-plus"></i>
                         Add User
                     </a>
-                    <ul class="dropdown-menu" aria-labelledby="dropdownUserMenu">
-                        <li><a class="dropdown-item" href="javascript:void(0)" id="add-user-manager">For Manager</a></li>
-                        <li><a class="dropdown-item" href="javascript:void(0)" id="add-user-employee">For Employee</a></li>
-                    </ul>
                 </div>
             </div>
             <div class="card-body">

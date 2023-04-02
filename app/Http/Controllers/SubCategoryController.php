@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use App\Models\Employee;
 use App\Models\SubCategory;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -14,7 +16,7 @@ class SubCategoryController extends Controller
 {
     public function index(Request $request)
     {
-        $sub_categories = SubCategory::with('category')->latest()->get();
+        $sub_categories = SubCategory::with(['category', 'user'])->latest()->get();
 
         // Draw Data Table
         if ($request->ajax()) {
@@ -22,6 +24,9 @@ class SubCategoryController extends Controller
                 ->addIndexColumn()
                 ->addColumn('category', function ($row) {
                     return $row->category->name;
+                })
+                ->addColumn('technician', function ($row){
+                    return $row->user->employee->name;
                 })
                 ->addColumn('action', function ($row) {
                     $btn = '<a href="javascript:void(0)" id="btn-edit-subcategory" data-id="' . $row->id . '" class="btn btn-primary btn-sm" title="Edit this sub category"> <i class="fa-solid fa-pen-to-square"></i> </a>';
@@ -34,7 +39,7 @@ class SubCategoryController extends Controller
 
         return view('admin.subcategory.index', [
             'title'             => 'Sub Categories - Helpdesk Ticketing System',
-            'name'              => Auth::user()->userable->name
+            'name'              => Auth::user()->employee->name
         ]);
     }
 
@@ -44,20 +49,27 @@ class SubCategoryController extends Controller
         return response()->json($categories);
     }
 
+    public function getTechnicians()
+    {
+        $employees = Employee::whereHas('user', function($q){
+            $q->where('role', 'Technician');
+        })->get(['id', 'name']);
+        return response()->json($employees);
+    }
+
     public function store(Request $request)
     {
         // get category id
         $category = Category::where('id', $request->category_id)->first();
 
+        // get user id 
+        $user = User::where('employee_id', $request->technician_id)->first();
+
         // set validation
         $validator = Validator::make($request->all(), [
-            'name'          => [
-                'required',
-                Rule::unique('sub_categories')->where('category_id', $category)
-            ],
-            'category_id'   => 'required'
-        ], [
-            'name.unique' => "This sub category already exists in $category->name category"
+            'name'          => 'required',
+            'category_id'   => 'required',
+            'technician_id' => 'required'
         ]);
 
         // check if validation fails
@@ -66,10 +78,10 @@ class SubCategoryController extends Controller
         }
 
         // create sub category
-        $category = Category::where('id', $request->category_id)->first();
         $sub_category = new SubCategory;
         $sub_category->name = $request->name;
         $sub_category->category()->associate($category);
+        $sub_category->user()->associate($user);
         $sub_category->save();
 
         // return response

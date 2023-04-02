@@ -15,12 +15,15 @@ return new class extends Migration
             $table->id();
             $table->integer('nik')->unique();
             $table->string('name');
-            $table->unsignedBigInteger('position_id');
+            $table->string('position');
+            $table->unsignedBigInteger('sub_department_id')->nullable();
+            $table->unsignedBigInteger('department_id');
             $table->text('image');
             $table->integer('isRequest')->default(0);
             $table->timestamps();
 
-            $table->foreign('position_id')->references('id')->on('positions')->onDelete('cascade');
+            $table->foreign('sub_department_id')->references('id')->on('sub_departments')->onDelete('cascade');
+            $table->foreign('department_id')->references('id')->on('departments')->onDelete('cascade');
         });
     }
 

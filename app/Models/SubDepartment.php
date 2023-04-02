@@ -10,21 +10,17 @@ class SubDepartment extends Model
     use HasFactory;
 
     protected $fillable = [
-        'name'
+        'name',
+        'department_id'
     ];
-
-    public function positions()
-    {
-        return $this->hasMany('App\Models\Position');
-    }
 
     public function department()
     {
-        return $this->belongsTo('App\Models\Department');
+        return $this->belongsTo(Department::class);
     }
 
     public function employees()
     {
-        return $this->hasManyThrough('App\Models\Employee', 'App\Models\Position');
+        return $this->hasMany(Employee::class);
     }
 }

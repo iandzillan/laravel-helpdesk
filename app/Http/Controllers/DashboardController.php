@@ -46,7 +46,7 @@ class DashboardController extends Controller
 
         return view($view, [
             'title' => $title,
-            'name'  => Auth::user()->userable->name
+            'name'  => Auth::user()->employee->name
         ]);
     }
 }

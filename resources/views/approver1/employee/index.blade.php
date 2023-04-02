@@ -54,7 +54,11 @@
                                 <div class="col-xl-6 col-lg-6">
                                     <div class="form-group">
                                         <label for="employee-position" class="form-label">Position</label>
-                                        <select id="employee-position" name="position_id" class="form-control form-select2"></select>
+                                        <select id="employee-position" name="position" class="form-control form-select2">
+                                            <option selected disabled> -- Choose -- </option>
+                                            <option value="Team Leader">Team Leader</option>
+                                            <option value="Team Member">Team Member</option>
+                                        </select>
                                         <div class="invalid-feedback d-none" role="alert" id="alert-employee-position"></div>
                                     </div>
                                 </div>
@@ -70,7 +74,7 @@
     <script>
         $(document).ready(function(){
             // get employee dept id
-            let id = "{{ Auth::user()->userable->department->id }}";
+            let id = "{{ Auth::user()->employee->department_id }}";
 
             // get subdept based on dept id 
             $.ajax({
@@ -84,7 +88,6 @@
                     // fill the subdept select option
                     $('#employee-subdept').empty();
                     $('#employee-subdept').append('<option disabled selected> -- Choose -- </option>');
-                    $('#employee-position').append('<option disabled selected> -- Choose -- </option>');
                     $.each(response, function(code, subdept){
                         $('#employee-subdept').append(`<option value="${subdept.id}">${subdept.name}</option>`);
                     });
@@ -93,32 +96,6 @@
                     console.log(error.responseJSON.message);
                     $('#employee-subdept').empty();
                 }
-            });
-
-            // get position based on subdept change
-            $('#employee-subdept').change(function(){
-                let id = $('#employee-subdept').val();
-
-                $.ajax({
-                    url: "{{ route('dept.employees.positions') }}",
-                    type: "get",
-                    cache: false,
-                    data: {
-                        'id': id
-                    },
-                    success:function(response){
-                        // fill the position select option
-                        $('#employee-position').empty();
-                        $('#employee-position').append('<option disabled selected> -- Choose -- </option>');
-                        $.each(response, function(code, position){
-                            $('#employee-position').append(`<option value="${position.id}">${position.name}</option>`);
-                        });
-                    }, 
-                    error:function(error){
-                        console.log(error.responseJSON.message);
-                        $('#employee-position').empty();
-                    }
-                });
             });
 
             // preview image
@@ -250,14 +227,14 @@
                         }
 
                         // check if position employee has error
-                        if (error.responseJSON.position_id) {
+                        if (error.responseJSON.position) {
                             // show alert
                             $('#employee-position').addClass('is-invalid');
                             $('#alert-employee-position').addClass('d-block');
                             $('#alert-employee-position').removeClass('d-none');
 
                             // show message
-                            $('#alert-employee-position').html(error.responseJSON.position_id);
+                            $('#alert-employee-position').html(error.responseJSON.position);
                         } else {
                             // remove alert
                             $('#employee-position').removeClass('is-invalid');

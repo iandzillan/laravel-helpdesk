@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('trackings', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('ticket_id');
-            $table->string('note');
+            $table->string('note')->nullable();
             $table->string('status');
             $table->timestamps();
 

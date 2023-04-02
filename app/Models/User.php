@@ -18,10 +18,11 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
+        'employee_id',
         'username',
+        'role',
         'email',
-        'password',
-        'role'
+        'password'
     ];
 
     /**
@@ -43,8 +44,18 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    public function userable()
+    public function employee()
     {
-        return $this->morphTo();
+        return $this->belongsTo(Employee::class);
+    }
+
+    public function subCategories()
+    {
+        return $this->hasMany(SubCategory::class);
+    }
+
+    public function ticket()
+    {
+        return $this->hasMany(Ticket::class);
     }
 }

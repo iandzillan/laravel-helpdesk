@@ -17,7 +17,7 @@ class ManagerController extends Controller
     {
         return view('admin.manager.index', [
             'title' => 'Add Manager - Helpdesk Ticketing System',
-            'name'  => Auth::user()->userable->name
+            'name'  => Auth::user()->employee->name
         ]);
     }
 
@@ -52,7 +52,7 @@ class ManagerController extends Controller
 
         return view('admin.manager.list', [
             'title' => 'Manager Master Data - Helpdesk Ticketing System',
-            'name'  => Auth::user()->userable->name
+            'name'  => Auth::user()->employee->name
         ]);
     }
 

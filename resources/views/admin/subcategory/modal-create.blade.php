@@ -9,14 +9,19 @@
             <form id="form-create-subcategory">
                 <div class="modal-body">
                     <div class="form-group">
-                        <label for="subcategory-name">Name</label>
-                        <input type="text" class="form-control" id="subcategory-name">
-                        <div class="invalid-feedback d-none" role="alert" id="alert-subcategory-name"></div>
+                        <label for="name">Name</label>
+                        <input type="text" class="form-control" id="name">
+                        <div class="invalid-feedback" role="alert" id="alert-name"></div>
                     </div>
                     <div class="form-group">
-                        <label for="select-category-id">Category</label>
-                        <select id="subcategory-categoryid" name="category" class="form-select mb-3 select2"></select>
-                        <div class="invalid-feedback d-none" role="alert" id="alert-subcategory-categoryid"></div>
+                        <label for="category-id">Category</label>
+                        <select id="category-id" name="category_id" class="form-select mb-3 select2"></select>
+                        <div class="invalid-feedback" role="alert" id="alert-categoryid"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="technician-id">Technician</label>
+                        <select id="technician-id" name="technician_id" class="form-select mb-3 select2"></select>
+                        <div class="invalid-feedback" role="alert" id="alert-technicianid"></div>
                     </div>
                 </div>
                 <div class="modal-footer">

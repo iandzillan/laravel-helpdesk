@@ -41,12 +41,7 @@
                     </div>
                     <div class="form-group">
                         <label for="role">Role</label>
-                        <select id="role" name="category" class="form-select mb-3 shadow-none select-modal">
-                            <option disabled selected>-- Choose --</option>
-                            <option value="Approver2">Approver Lv.2 (Sub Dept Head)</option>
-                            <option value="User">User</option>
-                            <option value="Technician">Technician</option>
-                        </select>
+                        <select id="role" name="role" class="form-select mb-3 shadow-none select-modal"></select>
                         <div class="invalid-feedback d-none" role="alert" id="alert-role"></div>
                     </div>
                 </div>
