@@ -162,14 +162,14 @@ class EmployeeController extends Controller
                     'sub_department_id' => $request->sub_department_id
                 ]);
                 break;
-            
+
             default:
                 $employee = Employee::create([
                     'nik'               => $request->nik,
                     'name'              => $request->name,
                     'image'             => $image_name,
                     'position'          => $request->position,
-                    'department_id'     => Auth::user()->employee->department_id, 
+                    'department_id'     => Auth::user()->employee->department_id,
                     'sub_department_id' => Auth::user()->employee->sub_department_id
                 ]);
                 break;
@@ -241,10 +241,10 @@ class EmployeeController extends Controller
         if ($request->ajax()) {
             return DataTables::of($employees)
                 ->addIndexColumn()
-                ->addColumn('dept', function($row){
+                ->addColumn('dept', function ($row) {
                     return $row->department->name;
                 })
-                ->addColumn('subdept', function($row){
+                ->addColumn('subdept', function ($row) {
                     if ($row->position != 'Manager') {
                         return $row->subDepartment->name;
                     }
@@ -330,8 +330,7 @@ class EmployeeController extends Controller
                     'sub_department_id' => 'required',
                     'image'             => 'sometimes|image|mimes:jpeg,png,jpg|max:1024',
                 ], [
-                    'sub_department_id.required' => 'The sub department field is required',
-                    'position_id.required'       => 'The position field is required'
+                    'sub_department_id.required' => 'The sub department field is required'
                 ]);
                 break;
 
@@ -372,16 +371,20 @@ class EmployeeController extends Controller
             // save to app storage
             $request->image->storeAs('public/uploads/photo-profile', $image_name);
         } else {
-            // get ext file
-            $image_ext = explode(".", $employee->image, 2);
-            $image_ext = end($image_ext);
+            // check if employee not use default image
+            if ($employee->image != "avtar_1.png") {
+                // get ext file
+                $image_ext = explode(".", $employee->image, 2);
+                $image_ext = end($image_ext);
 
+                // set name image
+                $image_name = "$employee->nik-$request->name.$image_ext";
+
+                // Rename image on app storage
+                Storage::move('public/uploads/photo-profile/' . $employee->image, 'public/uploads/photo-profile/' . $image_name);
+            }
             // use old image
-            $image_name = "$employee->nik-$request->name.$image_ext";
-            // $image_name = $employee->image;
-
-            // Rename image on app storage
-            Storage::move('public/uploads/photo-profile/'. $employee->image, 'public/uploads/photo-profile/'. $image_name);
+            $image_name = $employee->image;
         }
 
         switch ($role) {
@@ -394,7 +397,7 @@ class EmployeeController extends Controller
                     'department_id' => $request->department_id
                 ]);
                 break;
-            
+
             case 'Approver1':
                 // update manager
                 $employee->update([
@@ -404,7 +407,7 @@ class EmployeeController extends Controller
                     'sub_department_id' => $request->sub_department_id
                 ]);
                 break;
-            
+
             default:
                 // update employee
                 $employee->update([

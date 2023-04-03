@@ -68,7 +68,7 @@
 
                 @if (Auth::user()->role == 'Admin')
                     <li class="nav-item">
-                        <a class="nav-link {{(request()->segment(2) == 'all-tickets') ? 'active' : ''}}" aria-current="page" href="#">
+                        <a class="nav-link {{(request()->segment(2) == 'all-tickets') ? 'active' : ''}}" aria-current="page" href="{{ route('admin.all.tickets') }}">
                             <i class="icon">
                                 <i class="fa-solid fa-ticket"></i>
                             </i>
@@ -77,7 +77,7 @@
                     </li>
 
                     <li class="nav-item">
-                        <a class="nav-link {{(request()->segment(2) == 'unassigned-tickets') ? 'active' : ''}}" aria-current="page" href="#" title="Unassigned Ticket">
+                        <a class="nav-link {{(request()->segment(2) == 'unassigned-tickets') ? 'active' : ''}}" aria-current="page" href="{{ route('admin.entry.tickets') }}" title="Unassigned Ticket">
                             <i class="icon">
                                 <i class="fa-solid fa-list"></i>
                             </i>
@@ -200,7 +200,16 @@
                     </li>
 
                     <li class="nav-item">
-                        <a class="nav-link {{(request()->segment(2) == 'all-tickets') ? 'active' : ''}}" aria-current="page" href="#">
+                        <a class="nav-link {{(request()->segment(2) == 'my-tickets') ? 'active' : ''}}" aria-current="page" href="#">
+                            <i class="icon">
+                                <i class="fa-regular fa-address-book"></i>
+                            </i>
+                            <span class="item-name">My Tickets</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link {{(request()->segment(2) == 'all-tickets') ? 'active' : ''}}" aria-current="page" href="{{ route('dept.all.tickets') }}">
                             <i class="icon">
                                 <i class="fa-solid fa-ticket"></i>
                             </i>
@@ -209,11 +218,11 @@
                     </li>
 
                     <li class="nav-item">
-                        <a class="nav-link {{(request()->segment(2) == 'unassigned-tickets') ? 'active' : ''}}" aria-current="page" href="#" title="Unassigned Ticket">
+                        <a class="nav-link {{(request()->segment(2) == 'unassigned-tickets') ? 'active' : ''}}" aria-current="page" href="{{ route('dept.entry.tickets') }}" title="Unassigned Ticket">
                             <i class="icon">
                                 <i class="fa-solid fa-list"></i>
                             </i>
-                            <span class="item-name">Unassigned Tickets</span>
+                            <span class="item-name">New Entry Ticket</span>
                         </a>
                     </li>
 
@@ -287,15 +296,6 @@
                             <span class="item-name">Account Request</span>
                         </a>
                     </li>
-
-                    {{-- <li class="nav-item">
-                        <a class="nav-link {{(request()->segment(2) == 'positions') ? 'active' : ''}}" aria-current="page" href="{{ route('dept.positions') }}">
-                            <i class="icon">
-                                <i class="fa-solid fa-sitemap"></i>
-                            </i>
-                            <span class="item-name">Positions</span>
-                        </a>
-                    </li> --}}
                     <br>
                 @endif
 
@@ -314,7 +314,7 @@
                     </li>
 
                     <li class="nav-item">
-                        <a class="nav-link {{(request()->segment(2) == 'my-tickets') ? 'active' : ''}}" aria-current="page" href="{{ route('subdept.my.ticket') }}">
+                        <a class="nav-link {{(request()->segment(2) == 'my-tickets') ? 'active' : ''}}" aria-current="page" href="{{ route('subdept.my.tickets') }}">
                             <i class="icon">
                                 <i class="fa-regular fa-address-book"></i>
                             </i>
@@ -323,7 +323,7 @@
                     </li>
 
                     <li class="nav-item">
-                        <a class="nav-link {{(request()->segment(2) == 'all-tickets') ? 'active' : ''}}" aria-current="page" href="{{ route('subdept.all.ticket') }}">
+                        <a class="nav-link {{(request()->segment(2) == 'all-tickets') ? 'active' : ''}}" aria-current="page" href="{{ route('subdept.all.tickets') }}">
                             <i class="icon">
                                 <i class="fa-solid fa-ticket"></i>
                             </i>
@@ -419,7 +419,7 @@
                     </li>
 
                     <li class="nav-item">
-                        <a class="nav-link {{(request()->segment(2) == 'my-tickets') ? 'active' : ''}}" aria-current="page" href="{{ route('user.my.ticket') }}">
+                        <a class="nav-link {{(request()->segment(2) == 'my-tickets') ? 'active' : ''}}" aria-current="page" href="{{ route('user.my.tickets') }}">
                             <i class="icon">
                                 <i class="fa-solid fa-ticket"></i>
                             </i>

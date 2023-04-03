@@ -7,11 +7,18 @@
                 <div class="card-header d-flex justify-content-between">
                     <div class="header-title">
                         <h4 class="card-title text-bold">{{ $ticket->ticket_number }}</h4>
+                        <input type="hidden" name="ticket_number" id="ticket" value="{{ $ticket->ticket_number }}">
                     </div>
                     <div>
-                        @if ($ticket->status == 'Open' && request()->segment(2) != "all-tickets")    
-                            <a href="{{ route('subdept.entry.tickets.approve', $ticket->ticket_number) }}" id="approve" data-id="{{ $ticket->ticket_number }}" data-redirect="{{ route('subdept.entry.tickets') }}" class="btn btn-primary">Approve</a>
-                            <a href="#" class="btn btn-danger">Reject</a>
+                        @if ($ticket->status == 'Approved by Manager' && request()->segment(2) != "all-tickets")    
+                            <a href="javascript:void(0)" class="btn btn-primary" id="btn-assign" data-url="{{ route('admin.entry.tickets.technicians', $ticket->sub_category_id) }}">
+                                <i class="fa-solid fa-user-gear"></i>
+                                Assign Technician
+                            </a>
+                            <a href="#" class="btn btn-danger">
+                                <i class="fa-solid fa-file-circle-xmark"></i>
+                                Reject
+                            </a>
                         @endif
                     </div>
                 </div>
@@ -176,69 +183,159 @@
         </div>
     </div>
 
+    {{-- Modal --}}
+    <div class="modal fade" id="modal-create" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Assign Technician</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="form-assign">
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="technician" class="form-label">Technician</label>
+                            <select id="technician" name="technician_id" class="selectpicker form-control select2"></select>
+                            <div class="invalid-feedback d-none" role="alert" id="alert-technician"></div>
+                        </div>
+                        <div class="form-group">
+                            <label for="urgency" class="form-label">Urgency</label>
+                            <select id="urgency" name="urgency_id" class="selectpicker form-control select2"></select>
+                            <div class="invalid-feedback d-none" role="alert" id="alert-urgency"></div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" id="store">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <script>
         $(document).ready(function(){
-            // approve button action
-            $('body').on('click', '#approve', function(e){
-                e.preventDefault();
+            // btn_assign button action
+            $('body').on('click', '#btn-assign', function(){
+                // get variable
+                let ticket = $("#ticket").val();
+                let url    = $(this).data('url');
+                let url2   = "{{ route('admin.entry.tickets.urgencies', ":ticket") }}";
+                url2       = url2.replace(':ticket', ticket);
 
-                // define variable
-                let id       = $(this).data('id');
-                let redirect = $(this).data('redirect');
-                let url      = $(this).attr('href');
-                let token    = $('meta[name="csrf-token"]').attr('content');
-
-                // show confirmation
-                swal.fire({
-                    title: 'Approve?',
-                    icon: 'question',
-                    showCancelButton: true,
-                    confirmButtonText: 'Yes',
-                    cancelButtonText: 'No',
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        // show showLoading
-                        swal.fire({
-                            title: 'Please wait',
-                            text: 'Sending request...',
-                            showConfirmButton: false, 
-                            allowOutsideClick: false,
-                            allowEnterKey: false, 
-                            allowEscapeKey: false,
-                            didOpen: () => {
-                                swal.showLoading();
-                            }
-                        });
-
-                        // ajax approve
-                        $.ajax({
-                            url: url,
-                            type: 'patch',
-                            cache: false,
-                            data: {
-                                '_token': token
-                            }, 
-                            success:function(response){
-                                // show success message
-                                swal.fire({
-                                    icon: 'success',
-                                    title: response.message,
-                                    showConfirmButton: false,
-                                    timer: 2000
-                                });
-
-                                // rederict to new entry ticket page
-                                setTimeout(() => {
-                                    window.location.href = redirect;
-                                }, 2000);
-                            }, 
-                            error:function(error){
-                                console.log(error.responseJSON.message);
-                            }
+                // get technician
+                $.ajax({
+                    url: url,
+                    type: 'get',
+                    cache: false,
+                    success:function(response){
+                        $('#technician').empty();
+                        $('#technician').append('<option disabled selected> -- Choose -- </option>');
+                        $.each(response, function(code, technician){
+                            $('#technician').append('<option value="'+technician.id+'">'+technician.name+'</option>');
                         });
                     }
                 });
+
+                // get urgency
+                $.ajax({
+                    url: url2,
+                    type: 'get',
+                    cache: false,
+                    success:function(response){
+                        $('#urgency').empty();
+                        $('#urgency').append('<option disabled selected> -- Choose -- </option>');
+                        $.each(response, function (code, urgency){
+                            $('#urgency').append('<option value="'+urgency.id+'">'+urgency.name+' ('+urgency.hours+' hours)</option>');
+                        });
+                    }, 
+                    error:function(error){
+                        console.log(error.responseJSON.message);
+                    }
+                });
+
+                // open modal
+                $('#modal-create').modal('show');
             });
+
+            // store button action
+            $('body').on('click', '#store', function(e){
+                // define variable
+                let technician_id = $("#technician").val();
+                let urgency_id    = $("#urgency").val();
+                let ticket        = $("#ticket").val();
+                let token         = $('meta[name="csrf-token"]').attr('content');
+                let url           = "{{ route('admin.entry.tickets.assign', ":ticket") }}";
+                url               = url.replace(':ticket', ticket);
+
+                // show loading
+                swal.fire({
+                    title: 'Please wait',
+                    text: 'Sending request...',
+                    showConfirmButton: false,
+                    allowOutsideClick: false,
+                    allowEnterKey: false,
+                    allowEscapeKey: false,
+                    didOpen: () => {
+                        swal.showLoading();
+                    }
+                });
+
+                // ajax assign
+                $.ajax({
+                    url: url,
+                    type: 'patch',
+                    cache: false,
+                    data: {
+                        'technician_id': technician_id,
+                        'urgency_id': urgency_id,
+                        '_token': token
+                    }, 
+                    success:function(response){
+                        // show response
+                        swal.fire({
+                            icon: 'success',
+                            title: response.message,
+                            showConfirmButton: false, 
+                            timer: 2000
+                        });
+
+                        // redirect to unassigned ticket page
+                        setTimeout(() => {
+                            window.location.href = "{{ route('admin.entry.tickets') }}";
+                        }, 2000);
+                    }, 
+                    error:function(error){
+                        console.log(error.responseJSON.message);
+                        // show response
+                        swal.fire({
+                            icon: 'warning',
+                            title: 'Something wrong',
+                            text: 'Please check again',
+                            showConfirmButton: false,
+                            timer: 1000
+                        });
+
+                        // if technician field has error
+                        if (error.responseJSON.technician_id) {
+                            // show alert and message
+                            $('#technician').addClass('is-invalid');
+                            $('#alert-technician').addClass('d-block');
+                            $('#alert-technician').removeClass('d-none');
+                            $('#alert-technician').html(error.responseJSON.technician_id);
+                        }
+
+                        // if urgency field has error
+                        if (error.responseJSON.urgency_id) {
+                            // show alert and message
+                            $('#urgency').addClass('is-invalid');
+                            $('#alert-urgency').addClass('d-block');
+                            $('#alert-urgency').removeClass('d-none');
+                            $('#alert-urgency').html(error.responseJSON.urgency_id);
+                        }
+                    }
+                });
+            })
         });
     </script>
 @endsection

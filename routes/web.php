@@ -86,6 +86,15 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/admin/users-request/get-employee', [UserController::class, 'getEmployees'])->name('admin.users.getEmployees');
         Route::get('/admin/users-request/get-employee/{nik}', [UserController::class, 'getEmployee'])->name('admin.users.getEmployee');
         Route::get('/admin/users-request/account-active', [UserController::class, 'accountActive'])->name('admin.users.accountActive');
+
+        Route::get('/admin/all-tickets', [TicketController::class, 'allTicket'])->name('admin.all.tickets');
+        Route::get('/admin/all-tickets/{ticket}', [TicketController::class, 'show'])->name('admin.all.tickets.show');
+
+        Route::get('/admin/unassigned-tickets', [TicketController::class, 'newEntry'])->name('admin.entry.tickets');
+        Route::get('/admin/unassigned-tickets/{ticket}', [TicketController::class, 'show'])->name('admin.entry.tickets.show');
+        Route::get('/admin/unassigned-tickets/technician/{ticket}', [TicketController::class, 'getTechnicians'])->name('admin.entry.tickets.technicians');
+        Route::get('/admin/unassigned-tickets/urgencies/{ticket}', [TicketController::class, 'getUrgencies'])->name('admin.entry.tickets.urgencies');
+        Route::patch('/admin/unassigned-tickets/{ticket}/assign', [TicketController::class, 'assign'])->name('admin.entry.tickets.assign');
     });
 
     Route::group(['middleware' => ['role:Approver1']], function () {
@@ -111,6 +120,13 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/dept/user-request/{employee}', [EmployeeController::class, 'userRequest'])->name('dept.userrequest');
         Route::patch('/dept/is-request', [EmployeeController::class, 'isRequest'])->name('dept.isRequest');
         Route::get('/dept/send-request', [EmployeeController::class, 'sendRequest'])->name('dept.sendRequest');
+
+        Route::get('/dept/all-tickets', [TicketController::class, 'allTicket'])->name('dept.all.tickets');
+        Route::get('/dept/all-tickets/{ticket}', [TicketController::class, 'show'])->name('dept.all.tickets.show');
+
+        Route::get('/dept/entry-tickets', [TicketController::class, 'newEntry'])->name('dept.entry.tickets');
+        Route::get('/dept/entry-tickets/{ticket}', [TicketController::class, 'show'])->name('dept.entry.tickets.show');
+        Route::patch('/dept/entry-tickets/{ticket}/approve', [TicketController::class, 'approve'])->name('dept.entry.tickets.approve');
     });
 
     Route::group(['middleware' => ['role:Approver2']], function () {
@@ -135,11 +151,11 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/subdept/create-ticket/sub-category/{category}', [TicketController::class, 'getSubCategory'])->name('subdept.get.subCategory');
         Route::post('/subdept/create-ticket', [TicketController::class, 'store'])->name('subdept.ticket.store');
 
-        Route::get('/subdept/my-tickets', [TicketController::class, 'myTicket'])->name('subdept.my.ticket');
-        Route::get('/subdept/my-tickets/{ticket}', [TicketController::class, 'show'])->name('subdept.show.ticket');
+        Route::get('/subdept/my-tickets', [TicketController::class, 'myTicket'])->name('subdept.my.tickets');
+        Route::get('/subdept/my-tickets/{ticket}', [TicketController::class, 'show'])->name('subdept.my.tickets.show');
 
-        Route::get('/subdept/all-tickets', [TicketController::class, 'allTicket'])->name('subdept.all.ticket');
-        Route::get('/subdept/all-tickets/{ticket}', [TicketController::class, 'show'])->name('subdept.all.ticket.show');
+        Route::get('/subdept/all-tickets', [TicketController::class, 'allTicket'])->name('subdept.all.tickets');
+        Route::get('/subdept/all-tickets/{ticket}', [TicketController::class, 'show'])->name('subdept.all.tickets.show');
 
         Route::get('/subdept/entry-tickets', [TicketController::class, 'newEntry'])->name('subdept.entry.tickets');
         Route::get('/subdept/entry-tickets/{ticket}', [TicketController::class, 'show'])->name('subdept.entry.tickets.show');
@@ -154,7 +170,7 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/user/create-ticket/sub-category/{category}', [TicketController::class, 'getSubCategory'])->name('user.get.subCategory');
         Route::post('/user/create-ticket', [TicketController::class, 'store'])->name('user.ticket.store');
 
-        Route::get('/user/my-tickets', [TicketController::class, 'myTicket'])->name('user.my.ticket');
-        Route::get('/user/my-tickets/{ticket}', [TicketController::class, 'show'])->name('user.show.ticket');
+        Route::get('/user/my-tickets', [TicketController::class, 'myTicket'])->name('user.my.tickets');
+        Route::get('/user/my-tickets/{ticket}', [TicketController::class, 'show'])->name('user.my.tickets.show');
     });
 });

@@ -232,14 +232,22 @@
                         if(response){
                             // fill form
                             $('#subcategory-categoryid-edit').empty();
+                            $('#subcategory-categoryid-edit').append('<option disabled selected> -- Choose -- </option>');
+                            $('#technician-id-edit').empty();
+                            $('#technician-id-edit').append('<option disabled selected> -- Choose -- </option>');
                             $('#subcategory-id').val(response.data.id);
                             $('#subcategory-name-edit').val(response.data.name);
                             $.each(response.categories, function(code, category){
                                 $('#subcategory-categoryid-edit').append('<option value="'+category.id+'">'+category.name+'</option>');
                                 $(`#subcategory-categoryid-edit option[value=${response.data.category_id}]`).attr('selected', 'selected');
                             });
+                            $.each(response.technicians, function(code, technician){
+                                $('#technician-id-edit').append('<option value="'+technician.id+'">'+technician.name+'</option>');
+                                $(`#technician-id-edit option[value=${response.technician.id}]`).attr('selected', 'selected');
+                            });
                         } else {
                             $('#subcategory-categoryid-edit').empty();
+                            $('#technician-id-edit').empty();
                         }
                     }
                 });
@@ -253,10 +261,11 @@
                 e.preventDefault();
 
                 // define variable
-                let id          = $('#subcategory-id').val();
-                let name        = $('#subcategory-name-edit').val();
-                let category_id = $('#subcategory-categoryid-edit').val();
-                let token       = $('meta[name="csrf-token"]').attr('content');
+                let id            = $('#subcategory-id').val();
+                let name          = $('#subcategory-name-edit').val();
+                let category_id   = $('#subcategory-categoryid-edit').val();
+                let technician_id = $('#technician-id-edit').val();
+                let token         = $('meta[name="csrf-token"]').attr('content');
 
                 // show loading
                 Swal.fire({
@@ -279,6 +288,7 @@
                     data:{
                         'name': name,
                         'category_id': category_id,
+                        'technician_id': technician_id,
                         '_token': token
                     }, 
                     success:function(response){
@@ -292,14 +302,6 @@
 
                         // clear form
                         $('#form-edit-subcategory').trigger('reset');
-
-                        // clear alert
-                        $('#subcategory-name-edit').removeClass('is-invalid');
-                        $('#alert-subcategory-name-edit').addClass('d-none');
-                        $('#alert-subcategory-name-edit').removeClass('d-block');
-                        $('#subcategory-categoryid-edit').removeClass('is-invalid');
-                        $('#subcategory-categoryid-edit').addClass('d-none');
-                        $('#subcategory-categoryid-edit').removeClass('d-block');
 
                         // close modal
                         $('#modal-edit').modal('hide');
@@ -347,6 +349,22 @@
                             $('#subcategory-categoryid-edit').removeClass('is-invalid');
                             $('#subcategory-categoryid-edit').addClass('d-none');
                             $('#subcategory-categoryid-edit').removeClass('d-block');
+                        }
+
+                        // check if technician option error
+                        if (error.responseJSON.technician_id){
+                            // show alert
+                            $('#technician-id-edit').addClass('is-invalid');
+                            $('#technician-id-edit').removeClass('d-none');
+                            $('#technician-id-edit').addClass('d-block');
+
+                            // add message to alert
+                            $('#alert-technician-id-edit').html(error.responeJSON.technician_id);
+                        } else {
+                            // remove alert
+                            $('#technician-id-edit').removeClass('is-invalid');
+                            $('#technician-id-edit').addClass('d-none');
+                            $('#technician-id-edit').removeClass('d-block');
                         }
                     }
                 });

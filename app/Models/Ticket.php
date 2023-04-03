@@ -31,7 +31,7 @@ class Ticket extends Model
 
     public function technician()
     {
-        return $this->belongsTo('App\Models\User');
+        return $this->belongsTo('App\Models\User', 'technician_id');
     }
 
     public function urgency()
@@ -85,22 +85,18 @@ class Ticket extends Model
                 break;
 
             case 4:
-                $status = 'Waiting to be assigned';
-                break;
-
-            case 5:
                 $status = 'On work';
                 break;
 
-            case 6:
+            case 5:
                 $status = 'Pending';
                 break;
 
-            case 7:
-                $status = 'Closed';
+            case 6:
+                $status = 'Close';
                 break;
 
-            case 8:
+            case 7:
                 $status = 'Rejected';
                 break;
 

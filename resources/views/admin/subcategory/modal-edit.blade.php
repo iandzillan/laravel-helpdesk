@@ -18,9 +18,15 @@
 
                     <div class="form-group">
                         <label for="select-category-id-edit">Category</label>
-                        <select id="subcategory-categoryid-edit" name="category" class="form-select mb-3 select2-edit">
+                        <select id="subcategory-categoryid-edit" name="category_id" class="form-select mb-3 select2-edit">
                         </select>
                         <div class="invalid-feedback d-none" role="alert" id="alert-subcategory-categoryid-edit"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="technician-id-edit">Technician</label>
+                        <select id="technician-id-edit" name="technician_id" class="form-select mb-3 select2-edit"></select>
+                        <div class="invalid-feedback" role="alert" id="alert-technicianid-edit"></div>
                     </div>
                 </div>
                 <div class="modal-footer">

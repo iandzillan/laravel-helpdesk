@@ -8,6 +8,9 @@ use App\Models\Position;
 use App\Models\SubCategory;
 use App\Models\Ticket;
 use App\Models\Tracking;
+use App\Models\Urgency;
+use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -139,6 +142,7 @@ class TicketController extends Controller
         // store tracking
         $tracking         = new Tracking;
         $tracking->status = "Ticket created";
+        $tracking->note   = "Waiting to be approved by Team Leader";
         $ticket->trackings()->save($tracking);
 
         // return response
@@ -157,22 +161,22 @@ class TicketController extends Controller
         // check role
         switch ($role) {
             case 'Approver1':
-                // define vie & route
-                $view  = 'approver1.ticket.my-ticket';
-                $route = 'dept.show.ticket';
+                // define view & route
+                $view  = 'approver1.ticket.my-tickets';
+                $route = 'dept.my.tickets.show';
                 break;
                 break;
 
             case 'Approver2':
-                // define vie & route
-                $view  = 'approver2.ticket.my-ticket';
-                $route = 'subdept.show.ticket';
+                // define view & route
+                $view  = 'approver2.ticket.my-tickets';
+                $route = 'subdept.my.tickets.show';
                 break;
 
             case 'User':
                 // define view & route 
-                $view  = 'user.ticket.my-ticket';
-                $route = 'user.show.ticket';
+                $view  = 'user.ticket.my-tickets';
+                $route = 'user.my.tickets.show';
                 break;
 
             default:
@@ -195,7 +199,7 @@ class TicketController extends Controller
                             $status = '<span class="badge bg-light text-dark">' . $status . '</span>';
                             break;
 
-                        case 'Approved by supervisor':
+                        case 'Approved by Team Leader':
                             $status = '<span class="badge bg-secondary">' . $status . '</span>';
                             break;
 
@@ -255,18 +259,24 @@ class TicketController extends Controller
             case 'Admin':
                 // define view
                 $view = 'admin.ticket.show-ticket';
+                // get ticket
+                $ticket = Ticket::where('ticket_number', $ticket)->first();
                 break;
 
             case 'Approver1':
                 // define view
                 $view = 'approver1.ticket.show-ticket';
+                // get ticket
+                $ticket = Ticket::with('user', 'user.employee')->whereHas('user.employee', function ($q) {
+                    $q->where('department_id', Auth::user()->employee->department_id);
+                })->where('ticket_number', $ticket)->first();
                 break;
 
             case 'Approver2':
                 // define view
                 $view = 'approver2.ticket.show-ticket';
                 // get ticket
-                $ticket = Ticket::with('user', 'user.employee')->whereHas('user.employee', function($q){
+                $ticket = Ticket::with('user', 'user.employee')->whereHas('user.employee', function ($q) {
                     $q->where('sub_department_id', Auth::user()->employee->sub_department_id);
                 })->where('ticket_number', $ticket)->first();
                 break;
@@ -306,19 +316,34 @@ class TicketController extends Controller
         // check role
         switch ($role) {
             case 'Admin':
-                # code...
+                // get ticket
+                $tickets = Ticket::all();
+                // set view
+                $view = 'admin.ticket.all-ticket';
+                // set route
+                $route = 'admin.all.tickets.show';
                 break;
 
             case 'Approver1':
-                # code...
+                // get ticket
+                $tickets = Ticket::with('user', 'user.employee')->whereHas('user.employee', function ($q) {
+                    $q->where('department_id', Auth::user()->employee->department_id);
+                })->get();
+                // set view
+                $view  = 'approver1.ticket.all-ticket';
+                // set route
+                $route = 'dept.all.tickets.show';
                 break;
 
             case 'Approver2':
-                $tickets = Ticket::with('user', 'user.employee')->whereHas('user.employee', function($q){
+                // get ticket
+                $tickets = Ticket::with('user', 'user.employee')->whereHas('user.employee', function ($q) {
                     $q->where('sub_department_id', Auth::user()->employee->sub_department_id);
-                })->get(); 
-                $view    = 'approver2.ticket.all-ticket';
-                $route   = 'subdept.all.ticket.show';
+                })->get();
+                // set view
+                $view  = 'approver2.ticket.all-ticket';
+                // set route 
+                $route = 'subdept.all.tickets.show';
                 break;
 
             case 'Technician':
@@ -326,7 +351,7 @@ class TicketController extends Controller
                 break;
 
             default:
-                # code...
+                abort(404);
                 break;
         }
 
@@ -334,13 +359,13 @@ class TicketController extends Controller
         if ($request->ajax()) {
             return DataTables::of($tickets)
                 ->addIndexColumn()
-                ->addColumn('nik', function($row){
+                ->addColumn('nik', function ($row) {
                     return $row->user->employee->nik;
                 })
-                ->addColumn('name', function($row){
+                ->addColumn('name', function ($row) {
                     return $row->user->employee->name;
                 })
-                ->addColumn('sub_category', function($row){
+                ->addColumn('sub_category', function ($row) {
                     return $row->subCategory->name;
                 })
                 ->addColumn('status', function ($row) {
@@ -351,7 +376,7 @@ class TicketController extends Controller
                             $status = '<span class="badge bg-light text-dark">' . $status . '</span>';
                             break;
 
-                        case 'Approved by supervisor':
+                        case 'Approved by Team Leader':
                             $status = '<span class="badge bg-secondary">' . $status . '</span>';
                             break;
 
@@ -383,7 +408,6 @@ class TicketController extends Controller
                             $status = '<span class="badge bg-danger">' . $status . '</span>';
                             break;
                     }
-
                     return $status;
                 })
                 ->addColumn('action', function ($row) use ($route) {
@@ -408,24 +432,36 @@ class TicketController extends Controller
         // check role 
         switch ($role) {
             case 'Admin':
-                # code...
+                // query ticket
+                $tickets = Ticket::where('status', 3)->get();
+                // route
+                $route = 'admin.entry.tickets.show';
+                // view
+                $view = 'admin.ticket.new-entry';
                 break;
 
             case 'Approver1':
-                # code...
+                // query ticket
+                $tickets = Ticket::with('user', 'user.employee')->whereHas('user.employee', function ($q) {
+                    $q->where('department_id', Auth::user()->employee->department_id);
+                })->where('status', 2)->get();
+                // route
+                $route = 'dept.entry.tickets.show';
+                // view 
+                $view = 'approver1.ticket.new-entry';
                 break;
-            
+
             case 'Approver2':
                 // query tickets
-                $tickets = Ticket::with(['user', 'user.employee'])->whereHas('user.employee', function($q){
+                $tickets = Ticket::with(['user', 'user.employee'])->whereHas('user.employee', function ($q) {
                     $q->where('sub_department_id', Auth::user()->employee->sub_department_id);
-                })->whereIn('status', [1,2])->get();
+                })->where('status', 1)->get();
                 // route
                 $route = 'subdept.entry.tickets.show';
                 // view
                 $view = 'approver2.ticket.new-entry';
                 break;
-            
+
             default:
                 abort(404);
                 break;
@@ -435,13 +471,13 @@ class TicketController extends Controller
             // draw table
             return DataTables::of($tickets)
                 ->addIndexColumn()
-                ->addColumn('nik', function($row){
+                ->addColumn('nik', function ($row) {
                     return $row->user->employee->nik;
                 })
-                ->addColumn('name', function($row){
+                ->addColumn('name', function ($row) {
                     return $row->user->employee->name;
                 })
-                ->addColumn('sub_category', function($row){
+                ->addColumn('sub_category', function ($row) {
                     return $row->subCategory->name;
                 })
                 ->addColumn('status', function ($row) {
@@ -452,7 +488,7 @@ class TicketController extends Controller
                             $status = '<span class="badge bg-light text-dark">' . $status . '</span>';
                             break;
 
-                        case 'Approved by supervisor':
+                        case 'Approved by Team Leader':
                             $status = '<span class="badge bg-secondary">' . $status . '</span>';
                             break;
 
@@ -508,44 +544,110 @@ class TicketController extends Controller
 
         // check role 
         switch ($role) {
-            case 'Admin':
-                # code...
-                break;
-
-            case 'Approver2':
-                # code...
+            case 'Approver1':
+                // get ticket
+                $ticket = Ticket::whereHas('user.employee', function ($q) {
+                    $q->where('department_id', Auth::user()->employee->department_id);
+                })->where('ticket_number', $ticket)->first();
+                // set status
+                $status = 3;
+                // set tracking
+                $status_tracking = 'Ticket Approved by Manager';
+                $note_tracking   = 'Waiting to be assigned to technician by Admin';
                 break;
 
             case 'Approver2':
                 // get ticket
-                $ticket = Ticket::whereHas('user.employee', function($q){
+                $ticket = Ticket::whereHas('user.employee', function ($q) {
                     $q->where('sub_department_id', Auth::user()->employee->sub_department_id);
                 })->where('ticket_number', $ticket)->first();
                 // set status
-                $status = 'Approved by Team Leader';
+                $status = 2;
                 // set tracking
                 $status_tracking = 'Ticket Approved by Team Leader';
+                $note_tracking   = 'Waiting to be approved by Manager';
                 break;
-            
+
             default:
                 abort(404);
                 break;
         }
 
         // update ticket
-        $ticket->update([
-            'status' => $status
-        ]);
+        $ticket->status = $status;
+        $ticket->save();
 
         // update tracking ticket
-        $tracking = new Tracking;
+        $tracking         = new Tracking;
         $tracking->status = $status_tracking;
+        $tracking->note   = $note_tracking;
+        $ticket->trackings()->save($tracking);
+
+        // return response
+        return response()->json([
+            'success'  => true,
+            'message'  => 'Ticket Approved',
+            'data'     => $ticket
+        ]);
+    }
+
+    public function getTechnicians($ticket)
+    {
+        $subCategory = SubCategory::where('id', $ticket)->first();
+        $technicians = Employee::whereHas('user', function ($q) use ($subCategory) {
+            $q->where('id', $subCategory->technician_id);
+        })->get();
+
+        return response()->json($technicians);
+    }
+
+    public function getUrgencies($ticket)
+    {
+        $urgencies = Urgency::all();
+        return response()->json($urgencies);
+    }
+
+    public function assign(Request $request, $ticket)
+    {
+        // set validation
+        $validator = Validator::make($request->all(), [
+            'technician_id' => 'required',
+            'urgency_id'    => 'required'
+        ], [
+            'technician_id.required' => 'The technician field is required',
+            'urgency.required'       => 'The urgency field is required'
+        ]);
+
+        // check validation
+        if ($validator->fails()) {
+            // return error response
+            return response()->json($validator->errors(), 422);
+        }
+
+        // get user
+        $user = User::where('employee_id', $request->technician_id)->first();
+
+        // get ticket
+        $ticket = Ticket::where('ticket_number', $ticket)->first();
+        // update ticket
+        $ticket->status        = 4;
+        $ticket->urgency_id    = $request->urgency_id;
+        $ticket->technician_id = $user->id;
+        $ticket->progress_at   = Carbon::now();
+        $ticket->save();
+
+        // get technician
+        $technician = Employee::where('id', $request->technician_id)->first();
+        // update tracking
+        $tracking = new Tracking;
+        $tracking->status = "Ticket has been assigned";
+        $tracking->note   = "Ticket has been assigned to $technician->name";
         $ticket->trackings()->save($tracking);
 
         // return response
         return response()->json([
             'success' => true,
-            'message' => 'Ticket Approved',
+            'message' => 'Ticket has been assigned to technician',
             'data'    => $ticket
         ]);
     }

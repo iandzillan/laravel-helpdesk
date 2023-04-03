@@ -9,8 +9,8 @@
                         <h4 class="card-title text-bold">{{ $ticket->ticket_number }}</h4>
                     </div>
                     <div>
-                        @if ($ticket->status == 'Open' && request()->segment(2) != "all-tickets")    
-                            <a href="{{ route('subdept.entry.tickets.approve', $ticket->ticket_number) }}" id="approve" data-id="{{ $ticket->ticket_number }}" data-redirect="{{ route('subdept.entry.tickets') }}" class="btn btn-primary">Approve</a>
+                        @if ($ticket->status == 'Approved by Team Leader' && request()->segment(2) != 'all-tickets')    
+                            <a href="{{ route('dept.entry.tickets.approve', $ticket->ticket_number) }}" id="approve" data-id="{{ $ticket->ticket_number }}" data-redirect="{{ route('dept.entry.tickets') }}" class="btn btn-primary">Approve</a>
                             <a href="#" class="btn btn-danger">Reject</a>
                         @endif
                     </div>
@@ -185,8 +185,8 @@
                 // define variable
                 let id       = $(this).data('id');
                 let redirect = $(this).data('redirect');
-                let url      = $(this).attr('href');
                 let token    = $('meta[name="csrf-token"]').attr('content');
+                let url      = $(this).attr('href');
 
                 // show confirmation
                 swal.fire({

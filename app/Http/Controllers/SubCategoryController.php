@@ -25,7 +25,7 @@ class SubCategoryController extends Controller
                 ->addColumn('category', function ($row) {
                     return $row->category->name;
                 })
-                ->addColumn('technician', function ($row){
+                ->addColumn('technician', function ($row) {
                     return $row->user->employee->name;
                 })
                 ->addColumn('action', function ($row) {
@@ -51,7 +51,7 @@ class SubCategoryController extends Controller
 
     public function getTechnicians()
     {
-        $employees = Employee::whereHas('user', function($q){
+        $employees = Employee::whereHas('user', function ($q) {
             $q->where('role', 'Technician');
         })->get(['id', 'name']);
         return response()->json($employees);
@@ -95,14 +95,19 @@ class SubCategoryController extends Controller
     public function show($subcategory)
     {
         $sub_category = SubCategory::with('category')->where('id', $subcategory)->first();
-        $categories = Category::all('id', 'name');
+        $categories   = Category::all('id', 'name');
+        $technicians  = Employee::whereHas('user', function ($q) {
+            $q->where('role', 'Technician');
+        })->get(['id', 'name']);
 
         return response()->json([
-            'success'    => true,
-            'message'    => 'Detail sub category',
-            'data'       => $sub_category,
-            'category'   => $sub_category->category,
-            'categories' => $categories
+            'success'     => true,
+            'message'     => 'Detail sub category',
+            'data'        => $sub_category,
+            'category'    => $sub_category->category,
+            'technician'  => $sub_category->user->employee,
+            'categories'  => $categories,
+            'technicians' => $technicians
         ]);
     }
 
@@ -111,13 +116,17 @@ class SubCategoryController extends Controller
         // get category id
         $category = Category::where('id', $request->category_id)->first();
 
+        // get technician (user id)
+        $technician = User::where('employee_id', $request->technician_id)->first();
+
         // set validation
         $validator = Validator::make($request->all(), [
             'name'          => [
                 'required',
                 Rule::unique('sub_categories')->ignore($subcategory->id)->where('category_id', $category)
             ],
-            'category_id'   => 'required'
+            'category_id'   => 'required',
+            'technician_id' => 'required'
         ], [
             'name.unique' => "This sub category already exists in $category->name category"
         ]);
@@ -131,6 +140,7 @@ class SubCategoryController extends Controller
         $category = Category::where('id', $request->category_id)->first();
         $subcategory->name = $request->name;
         $subcategory->category()->associate($category);
+        $subcategory->user()->associate($technician);
         $subcategory->save();
 
         return response()->json([

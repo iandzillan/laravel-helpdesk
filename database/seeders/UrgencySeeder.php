@@ -15,7 +15,7 @@ class UrgencySeeder extends Seeder
     {
         $urgency = [
             [
-                'name' => 'Ctritical',
+                'name' => 'Critical',
                 'hours' => 1
             ],
             [
@@ -32,7 +32,7 @@ class UrgencySeeder extends Seeder
             ],
         ];
 
-        for ($i=0; $i < count($urgency); $i++) { 
+        for ($i = 0; $i < count($urgency); $i++) {
             Urgency::create([
                 'name'  => $urgency[$i]['name'],
                 'hours' => $urgency[$i]['hours'],
