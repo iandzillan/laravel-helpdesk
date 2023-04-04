@@ -37,7 +37,7 @@
                 responsive: true,
                 processing: true,
                 serverSide: true,
-                ajax: "{{ route('user.my.ticket') }}",
+                ajax: "{{ route('user.my.tickets') }}",
                 columns: [
                     {data: 'DT_RowIndex', name: 'DT_RowIndex'},
                     {data: 'ticket_number', name: 'ticket_number'},

@@ -15,8 +15,7 @@
                             <tr>
                                 <th>#</th>
                                 <th>Ticket Number</th>
-                                <th>NIK</th>
-                                <th>Name</th>
+                                <th>User</th>
                                 <th>Subject</th>
                                 <th>Status</th>
                                 <th>Created at</th>
@@ -43,7 +42,6 @@
                 columns: [
                     {data: 'DT_RowIndex', name: 'DT_RowIndex'},
                     {data: 'ticket_number', name: 'ticket_number'},
-                    {data: 'nik', name: 'nik'},
                     {data: 'name', name: 'name'},
                     {data: 'sub_category', name: 'sub_category'},
                     {data: 'status', name: 'status'},

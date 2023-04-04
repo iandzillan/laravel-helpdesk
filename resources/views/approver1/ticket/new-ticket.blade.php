@@ -18,12 +18,12 @@
                             <div class="col-xl-6 col-lg-6">
                                 <div class="form-group">
                                     <label for="nik" class="form-label">NIK</label>
-                                    <input type="text" class="form-control" id="nik" name="nik" value="{{ Auth::user()->userable->nik }}" readonly>
+                                    <input type="text" class="form-control" id="nik" name="nik" value="{{ Auth::user()->employee->nik }}" readonly>
                                     <div class="invalid-feedback d-none" role="alert" id="alert-nik"></div>
                                 </div>
                                 <div class="form-group">
                                     <label for="name" class="form-label">Name</label>
-                                    <input type="text" class="form-control" id="name" name="name" value="{{ Auth::user()->userable->name }}" readonly>
+                                    <input type="text" class="form-control" id="name" name="name" value="{{ Auth::user()->employee->name }}" readonly>
                                     <div class="invalid-feedback d-none" role="alert" id="alert-name"></div>
                                 </div>
                                 <div class="form-group">
@@ -84,7 +84,7 @@
 
             // get all category
             $.ajax({
-                url: "{{ route('subdept.get.category') }}",
+                url: "{{ route('dept.get.category') }}",
                 type: "get",
                 cache: false,
                 success:function(response){
@@ -104,7 +104,7 @@
             $('#category_id').change(function(){
                 // define varible
                 let category_id = $('#category_id').val();
-                let url = "{{ route('subdept.get.subCategory', ":id") }}";
+                let url = "{{ route('dept.get.subCategory', ":id") }}";
                 url = url.replace(':id', category_id);
 
                 // get sub category
@@ -145,7 +145,7 @@
 
                 // ajax store
                 $.ajax({
-                    url: "{{ route('subdept.ticket.store') }}",
+                    url: "{{ route('dept.ticket.store') }}",
                     type: "post",
                     cache: false,
                     data: formData,

@@ -18,12 +18,12 @@
                             <div class="col-xl-6 col-lg-6">
                                 <div class="form-group">
                                     <label for="nik" class="form-label">NIK</label>
-                                    <input type="text" class="form-control" id="nik" name="nik" value="{{ Auth::user()->userable->nik }}" readonly>
+                                    <input type="text" class="form-control" id="nik" name="nik" value="{{ Auth::user()->employee->nik }}" readonly>
                                     <div class="invalid-feedback d-none" role="alert" id="alert-nik"></div>
                                 </div>
                                 <div class="form-group">
                                     <label for="name" class="form-label">Name</label>
-                                    <input type="text" class="form-control" id="name" name="name" value="{{ Auth::user()->userable->name }}" readonly>
+                                    <input type="text" class="form-control" id="name" name="name" value="{{ Auth::user()->employee->name }}" readonly>
                                     <div class="invalid-feedback d-none" role="alert" id="alert-name"></div>
                                 </div>
                                 <div class="form-group">

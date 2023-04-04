@@ -26,22 +26,22 @@ class Ticket extends Model
 
     public function user()
     {
-        return $this->belongsTo('App\Models\User');
+        return $this->belongsTo(User::class);
     }
 
     public function technician()
     {
-        return $this->belongsTo('App\Models\User', 'technician_id');
+        return $this->belongsTo(User::class, 'technician_id');
     }
 
     public function urgency()
     {
-        return $this->belongsTo('App\Models\Urgency');
+        return $this->belongsTo(Urgency::class);
     }
 
     public function trackings()
     {
-        return $this->hasMany('App\Models\Tracking');
+        return $this->hasMany(Tracking::class);
     }
 
     public function subCategory()
@@ -93,7 +93,7 @@ class Ticket extends Model
                 break;
 
             case 6:
-                $status = 'Close';
+                $status = 'Closed';
                 break;
 
             case 7:

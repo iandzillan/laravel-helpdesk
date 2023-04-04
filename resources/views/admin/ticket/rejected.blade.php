@@ -5,7 +5,7 @@
         <div class="card">
             <div class="card-header d-flex justify-content-between">
                 <div class="header-title">
-                    <h4 class="card-title">Unassigned tickets</h4>
+                    <h4 class="card-title">{{ Auth::user()->employee->department->name }} rejected tickets</h4>
                 </div>
             </div>
             <div class="card-body">
@@ -15,7 +15,6 @@
                             <tr>
                                 <th>#</th>
                                 <th>Ticket Number</th>
-                                <th>User</th>
                                 <th>Subject</th>
                                 <th>Status</th>
                                 <th>Created at</th>
@@ -38,13 +37,12 @@
                 responsive: true,
                 processing: true,
                 serverSide: true,
-                ajax: "{{ route('admin.entry.tickets') }}",
+                ajax: "{{ route('admin.tickets.rejected') }}",
                 columns: [
                     {data: 'DT_RowIndex', name: 'DT_RowIndex'},
                     {data: 'ticket_number', name: 'ticket_number'},
                     {data: 'name', name: 'name'},
-                    {data: 'sub_category', name: 'sub_category'},
-                    {data: 'status', name: 'status'},
+                    {data: 'subject', name: 'subject'},
                     {data: 'created_at', name: 'created_at'},
                     {data: 'updated_at', name: 'updated_at'},
                     {data: 'action', name: 'action', orderable: false, searchable: false},

@@ -23,105 +23,119 @@
                             </div>
                             <hr>
                             <div class="row">
-                                <div class="col-md-6">
-                                    <h5 class="card-title">Created At</h5>
-                                    <p class="card-text">{{ $ticket->created_at }}</p>
+                                <div class="col-md">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h5 class="card-title">Created At</h5>
+                                            <p class="card-text">{{ $ticket->created_at }}</p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <h5 class="card-title">Last Update</h5>
+                                            <p class="card-text">{{ $ticket->updated_at }}</p>
+                                        </div>
+                                    </div>
                                     <hr>
 
-                                    <h5 class="card-title">User</h5>
-                                    <p class="card-text">{{ $ticket->user->employee->name }} ({{$ticket->user->employee->nik}})</p>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h5 class="card-title">User</h5>
+                                            <p class="card-text">{{ $ticket->user->employee->name }} ({{$ticket->user->employee->nik}})</p>
+                                            <p class="card-text">{{ $ticket->user->employee->subDepartment->name }}'s {{$ticket->user->employee->position}}</p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <h5 class="card-title">Subject</h5>
+                                            <p class="card-text">{{ $ticket->subject }}</p>
+                                        </div>
+                                    </div>
                                     <hr>
 
-                                    <h5 class="card-title">Subject</h5>
-                                    <p class="card-text">{{ $ticket->subject }}</p>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h5 class="card-title">Category</h5>
+                                            <p class="card-text">{{ $ticket->subCategory->category->name }}</p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <h5 class="card-title">Sub Category</h5>
+                                            <p class="card-text">{{ $ticket->subCategory->name }}</p>
+                                        </div>
+                                    </div>
                                     <hr>
 
-                                    <h5 class="card-title">Category</h5>
-                                    <p class="card-text">{{ $ticket->subCategory->category->name }}</p>
-                                    <hr>
-        
-                                    <h5 class="card-title">Sub Category</h5>
-                                    <p class="card-text">{{ $ticket->subCategory->name }}</p>
-                                    <hr>
-
-                                </div>
-                                <div class="col-md-6">
-                                    <h5 class="card-title">Last Update</h5>
-                                    <p class="card-text">{{ $ticket->updated_at }}</p>
-                                    <hr>
-
-                                    <h5 class="card-title">Status</h5>
-                                    @switch($ticket->status)
-                                        @case('Open')
-                                            <p class="card-text">
-                                                <span class="badge bg-light text-dark">{{ $ticket->status }}</span>
-                                            </p>
-                                            @break
-                                        @case('Approved by supervisor')
-                                            <p class="card-text">
-                                                <span class="badge bg-secondary">{{ $ticket->status }}</span>
-                                            </p>
-                                            @break
-                                        @case('Approved by Manager')
-                                            <p class="card-text">
-                                                <span class="badge bg-success">{{ $ticket->status }}</span>
-                                            </p>
-                                            @break
-                                        @case('Waiting to be assigned')
-                                            <p class="card-text">
-                                                <span class="badge bg-dark">{{ $ticket->status }}</span>
-                                            </p>
-                                            @break
-                                        @case('On work')
-                                            <p class="card-text">
-                                                <span class="badge bg-info">{{ $ticket->status }}</span>
-                                            </p>
-                                            @break
-                                        @case('Pending')
-                                            <p class="card-text">
-                                                <span class="badge bg-warning">{{ $ticket->status }}</span>
-                                            </p>
-                                            @break
-                                        @case('Closed')
-                                            <p class="card-text">
-                                                <span class="badge bg-primary">{{ $ticket->status }}</span>
-                                            </p>
-                                            @break
-                                        @case('Rejected')
-                                            <p class="card-text">
-                                                <span class="badge bg-danger">{{ $ticket->status }}</span>
-                                            </p>
-                                            @break
-                                        @default
-                                            <p class="card-text">
-                                                <span class="badge bg-danger">Undefined</span>
-                                            </p>
-                                    @endswitch
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h5 class="card-title">Status</h5>
+                                            @switch($ticket->status)
+                                                @case('Open')
+                                                    <p class="card-text">
+                                                        <span class="badge bg-light text-dark">{{ $ticket->status }}</span>
+                                                    </p>
+                                                    @break
+                                                @case('Approved by Team Leader')
+                                                    <p class="card-text">
+                                                        <span class="badge bg-secondary">{{ $ticket->status }}</span>
+                                                    </p>
+                                                    @break
+                                                @case('Approved by Manager')
+                                                    <p class="card-text">
+                                                        <span class="badge bg-success">{{ $ticket->status }}</span>
+                                                    </p>
+                                                    @break
+                                                @case('On work')
+                                                    <p class="card-text">
+                                                        <span class="badge bg-info">{{ $ticket->status }}</span>
+                                                    </p>
+                                                    @break
+                                                @case('Pending')
+                                                    <p class="card-text">
+                                                        <span class="badge bg-warning">{{ $ticket->status }}</span>
+                                                    </p>
+                                                    @break
+                                                @case('Closed')
+                                                    <p class="card-text">
+                                                        <span class="badge bg-primary">{{ $ticket->status }}</span>
+                                                    </p>
+                                                    @break
+                                                @case('Rejected')
+                                                    <p class="card-text">
+                                                        <span class="badge bg-danger">{{ $ticket->status }}</span>
+                                                    </p>
+                                                    @break
+                                                @default
+                                                    <p class="card-text">
+                                                        <span class="badge bg-danger">Undefined</span>
+                                                    </p>
+                                            @endswitch
+                                        </div>
+                                        <div class="col-md-6">
+                                            <h5 class="card-title">Technician</h5>
+                                            @if ($ticket->technician == null)
+                                                <p class="card-text">--</p>
+                                            @else
+                                                <p class="card-text">{{ $ticket->technician->employee->name }}</p>
+                                            @endif
+                                        </div>
+                                    </div>
                                     <hr>
 
-                                    <h5 class="card-title">Progress at</h5>
-                                    <p class="card-text">{{ $ticket->progress_at }}</p>
-                                    <hr>
-
-                                    <h5 class="card-title">Urgency</h5>
-                                    @if ($ticket->urgency == null)
-                                        <p class="card-text">--</p>
-                                    @else
-                                        <p class="card-text">{{ $ticket->urgency->name }}</p>
-                                    @endif
-                                    <hr>
-
-                                    <h5 class="card-title">Technician</h5>
-                                    @if ($ticket->technician == null)
-                                        <p class="card-text">--</p>
-                                    @else
-                                        <p class="card-text">{{ $ticket->user->userable->name }}</p>
-                                    @endif
-                                    <hr>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h5 class="card-title">Progress at</h5>
+                                            <p class="card-text">{{ $ticket->progress_at }}</p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <h5 class="card-title">Urgency</h5>
+                                            @if ($ticket->urgency == null)
+                                                <p class="card-text">--</p>
+                                            @else
+                                                <p class="card-text">{{ $ticket->urgency->name }} ({{ $ticket->urgency->hours }} hours)</p>
+                                            @endif
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
+                    <hr>
                     <div class="row">
                         <div class="header-title">
                             <h4 class="card-title text-bold">Tracking</h4>
