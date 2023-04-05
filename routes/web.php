@@ -95,6 +95,7 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/admin/unassigned-tickets/technician/{ticket}', [TicketController::class, 'getTechnicians'])->name('admin.entry.tickets.technicians');
         Route::get('/admin/unassigned-tickets/urgencies/{ticket}', [TicketController::class, 'getUrgencies'])->name('admin.entry.tickets.urgencies');
         Route::patch('/admin/unassigned-tickets/{ticket}/assign', [TicketController::class, 'assign'])->name('admin.entry.tickets.assign');
+        Route::patch('/admin/unassigned-tickets/{ticket}/reject', [TicketController::class, 'reject'])->name('admin.entry.tickets.reject');
 
         Route::get('/admin/onwork-tickets', [TicketController::class, 'onWork'])->name('admin.tickets.onwork');
         Route::get('/admin/onwork-tickets/{ticket}', [TicketController::class, 'show'])->name('admin.tickets.onwork.show');
@@ -144,6 +145,7 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/dept/entry-tickets', [TicketController::class, 'newEntry'])->name('dept.entry.tickets');
         Route::get('/dept/entry-tickets/{ticket}', [TicketController::class, 'show'])->name('dept.entry.tickets.show');
         Route::patch('/dept/entry-tickets/{ticket}/approve', [TicketController::class, 'approve'])->name('dept.entry.tickets.approve');
+        Route::patch('/dept/entry-tickets/{ticket}/reject', [TicketController::class, 'reject'])->name('dept.entry.tickets.reject');
 
         Route::get('/dept/onwork-tickets', [TicketController::class, 'onWork'])->name('dept.tickets.onwork');
         Route::get('/dept/onwork-tickets/{ticket}', [TicketController::class, 'show'])->name('dept.tickets.onwork.show');
@@ -186,6 +188,7 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/subdept/entry-tickets', [TicketController::class, 'newEntry'])->name('subdept.entry.tickets');
         Route::get('/subdept/entry-tickets/{ticket}', [TicketController::class, 'show'])->name('subdept.entry.tickets.show');
         Route::patch('/subdept/entry-tickets/{ticket}/approve', [TicketController::class, 'approve'])->name('subdept.entry.tickets.approve');
+        Route::patch('/subdept/entry-tickets/{ticket}/reject', [TicketController::class, 'reject'])->name('subdept.entry.tickets.reject');
 
         Route::get('/subdept/onwork-tickets', [TicketController::class, 'onWork'])->name('subdept.tickets.onwork');
         Route::get('/subdept/onwork-tickets/{ticket}', [TicketController::class, 'show'])->name('subdept.tickets.onwork.show');
@@ -225,6 +228,8 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/technician/onwork-tickets/{ticket}', [TicketController::class, 'show'])->name('technician.tickets.onwork.show');
         Route::get('/technician/onwork-tickets/progress/{ticket}', [TicketController::class, 'getProgress'])->name('technician.tickets.onwork.progress');
         Route::patch('/technician/onwork-tickets/{ticket}', [TicketController::class, 'update'])->name('technician.tickets.onwork.update');
+        Route::patch('/technician/onwork-tickets/pending/{ticket}', [TicketController::class, 'pending'])->name('technician.tickets.onwork.pending');
+        Route::patch('/technician/onwork-tickets/continue/{ticket}', [TicketController::class, 'continue'])->name('technician.tickets.onwork.continue');
 
         Route::get('/technician/closed-tickets', [TicketController::class, 'closed'])->name('technician.tickets.closed');
         Route::get('/technician/closed-tickets/{ticket}', [TicketController::class, 'show'])->name('technician.tickets.closed.show');

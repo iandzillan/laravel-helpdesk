@@ -218,7 +218,7 @@
                     </li>
 
                     <li class="nav-item">
-                        <a class="nav-link {{(request()->segment(2) == 'unassigned-tickets') ? 'active' : ''}}" aria-current="page" href="{{ route('dept.entry.tickets') }}" title="New Entry Tickets">
+                        <a class="nav-link {{(request()->segment(2) == 'entry-tickets') ? 'active' : ''}}" aria-current="page" href="{{ route('dept.entry.tickets') }}" title="New Entry Tickets">
                             <i class="icon">
                                 <i class="fa-solid fa-inbox"></i>
                             </i>

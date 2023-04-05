@@ -575,7 +575,7 @@ class TicketController extends Controller
         switch ($role) {
             case 'Admin':
                 // get all on work tickets 
-                $tickets = Ticket::where('status', 4)->latest()->get();
+                $tickets = Ticket::where('status', 4)->latest('progress_at')->get();
 
                 // define view
                 $view = 'admin.ticket.onwork';
@@ -588,7 +588,7 @@ class TicketController extends Controller
                 // get all on work tickets 
                 $tickets = Ticket::with(['user', 'user.employee'])->whereHas('user.employee', function ($q) {
                     $q->where('department_id', Auth::user()->employee->department_id);
-                })->where('status', 4)->latest()->get();
+                })->where('status', 4)->latest('progress_at')->get();
 
                 // define view
                 $view = 'approver1.ticket.onwork';
@@ -601,7 +601,7 @@ class TicketController extends Controller
                 // get all on work tickets 
                 $tickets = Ticket::with(['user', 'user.employee'])->whereHas('user.employee', function ($q) {
                     $q->where('sub_department_id', Auth::user()->employee->sub_department_id);
-                })->where('status', 4)->latest()->get();
+                })->where('status', 4)->latest('progress_at')->get();
 
                 // define view
                 $view = 'approver2.ticket.onwork';
@@ -612,7 +612,7 @@ class TicketController extends Controller
 
             case 'User':
                 // get all on work tickets 
-                $tickets = Ticket::where('user_id', Auth::user()->id)->where('status', 4)->latest()->get();
+                $tickets = Ticket::where('user_id', Auth::user()->id)->where('status', 4)->latest('progress_at')->get();
 
                 // define view
                 $view = 'user.ticket.onwork';
@@ -721,7 +721,7 @@ class TicketController extends Controller
         switch ($role) {
             case 'Admin':
                 // get all closed tickets 
-                $tickets = Ticket::where('status', 6)->latest()->get();
+                $tickets = Ticket::where('status', 6)->latest('updated_at')->get();
 
                 // define view
                 $view = 'admin.ticket.closed';
@@ -734,7 +734,7 @@ class TicketController extends Controller
                 // get all closed tickets 
                 $tickets = Ticket::with(['user', 'user.employee'])->whereHas('user.employee', function ($q) {
                     $q->where('department_id', Auth::user()->employee->department_id);
-                })->where('status', 6)->latest()->get();
+                })->where('status', 6)->latest('updated_at')->get();
 
                 // define view
                 $view = 'approver1.ticket.closed';
@@ -747,7 +747,7 @@ class TicketController extends Controller
                 // get all closed tickets 
                 $tickets = Ticket::with(['user', 'user.employee'])->whereHas('user.employee', function ($q) {
                     $q->where('sub_department_id', Auth::user()->employee->sub_department_id);
-                })->where('status', 6)->latest()->get();
+                })->where('status', 6)->latest('updated_at')->get();
 
                 // define view
                 $view = 'approver2.ticket.closed';
@@ -758,7 +758,7 @@ class TicketController extends Controller
 
             case 'User':
                 // get all closed tickets 
-                $tickets = Ticket::where('user_id', Auth::user()->id)->where('status', 6)->latest()->get();
+                $tickets = Ticket::where('user_id', Auth::user()->id)->where('status', 6)->latest('updated_at')->get();
 
                 // define view
                 $view = 'user.ticket.closed';
@@ -769,7 +769,7 @@ class TicketController extends Controller
 
             case 'Technician':
                 // get all on work tickets
-                $tickets = Ticket::where('tickets.technician_id', Auth::user()->id)->where('tickets.status', 6)->latest()->get();
+                $tickets = Ticket::where('tickets.technician_id', Auth::user()->id)->where('tickets.status', 6)->latest('updated_at')->get();
 
                 // define view
                 $view = 'technician.ticket.closed';
@@ -867,7 +867,7 @@ class TicketController extends Controller
         switch ($role) {
             case 'Admin':
                 // get all rejected tickets 
-                $tickets = Ticket::where('status', 7)->latest()->get();
+                $tickets = Ticket::where('status', 7)->latest('updated_at')->get();
 
                 // define view
                 $view = 'admin.ticket.rejected';
@@ -880,7 +880,7 @@ class TicketController extends Controller
                 // get all rejected tickets 
                 $tickets = Ticket::with(['user', 'user.employee'])->whereHas('user.employee', function ($q) {
                     $q->where('department_id', Auth::user()->employee->department_id);
-                })->where('status', 7)->latest()->get();
+                })->where('status', 7)->latest('updated_at')->get();
 
                 // define view
                 $view = 'approver1.ticket.rejected';
@@ -893,7 +893,7 @@ class TicketController extends Controller
                 // get all rejected tickets 
                 $tickets = Ticket::with(['user', 'user.employee'])->whereHas('user.employee', function ($q) {
                     $q->where('sub_department_id', Auth::user()->employee->sub_department_id);
-                })->where('status', 7)->latest()->get();
+                })->where('status', 7)->latest('updated_at')->get();
 
                 // define view
                 $view = 'approver2.ticket.rejected';
@@ -904,7 +904,7 @@ class TicketController extends Controller
 
             case 'User':
                 // get all rejected tickets 
-                $tickets = Ticket::where('user_id', Auth::user()->id)->where('status', 7)->latest()->get();
+                $tickets = Ticket::where('user_id', Auth::user()->id)->where('status', 7)->latest('updated_at')->get();
 
                 // define view
                 $view = 'user.ticket.rejected';
@@ -1047,6 +1047,72 @@ class TicketController extends Controller
         ]);
     }
 
+    public function reject(Request $request, $ticket)
+    {
+        // set validation
+        $validator = Validator::make($request->all(), [
+            'note' => 'required'
+        ]);
+
+        // check validation
+        if ($validator->fails()) {
+            // return error response
+            return response()->json($validator->errors(), 422);
+        }
+
+        // check role
+        switch (Auth::user()->role) {
+            case 'Admin':
+                // get the ticket
+                $ticket = Ticket::where('ticket_number', $ticket)->first();
+
+                // set the tracking
+                $status_tracking = "Ticket rejected by Admin";
+                break;
+
+            case 'Approver1':
+                // get the ticket
+                $ticket = Ticket::whereHas('user.employee', function ($q) {
+                    $q->where('department_id', Auth::user()->employee->department_id);
+                })->where('ticket_number', $ticket)->first();
+
+                // set the tracking
+                $status_tracking = "Ticket rejected by Manager";
+                break;
+
+            case 'Approver2':
+                // get the ticket
+                $ticket = Ticket::whereHas('user.employee', function ($q) {
+                    $q->where('sub_department_id', Auth::user()->employee->sub_department_id);
+                })->where('ticket_number', $ticket)->first();
+
+                // set the tracking
+                $status_tracking = "Ticket rejected by Team Leader";
+                break;
+
+            default:
+                abort(404);
+                break;
+        }
+
+        // update ticket
+        $ticket->status = 7;
+        $ticket->save();
+
+        // update tracking
+        $tracking         = new Tracking;
+        $tracking->status = $status_tracking;
+        $tracking->note   = $request->note;
+        $ticket->trackings()->save($tracking);
+
+        // return response
+        return response()->json([
+            'success' => true,
+            'message' => "Ticket has been rejected",
+            'data'    => $ticket
+        ]);
+    }
+
     public function getTechnicians($ticket)
     {
         $subCategory = SubCategory::where('id', $ticket)->first();
@@ -1140,7 +1206,6 @@ class TicketController extends Controller
         } else {
             $ticket->progress = $request->progress;
             $status_tracking  = 'On work';
-            $rediredt         = route('technician.tickets.onwork.show', $ticket->ticket_number);
         }
         // update ticket
         $ticket->save();
@@ -1156,6 +1221,70 @@ class TicketController extends Controller
             'success'  => true,
             'message'  => 'Ticket has been updated',
             'data'     => $ticket
+        ]);
+    }
+
+    public function pending(Request $request, $ticket)
+    {
+        // set validation
+        $validator = validator::make($request->all(), [
+            'note' => 'required'
+        ]);
+
+        // check validation
+        if ($validator->fails()) {
+            // return error response
+            return response()->json($validator->errors(), 422);
+        }
+
+        // get the ticket
+        $ticket         = Ticket::where('ticket_number', $ticket)->first();
+        $ticket->status = 5;
+        $ticket->save();
+
+        // get technician
+        $technician = Employee::whereHas('user', function ($q) use ($ticket) {
+            $q->where('id', $ticket->technician_id);
+        })->first();
+
+        // update tracking
+        $tracking         = new Tracking;
+        $tracking->status = 'Ticket postponed by ' . $technician->name;
+        $tracking->note   = $request->note;
+        $ticket->trackings()->save($tracking);
+
+        // return response
+        return response()->json([
+            'success' => true,
+            'message' => 'Ticket has been postponed',
+            'data'    => $ticket
+        ]);
+    }
+
+    public function continue($ticket)
+    {
+        // get the ticket
+        $ticket = Ticket::where('ticket_number', $ticket)->first();
+        // update status ticket
+        $ticket->status = 4;
+        $ticket->save();
+
+        // get technician
+        $technician = Employee::whereHas('user', function ($q) use ($ticket) {
+            $q->where('id', $ticket->technician_id);
+        })->first();
+
+        // update tracking
+        $tracking         = new Tracking;
+        $tracking->status = 'Ticket continued';
+        $tracking->note   = 'Ticket continued by ' . $technician->name;
+        $ticket->trackings()->save($tracking);
+
+        // return response
+        return response()->json([
+            'success' => true,
+            'message' => 'Ticket has been continued',
+            'data'    => $ticket
         ]);
     }
 }

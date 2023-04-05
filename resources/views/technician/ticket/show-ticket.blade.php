@@ -4,26 +4,48 @@
     <div class="row">
         <div class="col-xl-12 col-lg-12">
             <div class="card">
-                <div class="card-header d-flex justify-content-between">
-                    <div class="header-title">
-                        <h4 class="card-title text-bold">{{ $ticket->ticket_number }}</h4>
-                    </div>
-                    <div>
-                        @if ($ticket->status == 'On work')    
-                            <a href="javascript:void(0)" class="btn btn-primary" id="btn-update" data-id="{{ $ticket->ticket_number }}">
-                                <i class="fa-solid fa-wrench"></i>
-                                Update Progress
-                            </a>
-                            <a href="#" class="btn btn-warning">
-                                <i class="fa-regular fa-circle-pause"></i>
-                                Hold
-                            </a>
-                        @endif
+                <div class="card-header">
+                    <div class="row d-flex justify-content-between">
+                        <div class="col-md-6 mb-3">
+                            <div class="header-title">
+                                <h4 class="card-title text-bold">{{ $ticket->ticket_number }}</h4>
+                            </div>
+                        </div>
+                        <div class="col-md-6 d-flex justify-content-end">
+                            @if ($ticket->status == 'On work')
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-primary">Action</button>
+                                    <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <span class="visually-hidden">Toggle Dropdown</span>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li>
+                                            <a href="javascript:void(0)" class="dropdown-item" id="btn-update" data-id="{{ $ticket->ticket_number }}">
+                                                <i class="fa-solid fa-wrench"></i>
+                                                Update Progress
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="javascript:void(0)" class="dropdown-item" id="btn-hold" data-id="{{ $ticket->ticket_number }}">
+                                                <i class="fa-regular fa-circle-pause"></i>
+                                                Hold
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>    
+                            @endif
+                            @if ($ticket->status == 'Pending')
+                                <a href="javascript:void(0)" class="btn btn-primary" id="btn-continue" data-id="{{ $ticket->ticket_number }}">
+                                    <i class="fa-regular fa-circle-play"></i>
+                                    Continue
+                                </a>
+                            @endif
+                        </div>
                     </div>
                 </div>
                 <div class="card-body">
                     <div class="row">
-                        <div class="col-md-6 mb-3">
+                        <div class="col-md-6 mb-3 mt-3">
                             <img src="{{ asset('storage/uploads/tickets/'.$ticket->image) }}" class="img-fluid rounded-start mb-3" alt="...">
                             <h5 class="card-title">Description</h5>
                             <p class="card-text">{{ $ticket->description }}</p>
@@ -35,9 +57,9 @@
                             </div>
                             <hr>
                             <div class="row">
-                                <div class="col-md">
+                                <div class="col-md-12">
                                     <div class="row">
-                                        <div class="col-md-6">
+                                        <div class="col-md-6 mb-3">
                                             <h5 class="card-title">Created At</h5>
                                             <p class="card-text">{{ $ticket->created_at }}</p>
                                         </div>
@@ -49,7 +71,7 @@
                                     <hr>
 
                                     <div class="row">
-                                        <div class="col-md-6">
+                                        <div class="col-md-6 mb-3">
                                             <h5 class="card-title">User</h5>
                                             <p class="card-text">{{ $ticket->user->employee->name }} ({{$ticket->user->employee->nik}})</p>
                                             @if ($ticket->user->employee->sub_department_id == null)
@@ -66,7 +88,7 @@
                                     <hr>
 
                                     <div class="row">
-                                        <div class="col-md-6">
+                                        <div class="col-md-6 mb-3">
                                             <h5 class="card-title">Category</h5>
                                             <p class="card-text">{{ $ticket->subCategory->category->name }}</p>
                                         </div>
@@ -78,7 +100,7 @@
                                     <hr>
 
                                     <div class="row">
-                                        <div class="col-md-6">
+                                        <div class="col-md-6 mb-3">
                                             <h5 class="card-title">Status</h5>
                                             @switch($ticket->status)
                                                 @case('Open')
@@ -134,7 +156,7 @@
                                     <hr>
 
                                     <div class="row">
-                                        <div class="col-md-6">
+                                        <div class="col-md-6 mb-3">
                                             <h5 class="card-title">Progress at</h5>
                                             <p class="card-text">{{ $ticket->progress_at }}</p>
                                         </div>
@@ -155,7 +177,7 @@
                     <div class="row">
                         <div class="header-title">
                             <h4 class="card-title text-bold">Tracking</h4>
-                            <div class="table-responsive-md">
+                            <div class="table-responsive">
                                 <table class="table table-borderless">
                                     @forelse ($trackings as $tracking)
                                         <tr>
@@ -210,7 +232,33 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary" id="update">Save</button>
+                        <button type="button" class="btn btn-primary" id="update">Assign</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    {{-- Modal --}}
+    <div class="modal fade" id="modal-pending" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Please fill the reason</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="form-pending">
+                    <div class="modal-body">
+                        <input type="hidden" id="ticket-pending">
+                        <div class="form-group">
+                            <label class="form-label" for="note-pending">Note*</label>
+                            <textarea class="form-control" id="note-pending" rows="5"></textarea>
+                            <div class="invalid-feedback d-none" role="alert" id="alert-note-pending"></div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" id="pending">Pending</button>
                     </div>
                 </form>
             </div>
@@ -219,7 +267,7 @@
 
     <script>
         $(document).ready(function(){
-            // btn_assign button action
+            // btn-assign button action
             $('body').on('click', '#btn-update', function(){
                 // get variable
                 let ticket = $(this).data('id');
@@ -329,7 +377,144 @@
                         }
                     }
                 });
-            })
+            });
+
+            // btn_hold button action
+            $('body').on('click', '#btn-hold', function(){
+                // define variable
+                let ticket = $(this).data('id');
+                // put the ticket to modal
+                $('#ticket-pending').val(ticket);
+                $('#modal-pending').modal('show');
+            });
+
+            // pending button action
+            $('body').on('click', '#pending', function(e){
+                e.preventDefault();
+                
+                // define variable
+                let ticket = $('#ticket-pending').val();
+                let note   = $('#note-pending').val();
+                let token  = $('meta[name="csrf-token"]').attr('content');
+                let url    = "{{ route('technician.tickets.onwork.pending', ":ticket") }}";
+                url        = url.replace(':ticket', ticket);
+
+                // show loading
+                swal.fire({
+                    title: 'Please wait',
+                    text: 'Sending request...',
+                    showConfirmButton: false, 
+                    allowOutsideClick: false,
+                    allowEnterKey: false,
+                    allowEscapeKey: false,
+                    didOpen: () => {
+                        swal.showLoading();
+                    }
+                });
+
+                //  ajax pending
+                $.ajax({
+                    url: url,
+                    type: 'patch',
+                    cache: false,
+                    data: {
+                        'note': note,
+                        '_token': token
+                    }, 
+                    success:function(response){
+                        // show message
+                        swal.fire({
+                            icon: 'success',
+                            title: response.message,
+                            showConfirmButton: false,
+                            timer: 2000
+                        });
+
+                        // reload page
+                        setTimeout(() => {
+                            location.reload();
+                        }, 2000);
+                    }, 
+                    error:function(error){
+                        // show message
+                        swal.fire({
+                            icon: 'warning',
+                            title: 'Something wrong',
+                            text: 'Please check again',
+                            showConfirmButton: false,
+                            timer: 1000
+                        });
+
+                        // check if note field error 
+                        if (error.responseJSON.note) {
+                            // show alert & message
+                            $('#note-pending').addClass('is-invalid');
+                            $('#alert-note-pending').addClass('d-block');
+                            $('#alert-note-pending').removeClass('d-none');
+                            $('#alert-note-pending').html(error.responseJSON.note);
+                        }
+                    }
+                });
+            });
+
+            // btn-continue buttin action 
+            $('body').on('click', '#btn-continue', function(e){
+                e.preventDefault();
+
+                // define varibale
+                let ticket = $(this).data('id');
+                let token  = $('meta[name="csrf-token"]').attr('content');
+                let url    = "{{ route('technician.tickets.onwork.continue', ":ticket") }}";
+                url        = url.replace(':ticket', ticket);
+
+                // show confirmation 
+                swal.fire({
+                    icon: 'question',
+                    title: 'Continued?',
+                    showCancelButton: true,
+                    cancelButtonText: 'No',
+                    confirmButtonText: 'Yes',
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // show loading
+                        swal.fire({
+                            title: 'Please wait',
+                            text: 'Sending request...',
+                            showConfirmButton: false,
+                            allowOutsideClick: false,
+                            allowEnterKey: false,
+                            allowEscapeKey: false,
+                            didOpen: () => {
+                                swal.showLoading();
+                            }
+                        });
+
+                        // ajax continued
+                        $.ajax({
+                            url: url,
+                            type: 'patch',
+                            cache: false,
+                            data: {
+                                '_token': token
+                            },
+                            success:function(response){
+                                // show message
+                                swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    showConfirmButton: false,
+                                    timer: 2000
+                                });
+
+                                // reload page
+                                setTimeout(() => {
+                                    location.reload();
+                                }, 2000);
+                            }
+                        });
+                    }
+                });
+            });
         });
     </script>
 @endsection
