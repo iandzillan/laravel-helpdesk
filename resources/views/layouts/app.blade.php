@@ -74,7 +74,7 @@
         </div>
 
         {{-- Content start --}}
-        <div class="conatiner-fluid content-inner mt-n5 py-0">
+        <div class="container-fluid content-inner mt-n5 py-0">
             <div class="row">
                 @yield('content')
             </div>

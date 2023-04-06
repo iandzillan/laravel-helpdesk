@@ -15,6 +15,11 @@ class Category extends Model
 
     public function subCategories()
     {
-        return $this->hasMany('App\Models\SubCategory');
+        return $this->hasMany(SubCategory::class);
+    }
+
+    public function tickets()
+    {
+        return $this->hasManyThrough(Ticket::class, SubCategory::class);
     }
 }
