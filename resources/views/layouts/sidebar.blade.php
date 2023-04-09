@@ -191,7 +191,7 @@
 
                 @if (Auth::user()->role == 'Approver1')
                     <li class="nav-item">
-                        <a class="nav-link {{(request()->segment(2) == 'new-tickets') ? 'active' : ''}}" aria-current="page" href="{{ route('dept.create.ticket') }}" title="Create Ticket">
+                        <a class="nav-link {{(request()->segment(2) == 'create-ticket') ? 'active' : ''}}" aria-current="page" href="{{ route('dept.create.ticket') }}" title="Create Ticket">
                             <i class="icon">
                                 <i class="fa-solid fa-folder-plus"></i>
                             </i>
@@ -305,7 +305,7 @@
 
                 @if (Auth::user()->role == 'Approver2')
                     <li class="nav-item">
-                        <a class="nav-link {{(request()->segment(2) == 'new-tickets') ? 'active' : ''}}" aria-current="page" href="{{ route('subdept.create.ticket') }}" title="Create Ticket">
+                        <a class="nav-link {{(request()->segment(2) == 'create-ticket') ? 'active' : ''}}" aria-current="page" href="{{ route('subdept.create.ticket') }}" title="Create Ticket">
                             <i class="icon">
                                 <i class="fa-solid fa-folder-plus"></i>
                             </i>
@@ -410,7 +410,7 @@
 
                 @if (Auth::user()->role == 'User')
                     <li class="nav-item">
-                        <a class="nav-link {{(request()->segment(2) == 'create-tickets') ? 'active' : ''}}" aria-current="page" href="{{ route('user.create.ticket') }}" title="Create Ticket">
+                        <a class="nav-link {{(request()->segment(2) == 'create-ticket') ? 'active' : ''}}" aria-current="page" href="{{ route('user.create.ticket') }}" title="Create Ticket">
                             <i class="icon">
                                 <i class="fa-solid fa-folder-plus"></i>
                             </i>

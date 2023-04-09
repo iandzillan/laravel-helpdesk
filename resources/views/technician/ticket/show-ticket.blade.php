@@ -326,7 +326,7 @@
                 // ajax update 
                 $.ajax({
                     url: url,
-                    type: 'patch',
+                    type: 'put',
                     cache: false,
                     data: {
                         'note': note,
@@ -334,17 +334,49 @@
                         '_token': token
                     }, 
                     success:function(response){
-                        // show response
-                        swal.fire({
-                            icon: 'success',
-                            title: response.message,
-                            showConfirmButton: false, 
-                            timer: 2000
-                        });
+                        if (response.data.progress == 100) {
+                            // define variable
+                            let ticket    = response.data.ticket_number;
+                            let url_email = "{{ route('notification', ":ticket") }}";
+                            url_email     = url_email.replace(':ticket', ticket);
+
+                            // ajax email
+                            $.ajax({
+                                url: url_email,
+                                type: 'get',
+                                cache: false,
+                                success: function(response1){
+                                    swal.fire({
+                                        icon: 'success',
+                                        title: 'Ticket closed',
+                                        text: 'Notification has been sended to the user',
+                                        showConfirmButton: false,
+                                        timer: 2000
+                                    });
+                                },
+                                error: function(error1){
+                                    swal.fire({
+                                        icon: 'warning',
+                                        text: error1.responseJSON.message,
+                                        showConfirmButton: false
+                                    });
+                                }
+                            });
+                        } else {
+                            swal.fire({
+                                icon: 'success',
+                                title: 'Ticket has been updated',
+                                showConfirmButton: false,
+                                timer: 2000
+                            });
+                        }
+
+                        // modal hide
+                        $('#modal-update').modal('hide');
 
                         // redirect to unassigned ticket page
                         setTimeout(() => {
-                            location.reload();
+                            window.location.href = "{{ route('technician.tickets.onwork') }}"
                         }, 2000);
                     }, 
                     error:function(error){

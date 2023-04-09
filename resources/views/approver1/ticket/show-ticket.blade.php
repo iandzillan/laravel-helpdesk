@@ -265,18 +265,38 @@
                         // ajax approve
                         $.ajax({
                             url: url,
-                            type: 'patch',
+                            type: 'put',
                             cache: false,
                             data: {
                                 '_token': token
                             }, 
                             success:function(response){
-                                // show success message
-                                swal.fire({
-                                    icon: 'success',
-                                    title: response.message,
-                                    showConfirmButton: false,
-                                    timer: 2000
+                                // defince variable
+                                let ticket    = response.data.ticket_number;
+                                let url_email = "{{ route('notification', ":ticket") }}";
+                                url_email     = url_email.replace(':ticket', ticket);
+
+                                // ajax email
+                                $.ajax({
+                                    url: url_email,
+                                    type: 'get',
+                                    cache: false,
+                                    success: function(response1){
+                                        swal.fire({
+                                            icon: 'success',
+                                            title: 'Ticket has been approved',
+                                            text: 'Notification has been sended to Admin',
+                                            showConfirmButton: false,
+                                            timer: 2000
+                                        });
+                                    },
+                                    error: function(error1){
+                                        swal.fire({
+                                            icon: 'warning',
+                                            text: error1.responseJSON.message,
+                                            showConfirmButton: false
+                                        });
+                                    }
                                 });
 
                                 // rederict to new entry ticket page

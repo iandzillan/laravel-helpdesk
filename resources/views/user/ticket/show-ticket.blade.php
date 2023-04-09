@@ -18,14 +18,14 @@
                         </div>
                         <div class="col-md-6">
                             <h5 class="card-title">Progress</h5>
-                            <div class="progress mb-3">
-                                <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="{{ $ticket->progress }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ $ticket->progress }}">{{ $ticket->progress }}%</div>
+                            <div class="progress">
+                                <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="{{ $ticket->progress }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ $ticket->progress }}%">{{ $ticket->progress }}%</div>
                             </div>
                             <hr>
                             <div class="row">
                                 <div class="col-md">
                                     <div class="row">
-                                        <div class="col-md-6">
+                                        <div class="col-md-6 mb-3">
                                             <h5 class="card-title">Created At</h5>
                                             <p class="card-text">{{ $ticket->created_at }}</p>
                                         </div>
@@ -37,7 +37,7 @@
                                     <hr>
 
                                     <div class="row">
-                                        <div class="col-md-6">
+                                        <div class="col-md-6 mb-3">
                                             <h5 class="card-title">User</h5>
                                             <p class="card-text">{{ $ticket->user->employee->name }} ({{$ticket->user->employee->nik}})</p>
                                             <p class="card-text">{{ $ticket->user->employee->subDepartment->name }}'s {{$ticket->user->employee->position}}</p>
@@ -50,7 +50,7 @@
                                     <hr>
 
                                     <div class="row">
-                                        <div class="col-md-6">
+                                        <div class="col-md-6 mb-3">
                                             <h5 class="card-title">Category</h5>
                                             <p class="card-text">{{ $ticket->subCategory->category->name }}</p>
                                         </div>
@@ -62,7 +62,7 @@
                                     <hr>
 
                                     <div class="row">
-                                        <div class="col-md-6">
+                                        <div class="col-md-6 mb-3">
                                             <h5 class="card-title">Status</h5>
                                             @switch($ticket->status)
                                                 @case('Open')
@@ -118,7 +118,7 @@
                                     <hr>
 
                                     <div class="row">
-                                        <div class="col-md-6">
+                                        <div class="col-md-6 mb-3">
                                             <h5 class="card-title">Progress at</h5>
                                             <p class="card-text">{{ $ticket->progress_at }}</p>
                                         </div>

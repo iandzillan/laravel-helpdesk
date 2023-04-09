@@ -126,7 +126,6 @@
                                 'role': role,
                             },
                             success:function(response1){
-                                console.log(response1.message);
                                 // show message
                                 Swal.fire({
                                     icon: 'success',
@@ -137,7 +136,6 @@
                             },
                             error:function(error1){
                                 console.log(error1.responseJSON.message);
-
                                 // show message
                                 Swal.fire({
                                     icon: 'warning',

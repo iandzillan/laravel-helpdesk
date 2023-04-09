@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{$title}}</title>
 
     <!-- Favicon -->
@@ -31,6 +32,10 @@
     <link href="assets/vendor/fontawesome-free/css/fontawesome.min.css" rel="stylesheet">
     <link href="assets/vendor/fontawesome-free/css/brands.min.css" rel="stylesheet">
     <link href="assets/vendor/fontawesome-free/css/solid.min.css" rel="stylesheet">
+
+    {{-- Sweetalert --}}
+    <script src="{{asset('assets/vendor/sweetalert/dist/sweetalert2.all.min.js')}}"></script>
+    <link rel="stylesheet" href="{{asset('assets/vendor/sweetalert/dist/sweetalert2.min.css')}}">
 </head>
 <body data-bs-spy="scroll" data-bs-target="#elements-section" data-bs-offset="0" tabindex="0">
     {{-- Loader start --}}
@@ -54,42 +59,25 @@
                                         <h4 class="logo-title ms-3">Helpdesk Ticketing System</h4>
                                     </div>
                                     <h2 class="mb-2 text-center">Sign In</h2>
-                                    @if (session()->has('error'))
-                                    <div class="alert bg-danger d-flex align-items-center" role="alert">
-                                            <i class="fa-solid fa-triangle-exclamation text-white"> </i>
-                                            <div class="text-white px-2">
-                                                {{session()->get('error')}}
-                                            </div>
-                                        </div>
-                                    @endif
-                                    <form action="{{route('loginProcess')}}" method="POST">
-                                        @csrf
+                                    <form>
                                         <div class="row">
                                             <div class="col-lg-12">
                                                 <div class="form-group">
                                                     <label for="username" class="form-label">Username</label>
                                                     <input type="text" class="form-control @error('username') is-invalid @enderror" name="username" id="username" placeholder="Enter your username" value="{{old('username')}}">
-                                                    @error('username')
-                                                        <div class="invalid-feedback">
-                                                            {{$message}}
-                                                        </div>
-                                                    @enderror
+                                                    <div class="invalid-feedback d-none" role="alert" id="alert-username"></div>
                                                 </div>
                                             </div>
                                             <div class="col-lg-12">
                                                 <div class="form-group">
                                                     <label for="password" class="form-label">Password</label>
                                                     <input type="password" class="form-control @error('password') is-invalid @enderror" name="password" id="password" placeholder="Enter your password">
-                                                    @error('password')
-                                                        <div class="invalid-feedback">
-                                                            {{$message}}
-                                                        </div>
-                                                    @enderror
+                                                    <div class="invalid-feedback d-none" role="alert" id="alert-password"></div>
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="d-flex justify-content-center">
-                                            <button type="submit" class="btn btn-primary">Sign In</button>
+                                            <button type="submit" class="btn btn-primary" id="login">Sign In</button>
                                         </div>
                                     </form>
                                 </div>
@@ -131,5 +119,72 @@
     
     <!-- App Script -->
     <script src="assets/js/hope-ui.js" defer></script>
+
+    <script>
+        $(document).ready(function(){
+            $('body').on('click', '#login', function(e){
+                e.preventDefault();
+
+                let username = $('#username').val();
+                let password = $('#password').val();
+                let token    = $('meta[name="csrf-token"]').attr('content');
+
+                $.ajax({
+                    url: "{{route('loginProcess')}}",
+                    type: "post",
+                    cache: false,
+                    data: {
+                        'username': username,
+                        'password': password, 
+                        '_token'  : token
+                    },
+                    success:function(response){
+                        if (response.success) {
+                            swal.fire({
+                                icon: 'success',
+                                title: response.message,
+                                showConfirmButton: false,
+                                timer: 2000
+                            }).then(function(){
+                                window.location.href = response.link
+                            });
+                        } else {
+                            swal.fire({
+                                icon: 'warning',
+                                title: response.message,
+                                text: 'Username or password wrong',
+                                showConfirmButton: false, 
+                                timer: 2000
+                            });
+                        }
+                    }, 
+                    error: function(error){
+                        console.log(error.responseJSON.message);
+                        if (error.responseJSON.username) {
+                            $('#username').addClass('is-invalid');
+                            $('#alert-username').addClass('d-block');
+                            $('#alert-username').removeClass('d-none');
+                            $('#alert-username').html(error.responseJSON.username);
+                        } else {
+                            $('#username').removeClass('is-invalid');
+                            $('#alert-username').removeClass('d-block');
+                            $('#alert-username').addClass('d-none');
+                        }
+
+                        if (error.responseJSON.password) {
+                            $('#password').addClass('is-invalid');
+                            $('#alert-password').addClass('d-block');
+                            $('#alert-password').removeClass('d-none');
+                            $('#alert-password').html(error.responseJSON.password);
+                        } else {
+                            $('#password').removeClass('is-invalid');
+                            $('#alert-password').removeClass('d-block');
+                            $('#alert-password').addClass('d-none');
+                        }
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 </html>

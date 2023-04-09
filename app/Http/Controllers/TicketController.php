@@ -10,10 +10,12 @@ use App\Models\Ticket;
 use App\Models\Tracking;
 use App\Models\Urgency;
 use App\Models\User;
+use App\Notifications\StatusUpdateNotification;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Validator;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -1286,5 +1288,79 @@ class TicketController extends Controller
             'message' => 'Ticket has been continued',
             'data'    => $ticket
         ]);
+    }
+
+    public function statusUpdate($ticket)
+    {
+        $ticket = Ticket::where('ticket_number', $ticket)->first();
+        switch ($ticket->status) {
+            case 'Open':
+                $sub_department = Auth::user()->employee->sub_department_id;
+                $team_leader    = Employee::where('sub_department_id', $sub_department)->where('position', 'Team Leader')->first();
+                $reciever       = $team_leader->user->email;
+                $data_email     = [
+                    'greeting'    => "Dear $team_leader->name",
+                    'body'        => "We would like to inform you there's a new ticket that need your approval. Please click button below to see the detail",
+                    'thanks'      => "Thank you from Helpdesk Ticketing System. No need to reply this email",
+                    'action_text' => "View Ticket",
+                    'action_url'  => route('subdept.entry.tickets.show', $ticket->ticket_number) 
+                ];
+                break;
+            
+            case 'Approved by Team Leader':
+                $department     = Auth::user()->employee->department_id;
+                $manager        = Employee::where('department_id', $department)->where('position', 'Manager')->first();
+                $reciever       = $manager->user->email;
+                $data_email     = [
+                    'greeting'    => "Dear $manager->name",
+                    'body'        => "We would like to inform you there's a new ticket that need your approval. Please click button below to see the detail",
+                    'thanks'      => "Thank you from Helpdesk Ticketing System. No need to reply this email",
+                    'action_text' => "View Ticket",
+                    'action_url'  => route('dept.entry.tickets.show', $ticket->ticket_number) 
+                ];
+                break;
+
+            case 'Approved by Manager':
+                $admin          = User::where('role', 'Admin')->first();
+                $reciever       = $admin->email;
+                $data_email     = [
+                    'greeting'    => "Dear {$admin->employee->name}",
+                    'body'        => "We would like to inform you there's a new ticket that need your approval. Please click button below to see the detail",
+                    'thanks'      => "Thank you from Helpdesk Ticketing System. No need to reply this email",
+                    'action_text' => "View Ticket",
+                    'action_url'  => route('admin.entry.tickets.show', $ticket->ticket_number) 
+                ];
+                break;
+            
+            case 'On work':
+                $technician     = User::where('id', $ticket->technician_id)->first();
+                $reciever       = $technician->email;
+                $data_email     = [
+                    'greeting'    => "Dear {$technician->employee->name}",
+                    'body'        => "We would like to inform you there's a new ticket that assign to you with " . strtolower($ticket->urgency->name) . " urgency. Please click button below to see the detail",
+                    'thanks'      => "Thank you from Helpdesk Ticketing System. No need to reply this email",
+                    'action_text' => "View Ticket",
+                    'action_url'  => route('technician.tickets.onwork.show', $ticket->ticket_number) 
+                ];
+                break;
+            
+            case 'Closed':
+                $user           = User::where('id', $ticket->user_id)->first();
+                $reciever       = $user->email;
+                $data_email     = [
+                    'greeting'    => "Dear {$user->employee->name}",
+                    'body'        => "We would like to inform your that your tiket has been completed. Please click button below to see the detail",
+                    'thanks'      => "Thank you from Helpdesk Ticketing System. No need to reply this email",
+                    'action_text' => "View Ticket",
+                    'action_url'  => route('user.my.tickets.show', $ticket->ticket_number) 
+                ];
+                break;
+            
+            default:
+                # code...
+                break;
+        }
+
+        Notification::route('mail', $reciever)->notify(new StatusUpdateNotification($data_email));
     }
 }

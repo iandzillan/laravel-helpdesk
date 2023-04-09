@@ -34,11 +34,59 @@ class DashboardController extends Controller
             case 'Approver1':
                 $view  = 'approver1.dashboard';
                 $title = 'Manager Dashboard - Helpdesk Ticketing System';
+                $total_ticket      = Ticket::whereHas('user.employee', function($q){
+                    $q->where('department_id', Auth::user()->employee->department_id);
+                })->get()->count();
+                $approval_tl       = Ticket::where('status', 1)->whereHas('user.employee', function($q){
+                    $q->where('department_id', Auth::user()->employee->department_id);
+                })->get()->count();
+                $approval_manager  = Ticket::where('status', 2)->whereHas('user.employee', function($q){
+                    $q->where('department_id', Auth::user()->employee->department_id);
+                })->get()->count();
+                $unassigned_ticket = Ticket::where('status', 3)->whereHas('user.employee', function($q){
+                    $q->where('department_id', Auth::user()->employee->department_id);
+                })->get()->count();
+                $onwork_ticket     = Ticket::where('status', 4)->whereHas('user.employee', function($q){
+                    $q->where('department_id', Auth::user()->employee->department_id);
+                })->get()->count();
+                $pending_ticket    = Ticket::where('status', 5)->whereHas('user.employee', function($q){
+                    $q->where('department_id', Auth::user()->employee->department_id);
+                })->get()->count();
+                $closed_ticket     = Ticket::where('status', 6)->whereHas('user.employee', function($q){
+                    $q->where('department_id', Auth::user()->employee->department_id);
+                })->get()->count();
+                $rejected_ticket   = Ticket::where('status', 7)->whereHas('user.employee', function($q){
+                    $q->where('department_id', Auth::user()->employee->department_id);
+                })->get()->count();
                 break;
 
             case 'Approver2':
                 $view  = 'approver2.dashboard';
                 $title = 'Sub Dept Head Dashboard - Helpdesk Ticketing System';
+                $total_ticket      = Ticket::whereHas('user.employee', function($q){
+                    $q->where('sub_department_id', Auth::user()->employee->sub_department_id);
+                })->get();
+                $approval_tl       = Ticket::where('status', 1)->whereHas('user.employee', function($q){
+                    $q->where('sub_department_id', Auth::user()->employee->sub_department_id);
+                })->get();
+                $approval_manager  = Ticket::where('status', 2)->whereHas('user.employee', function($q){
+                    $q->where('sub_department_id', Auth::user()->employee->sub_department_id);
+                })->get();
+                $unassigned_ticket = Ticket::where('status', 3)->whereHas('user.employee', function($q){
+                    $q->where('sub_department_id', Auth::user()->employee->sub_department_id);
+                })->get();
+                $onwork_ticket     = Ticket::where('status', 4)->whereHas('user.employee', function($q){
+                    $q->where('sub_department_id', Auth::user()->employee->sub_department_id);
+                })->get();
+                $pending_ticket    = Ticket::where('status', 5)->whereHas('user.employee', function($q){
+                    $q->where('sub_department_id', Auth::user()->employee->sub_department_id);
+                })->get();
+                $closed_ticket     = Ticket::where('status', 6)->whereHas('user.employee', function($q){
+                    $q->where('sub_department_id', Auth::user()->employee->sub_department_id);
+                })->get();
+                $rejected_ticket   = Ticket::where('status', 7)->whereHas('user.employee', function($q){
+                    $q->where('sub_department_id', Auth::user()->employee->sub_department_id);
+                })->get();
                 break;
 
             case 'User':

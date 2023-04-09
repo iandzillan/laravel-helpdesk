@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
 class CheckUserSessionMiddleware
@@ -15,6 +16,9 @@ class CheckUserSessionMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        return $next($request);
+        if ($request->session()->exists('user')) {
+            return $next($request);
+        }
+        return abort(Response::HTTP_FORBIDDEN, '403 Forbidden');
     }
 }

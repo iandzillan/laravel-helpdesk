@@ -18,6 +18,6 @@ class CekRoleMiddleware
         if (auth()->user()->role == $role) {
             return $next($request);
         }
-        return abort(400);
+        return abort(Response::HTTP_FORBIDDEN, '403 Forbidden');
     }
 }
