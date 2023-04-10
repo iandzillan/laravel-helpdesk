@@ -44,7 +44,9 @@ Route::group(['middleware' => ['auth']], function () {
 
     Route::group(['middleware' => ['role:Admin']], function () {
         Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
-        Route::get('/admin/dashboard/category-chart', [DashboardController::class, 'getCategoryYear'])->name('admin.dashboard.category');
+        Route::get('/admin/dashboard/chart-year', [DashboardController::class, 'getCategoryYear'])->name('admin.chart.year');
+        Route::get('/admin/dashboard/chart-month', [DashboardController::class, 'getCategoryMonth'])->name('admin.chart.month');
+        Route::get('/admin/dashboard/chart-week', [DashboardController::class, 'getCategoryWeek'])->name('admin.chart.week');
 
         Route::get('/admin/categories', [CategoryController::class, 'index'])->name('admin.categories');
         Route::post('/admin/categories', [CategoryController::class, 'store'])->name('admin.categories.store');

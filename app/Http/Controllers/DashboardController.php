@@ -21,70 +21,70 @@ class DashboardController extends Controller
             case 'Admin':
                 $view  = 'admin.dashboard';
                 $title = 'Admin Dashboard - Helpdesk Ticketing System';
-                $total_ticket      = Ticket::all()->count();
-                $approval_tl       = Ticket::where('status', 1)->get()->count();
-                $approval_manager  = Ticket::where('status', 2)->get()->count();
-                $unassigned_ticket = Ticket::where('status', 3)->get()->count();
-                $onwork_ticket     = Ticket::where('status', 4)->get()->count();
-                $pending_ticket    = Ticket::where('status', 5)->get()->count();
-                $closed_ticket     = Ticket::where('status', 6)->get()->count();
-                $rejected_ticket   = Ticket::where('status', 7)->get()->count();
+                $total_ticket      = Ticket::all();
+                $approval_tl       = Ticket::where('status', 1)->get();
+                $approval_manager  = Ticket::where('status', 2)->get();
+                $unassigned_ticket = Ticket::where('status', 3)->get();
+                $onwork_ticket     = Ticket::where('status', 4)->get();
+                $pending_ticket    = Ticket::where('status', 5)->get();
+                $closed_ticket     = Ticket::where('status', 6)->get();
+                $rejected_ticket   = Ticket::where('status', 7)->get();
                 break;
 
             case 'Approver1':
                 $view  = 'approver1.dashboard';
                 $title = 'Manager Dashboard - Helpdesk Ticketing System';
-                $total_ticket      = Ticket::whereHas('user.employee', function($q){
+                $total_ticket      = Ticket::whereHas('user.employee', function ($q) {
                     $q->where('department_id', Auth::user()->employee->department_id);
-                })->get()->count();
-                $approval_tl       = Ticket::where('status', 1)->whereHas('user.employee', function($q){
+                })->get();
+                $approval_tl       = Ticket::where('status', 1)->whereHas('user.employee', function ($q) {
                     $q->where('department_id', Auth::user()->employee->department_id);
-                })->get()->count();
-                $approval_manager  = Ticket::where('status', 2)->whereHas('user.employee', function($q){
+                })->get();
+                $approval_manager  = Ticket::where('status', 2)->whereHas('user.employee', function ($q) {
                     $q->where('department_id', Auth::user()->employee->department_id);
-                })->get()->count();
-                $unassigned_ticket = Ticket::where('status', 3)->whereHas('user.employee', function($q){
+                })->get();
+                $unassigned_ticket = Ticket::where('status', 3)->whereHas('user.employee', function ($q) {
                     $q->where('department_id', Auth::user()->employee->department_id);
-                })->get()->count();
-                $onwork_ticket     = Ticket::where('status', 4)->whereHas('user.employee', function($q){
+                })->get();
+                $onwork_ticket     = Ticket::where('status', 4)->whereHas('user.employee', function ($q) {
                     $q->where('department_id', Auth::user()->employee->department_id);
-                })->get()->count();
-                $pending_ticket    = Ticket::where('status', 5)->whereHas('user.employee', function($q){
+                })->get();
+                $pending_ticket    = Ticket::where('status', 5)->whereHas('user.employee', function ($q) {
                     $q->where('department_id', Auth::user()->employee->department_id);
-                })->get()->count();
-                $closed_ticket     = Ticket::where('status', 6)->whereHas('user.employee', function($q){
+                })->get();
+                $closed_ticket     = Ticket::where('status', 6)->whereHas('user.employee', function ($q) {
                     $q->where('department_id', Auth::user()->employee->department_id);
-                })->get()->count();
-                $rejected_ticket   = Ticket::where('status', 7)->whereHas('user.employee', function($q){
+                })->get();
+                $rejected_ticket   = Ticket::where('status', 7)->whereHas('user.employee', function ($q) {
                     $q->where('department_id', Auth::user()->employee->department_id);
-                })->get()->count();
+                })->get();
                 break;
 
             case 'Approver2':
                 $view  = 'approver2.dashboard';
                 $title = 'Sub Dept Head Dashboard - Helpdesk Ticketing System';
-                $total_ticket      = Ticket::whereHas('user.employee', function($q){
+                $total_ticket      = Ticket::whereHas('user.employee', function ($q) {
                     $q->where('sub_department_id', Auth::user()->employee->sub_department_id);
                 })->get();
-                $approval_tl       = Ticket::where('status', 1)->whereHas('user.employee', function($q){
+                $approval_tl       = Ticket::where('status', 1)->whereHas('user.employee', function ($q) {
                     $q->where('sub_department_id', Auth::user()->employee->sub_department_id);
                 })->get();
-                $approval_manager  = Ticket::where('status', 2)->whereHas('user.employee', function($q){
+                $approval_manager  = Ticket::where('status', 2)->whereHas('user.employee', function ($q) {
                     $q->where('sub_department_id', Auth::user()->employee->sub_department_id);
                 })->get();
-                $unassigned_ticket = Ticket::where('status', 3)->whereHas('user.employee', function($q){
+                $unassigned_ticket = Ticket::where('status', 3)->whereHas('user.employee', function ($q) {
                     $q->where('sub_department_id', Auth::user()->employee->sub_department_id);
                 })->get();
-                $onwork_ticket     = Ticket::where('status', 4)->whereHas('user.employee', function($q){
+                $onwork_ticket     = Ticket::where('status', 4)->whereHas('user.employee', function ($q) {
                     $q->where('sub_department_id', Auth::user()->employee->sub_department_id);
                 })->get();
-                $pending_ticket    = Ticket::where('status', 5)->whereHas('user.employee', function($q){
+                $pending_ticket    = Ticket::where('status', 5)->whereHas('user.employee', function ($q) {
                     $q->where('sub_department_id', Auth::user()->employee->sub_department_id);
                 })->get();
-                $closed_ticket     = Ticket::where('status', 6)->whereHas('user.employee', function($q){
+                $closed_ticket     = Ticket::where('status', 6)->whereHas('user.employee', function ($q) {
                     $q->where('sub_department_id', Auth::user()->employee->sub_department_id);
                 })->get();
-                $rejected_ticket   = Ticket::where('status', 7)->whereHas('user.employee', function($q){
+                $rejected_ticket   = Ticket::where('status', 7)->whereHas('user.employee', function ($q) {
                     $q->where('sub_department_id', Auth::user()->employee->sub_department_id);
                 })->get();
                 break;
@@ -122,15 +122,91 @@ class DashboardController extends Controller
 
     public function getCategoryYear()
     {
-        $category = Category::withCount('tickets')->whereHas('tickets', function ($q) {
-            $q->groupBy(DB::raw('MONTH(tickets.created_at)'));
-        })->get();
+        switch (Auth::user()->role) {
+            case 'Admin':
+                $months = Ticket::select(DB::raw('MONTHNAME(created_at) as month'))->groupBy(DB::raw('MONTHNAME(created_at)'))->orderBy(DB::raw('MONTH(created_at)', 'asc'))->pluck('month')->all();
 
-        $month   = Ticket::select(DB::raw('MONTHNAME(created_at) as month'))->groupBy(DB::raw('MONTHNAME(created_at)'))->orderBy(DB::raw('MONTH(created_at)', 'asc'))->pluck('month')->all();
+                $tickets = Ticket::join('sub_categories', 'sub_categories.id', '=', 'tickets.sub_category_id')
+                    ->join('categories', 'categories.id', '=', 'sub_categories.category_id')
+                    ->select(DB::raw('categories.name as name, count(tickets.id) as count, MONTH(tickets.created_at)'))
+                    ->where(DB::raw('YEAR(tickets.created_at)'), date('Y'))
+                    ->groupBy(DB::raw('categories.name, MONTH(tickets.created_at)'))
+                    ->get();
+
+                $tickets = $tickets->mapToGroups(function ($item, $key) {
+                    return [$item['name'] => $item['count']];
+                });
+                break;
+
+            default:
+                # code...
+                break;
+        }
 
         return response()->json([
-            'category' => $category,
-            'month'    => $month
+            'name'  => $tickets->keys(),
+            'data'  => $tickets->values(),
+            'month' => $months
+        ]);
+    }
+
+    public function getCategoryMonth()
+    {
+        switch (Auth::user()->role) {
+            case 'Admin':
+                $months = Ticket::select(DB::raw('MONTHNAME(created_at) as month'))->where(DB::raw('MONTHNAME(created_at)'), date('F'))->groupBy(DB::raw('MONTHNAME(created_at)'))->pluck('month');
+
+                $tickets = Ticket::join('sub_categories', 'sub_categories.id', '=', 'tickets.sub_category_id')
+                    ->join('categories', 'categories.id', '=', 'sub_categories.category_id')
+                    ->select(DB::raw('categories.name as name, count(tickets.id) as count, MONTH(tickets.created_at)'))
+                    ->where(DB::raw('MONTHNAME(tickets.created_at)'), date('F'))
+                    ->groupBy(DB::raw('categories.name, MONTH(tickets.created_at)'))
+                    ->get();
+
+                $tickets = $tickets->mapToGroups(function ($item, $key) {
+                    return [$item['name'] => $item['count']];
+                });
+                break;
+
+            default:
+                # code...
+                break;
+        }
+
+        return response()->json([
+            'name' => $tickets->keys(),
+            'data' => $tickets->values(),
+            'month' => $months
+        ]);
+    }
+
+    public function getCategoryWeek()
+    {
+        switch (Auth::user()->role) {
+            case 'Admin':
+                $week = Ticket::select(DB::raw('DATE(created_at) AS date'))->whereBetween('created_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])->groupBy('date')->pluck('date');
+
+                $tickets = Ticket::join('sub_categories', 'sub_categories.id', '=', 'tickets.sub_category_id')
+                    ->join('categories', 'categories.id', '=', 'sub_categories.category_id')
+                    ->select(DB::raw('categories.name as name, count(tickets.id) as count, DATE(tickets.created_at)'))
+                    ->whereBetween('tickets.created_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])
+                    ->groupBy(DB::raw('categories.name, DATE(tickets.created_at)'))
+                    ->get();
+
+                $tickets = $tickets->mapToGroups(function ($item, $key) {
+                    return [$item['name'] => $item['count']];
+                });
+                break;
+
+            default:
+                # code...
+                break;
+        }
+
+        return response()->json([
+            'name' => $tickets->keys(),
+            'data' => $tickets->values(),
+            'week' => $week
         ]);
     }
 }
