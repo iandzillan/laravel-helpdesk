@@ -121,68 +121,66 @@
     <script src="assets/js/hope-ui.js" defer></script>
 
     <script>
-        $(document).ready(function(){
-            $('body').on('click', '#login', function(e){
-                e.preventDefault();
+        $('body').on('click', '#login', function(e){
+            e.preventDefault();
 
-                let username = $('#username').val();
-                let password = $('#password').val();
-                let token    = $('meta[name="csrf-token"]').attr('content');
+            let username = $('#username').val();
+            let password = $('#password').val();
+            let token    = $('meta[name="csrf-token"]').attr('content');
 
-                $.ajax({
-                    url: "{{route('loginProcess')}}",
-                    type: "post",
-                    cache: false,
-                    data: {
-                        'username': username,
-                        'password': password, 
-                        '_token'  : token
-                    },
-                    success:function(response){
-                        if (response.success) {
-                            swal.fire({
-                                icon: 'success',
-                                title: response.message,
-                                showConfirmButton: false,
-                                timer: 2000
-                            }).then(function(){
-                                window.location.href = response.link
-                            });
-                        } else {
-                            swal.fire({
-                                icon: 'warning',
-                                title: response.message,
-                                text: 'Username or password wrong',
-                                showConfirmButton: false, 
-                                timer: 2000
-                            });
-                        }
-                    }, 
-                    error: function(error){
-                        console.log(error.responseJSON.message);
-                        if (error.responseJSON.username) {
-                            $('#username').addClass('is-invalid');
-                            $('#alert-username').addClass('d-block');
-                            $('#alert-username').removeClass('d-none');
-                            $('#alert-username').html(error.responseJSON.username);
-                        } else {
-                            $('#username').removeClass('is-invalid');
-                            $('#alert-username').removeClass('d-block');
-                            $('#alert-username').addClass('d-none');
-                        }
-
-                        if (error.responseJSON.password) {
-                            $('#password').addClass('is-invalid');
-                            $('#alert-password').addClass('d-block');
-                            $('#alert-password').removeClass('d-none');
-                            $('#alert-password').html(error.responseJSON.password);
-                        } else {
-                            $('#password').removeClass('is-invalid');
-                            $('#alert-password').removeClass('d-block');
-                            $('#alert-password').addClass('d-none');
-                        }
+            $.ajax({
+                url: "{{route('loginProcess')}}",
+                type: "post",
+                cache: false,
+                data: {
+                    'username': username,
+                    'password': password, 
+                    '_token'  : token
+                },
+                success:function(response){
+                    if (response.success) {
+                        swal.fire({
+                            icon: 'success',
+                            title: response.message,
+                            showConfirmButton: false,
+                            timer: 2000
+                        }).then(function(){
+                            window.location.href = response.link
+                        });
+                    } else {
+                        swal.fire({
+                            icon: 'warning',
+                            title: response.message,
+                            text: 'Username or password wrong',
+                            showConfirmButton: false, 
+                            timer: 2000
+                        });
                     }
-                });
+                }, 
+                error: function(error){
+                    console.log(error.responseJSON.message);
+                    if (error.responseJSON.username) {
+                        $('#username').addClass('is-invalid');
+                        $('#alert-username').addClass('d-block');
+                        $('#alert-username').removeClass('d-none');
+                        $('#alert-username').html(error.responseJSON.username);
+                    } else {
+                        $('#username').removeClass('is-invalid');
+                        $('#alert-username').removeClass('d-block');
+                        $('#alert-username').addClass('d-none');
+                    }
+
+                    if (error.responseJSON.password) {
+                        $('#password').addClass('is-invalid');
+                        $('#alert-password').addClass('d-block');
+                        $('#alert-password').removeClass('d-none');
+                        $('#alert-password').html(error.responseJSON.password);
+                    } else {
+                        $('#password').removeClass('is-invalid');
+                        $('#alert-password').removeClass('d-block');
+                        $('#alert-password').addClass('d-none');
+                    }
+                }
             });
         });
     </script>

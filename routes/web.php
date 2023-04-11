@@ -44,9 +44,12 @@ Route::group(['middleware' => ['auth']], function () {
 
     Route::group(['middleware' => ['role:Admin']], function () {
         Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
-        Route::get('/admin/dashboard/chart-year', [DashboardController::class, 'getCategoryYear'])->name('admin.chart.year');
-        Route::get('/admin/dashboard/chart-month', [DashboardController::class, 'getCategoryMonth'])->name('admin.chart.month');
-        Route::get('/admin/dashboard/chart-week', [DashboardController::class, 'getCategoryWeek'])->name('admin.chart.week');
+        Route::get('/admin/dashboard/category-chart-year', [DashboardController::class, 'getCategoryYear'])->name('admin.categorychart.year');
+        Route::get('/admin/dashboard/category-chart-month', [DashboardController::class, 'getCategoryMonth'])->name('admin.categorychart.month');
+        Route::get('/admin/dashboard/category-chart-week', [DashboardController::class, 'getCategoryWeek'])->name('admin.categorychart.week');
+        Route::get('/admin/dashboard/subcategory-chart-year', [DashboardController::class, 'getSubCategoryYear'])->name('admin.subcategorychart.year');
+        Route::get('/admin/dashboard/subcategory-chart-month', [DashboardController::class, 'getSubCategoryMonth'])->name('admin.subcategorychart.month');
+        Route::get('/admin/dashboard/subcategory-chart-week', [DashboardController::class, 'getSubCategoryWeek'])->name('admin.subcategorychart.week');
 
         Route::get('/admin/categories', [CategoryController::class, 'index'])->name('admin.categories');
         Route::post('/admin/categories', [CategoryController::class, 'store'])->name('admin.categories.store');
@@ -115,6 +118,12 @@ Route::group(['middleware' => ['auth']], function () {
 
     Route::group(['middleware' => ['role:Approver1']], function () {
         Route::get('/dept/dashboard', [DashboardController::class, 'index'])->name('dept.dashboard');
+        Route::get('/dept/dashboard/category-chart-year', [DashboardController::class, 'getCategoryYear'])->name('dept.categorychart.year');
+        Route::get('/dept/dashboard/category-chart-month', [DashboardController::class, 'getCategoryMonth'])->name('dept.categorychart.month');
+        Route::get('/dept/dashboard/category-chart-week', [DashboardController::class, 'getCategoryWeek'])->name('dept.categorychart.week');
+        Route::get('/dept/dashboard/subcategory-chart-year', [DashboardController::class, 'getSubCategoryYear'])->name('dept.subcategorychart.year');
+        Route::get('/dept/dashboard/subcategory-chart-month', [DashboardController::class, 'getSubCategoryMonth'])->name('dept.subcategorychart.month');
+        Route::get('/dept/dashboard/subcategory-chart-week', [DashboardController::class, 'getSubCategoryWeek'])->name('dept.subcategorychart.week');
 
         Route::get('/dept/sub-departments', [SubDepartmentController::class, 'index'])->name('dept.subdepartments');
         Route::post('/dept/sub-departments', [SubDepartmentController::class, 'store'])->name('dept.subdepartments.store');
@@ -165,6 +174,12 @@ Route::group(['middleware' => ['auth']], function () {
 
     Route::group(['middleware' => ['role:Approver2']], function () {
         Route::get('/subdept/dashboard', [DashboardController::class, 'index'])->name('subdept.dashboard');
+        Route::get('/subdept/dashboard/category-chart-year', [DashboardController::class, 'getCategoryYear'])->name('subdept.categorychart.year');
+        Route::get('/subdept/dashboard/category-chart-month', [DashboardController::class, 'getCategoryMonth'])->name('subdept.categorychart.month');
+        Route::get('/subdept/dashboard/category-chart-week', [DashboardController::class, 'getCategoryWeek'])->name('subdept.categorychart.week');
+        Route::get('/subdept/dashboard/subcategory-chart-year', [DashboardController::class, 'getSubCategoryYear'])->name('subdept.subcategorychart.year');
+        Route::get('/subdept/dashboard/subcategory-chart-month', [DashboardController::class, 'getSubCategoryMonth'])->name('subdept.subcategorychart.month');
+        Route::get('/subdept/dashboard/subcategory-chart-week', [DashboardController::class, 'getSubCategoryWeek'])->name('subdept.subcategorychart.week');
 
         Route::get('/subdept/new-employee', [EmployeeController::class, 'index'])->name('subdept.employees.index');
         Route::get('/subdept/new-employee/position', [EmployeeController::class, 'getPositions'])->name('subdept.employees.positions');

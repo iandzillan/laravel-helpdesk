@@ -25,11 +25,11 @@
                             <div class="progress-widget">
                                 <span class="fa-stack fa-2x">
                                     <i class="fa-solid fa-circle fa-stack-2x text-dark"></i>
-                                    <i class="fa-solid fa-code-fork fa-stack-1x fa-inverse"></i>
+                                    <i class="fa-solid fa-user fa-stack-1x fa-inverse"></i>
                                 </span>
                                 <div class="progress-detail">
-                                <p  class="mb-2">Approver Lv.2</p>
-                                <h4 class="counter">{{ $ticket['new']->count() }}</h4>
+                                <p  class="mb-2">My Tickets</p>
+                                <h4 class="counter">{{ $ticket['myticket']->count() }}</h4>
                                 </div>
                             </div>
                         </div>
@@ -40,26 +40,11 @@
                             <div class="progress-widget">
                                 <span class="fa-stack fa-2x">
                                     <i class="fa-solid fa-circle fa-stack-2x text-secondary"></i>
-                                    <i class="fa-solid fa-building fa-stack-1x fa-inverse"></i>
+                                    <i class="fa-solid fa-inbox fa-stack-1x fa-inverse"></i>
                                 </span>
                                 <div class="progress-detail">
-                                <p  class="mb-2">Approver Lv.1</p>
-                                <h4 class="counter">{{ $ticket['approval_manager']->count() }}</h4>
-                                </div>
-                            </div>
-                        </div>
-                    </li>
-
-                    <li class="swiper-slide card card-slide" data-aos="fade-up" data-aos-delay="700">
-                        <div class="card-body">
-                            <div class="progress-widget">
-                                <span class="fa-stack fa-2x">
-                                    <i class="fa-solid fa-circle fa-stack-2x text-success"></i>
-                                    <i class="fa-solid fa-list fa-stack-1x fa-inverse"></i>
-                                </span>
-                                <div class="progress-detail">
-                                <p  class="mb-2">Unassigned</p>
-                                <h4 class="counter">{{ $ticket['unassigned']->count() }}</h4>
+                                <p  class="mb-2">Need Approval</p>
+                                <h4 class="counter">{{ $ticket['new']->count() }}</h4>
                                 </div>
                             </div>
                         </div>
@@ -131,7 +116,7 @@
         </div>
     </div>
 
-    <div class="col-md-12 col-lg-8">
+    <div class="col-md-12 col-lg-7">
         <div class="row">
             <div class="col-md-12">
                 <div class="card" data-aos="fade-up" data-aos-delay="800">
@@ -145,14 +130,11 @@
                         </div>
                         <div class="d-flex align-items-center align-self-center">
                             <div class="dropdown">
-                                <a href="#" class="text-secondary dropdown-toggle" id="dropdownMenuButton22" data-bs-toggle="dropdown" aria-expanded="false">
-                                This Week
-                                </a>
-                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton22">
-                                    <li><a class="dropdown-item" href="#">This Week</a></li>
-                                    <li><a class="dropdown-item" href="#">This Month</a></li>
-                                    <li><a class="dropdown-item" href="#">This Year</a></li>
-                                </ul>
+                                <select id="filter-bar" name="filter-bar" class="form-select mb-3">
+                                    <option value="year" selected>This Year</option>
+                                    <option value="month">This Month</option>
+                                    <option value="week">This Week</option>
+                                </select>
                             </div>
                         </div>
                     </div>
@@ -162,43 +144,49 @@
                 </div>
             </div>
         </div>
-    </div>
 
-    <div class="col-md-12 col-lg-4">
         <div class="row">
             <div class="col-md-12 col-lg-12">
-                <div class="card" data-aos="fade-up" data-aos-delay="900">
+                <div class="card" data-aos="fade-up" data-aos-delay="100">
                     <div class="flex-wrap card-header d-flex align-items-center">
                         <span class="fa-stack fa-2x">
                             <i class="fa-solid fa-square fa-stack-2x text-primary"></i>
-                            <i class="fa-solid fa-code-fork fa-stack-1x fa-inverse"></i>
+                            <i class="fa-solid fa-hammer fa-stack-1x fa-inverse"></i>
                         </span>
                         <div class="header-title">
-                            <h4 class="card-title">Need your approval</h4>
+                            <h4 class="card-title">On Work</h4>
                         </div>
                     </div>
-                    <div class="card-body" style="height: 293px; overflow: auto">
+                    <div class="card-body" style="max-height: 400px; overflow: auto">
                         <div class="table-responsive">
                             <table id="basic-table" class="table table-striped mb-0" role="grid">
                                 <thead>
                                     <tr>
                                         <th>#</th>
                                         <th>ticket</th>
-                                        <th>Action</th>
+                                        <th>Progress</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach ($ticket['new'] as $ticket)
+                                    @forelse ($ticket['onwork'] as $onwork)
                                         <tr>
                                             <td>{{$loop->iteration}}</td>
-                                            <td>{{$ticket->ticket_number}}</td>
                                             <td>
-                                                <a href="{{ route('subdept.entry.tickets.show', $ticket->ticket_number) }}" class="btn btn-sm btn-primary">
-                                                    <i class="fa-solid fa-magnifying-glass"></i>
+                                                <a href="{{ route('subdept.tickets.onwork.show', $onwork->ticket_number) }}">
+                                                    {{$onwork->ticket_number}}
                                                 </a>
                                             </td>
+                                            <td>
+                                                <div class="progress">
+                                                    <div class="progress-bar" role="progressbar" style="width: {{ $onwork->progress }}%;" aria-valuenow="{{ $onwork->progress }}" aria-valuemin="0" aria-valuemax="100">{{ $onwork->progress }}%</div>
+                                                </div>
+                                            </td>
                                         </tr>
-                                    @endforeach
+                                    @empty
+                                        <tr>
+                                            <td colspan="3" align="center">No Ticket...</td>
+                                        </tr>
+                                    @endforelse
                                 </tbody>
                             </table>
                         </div>
@@ -207,4 +195,80 @@
             </div>
         </div>
     </div>
+
+    <div class="col-md-12 col-lg-5">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card" data-aos="fade-up" data-aos-delay="900">
+                    <div class="flex-wrap card-header d-flex justify-content-between align-items-center">
+                        <div class="header-title d-flex justify-content-between align-items-center">
+                            <span class="fa-stack fa-2x">
+                                <i class="fa-solid fa-square fa-stack-2x text-primary"></i>
+                                <i class="fa-solid fa-folder-tree fa-stack-1x fa-inverse"></i>
+                            </span>
+                            <h4 class="card-title">Sub Category</h4>
+                        </div>
+                        <div class="d-flex align-items-center align-self-center">
+                            <div class="dropdown">
+                                <select id="filter-donut" name="filter-donut" class="form-select mb-3">
+                                    <option value="year" selected>This Year</option>
+                                    <option value="month">This Month</option>
+                                    <option value="week">This Week</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div id="sub-category" class="d-main"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12 col-lg-12">
+                <div class="card" data-aos="fade-up" data-aos-delay="100">
+                    <div class="flex-wrap card-header d-flex align-items-center">
+                        <span class="fa-stack fa-2x">
+                            <i class="fa-solid fa-square fa-stack-2x text-primary"></i>
+                            <i class="fa-solid fa-inbox fa-stack-1x fa-inverse"></i>
+                        </span>
+                        <div class="header-title">
+                            <h4 class="card-title">Need your approval</h4>
+                        </div>
+                    </div>
+                    <div class="card-body" style="max-height: 400px; overflow: auto">
+                        <div class="table-responsive">
+                            <table id="basic-table" class="table table-striped mb-0" role="grid">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>ticket</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @forelse ($ticket['new'] as $new)
+                                        <tr>
+                                            <td>{{$loop->iteration}}</td>
+                                            <td>
+                                                <a href="{{ route('subdept.entry.tickets.show', $new->ticket_number) }}">
+                                                    {{$new->ticket_number}}
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="3" align="center">No Ticket...</td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @include('approver2.dashboard-chart')
 @endsection

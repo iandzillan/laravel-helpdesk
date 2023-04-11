@@ -145,7 +145,7 @@
                         </div>
                         <div class="d-flex align-items-center align-self-center">
                             <div class="dropdown">
-                                <select id="filter" name="filter" class="form-select mb-3">
+                                <select id="filter-bar" name="filter-bar" class="form-select mb-3">
                                     <option value="year" selected>This Year</option>
                                     <option value="month">This Month</option>
                                     <option value="week">This Week</option>
@@ -161,8 +161,60 @@
         </div>
 
         <div class="row">
-            <div class="col-md-12">
+            <div class="col-md-12 col-lg-12">
                 <div class="card" data-aos="fade-up" data-aos-delay="800">
+                    <div class="flex-wrap card-header d-flex align-items-center">
+                        <span class="fa-stack fa-2x">
+                            <i class="fa-solid fa-square fa-stack-2x text-primary"></i>
+                            <i class="fa-solid fa-list fa-stack-1x fa-inverse"></i>
+                        </span>
+                        <div class="header-title">
+                            <h4 class="card-title">On Work</h4>
+                        </div>
+                    </div>
+                    <div class="card-body" style="max-height: 400px; overflow: auto">
+                        <div class="table-responsive">
+                            <table id="basic-table" class="table table-striped mb-0" role="grid">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>ticket</th>
+                                        <th>Progress</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @forelse ($ticket['onwork'] as $onwork)
+                                        <tr>
+                                            <td>{{$loop->iteration}}</td>
+                                            <td>
+                                                <a href="{{ route('admin.tickets.onwork.show', $onwork->ticket_number) }}">
+                                                    {{$onwork->ticket_number}}
+                                                </a>
+                                            </td>
+                                            <td>
+                                                <div class="progress">
+                                                    <div class="progress-bar" role="progressbar" style="width: {{ $onwork->progress }}%;" aria-valuenow="{{ $onwork->progress }}" aria-valuemin="0" aria-valuemax="100">{{ $onwork->progress }}%</div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="3" align="center">No Ticket...</td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-12 col-lg-5">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card" data-aos="fade-up" data-aos-delay="900">
                     <div class="flex-wrap card-header d-flex justify-content-between align-items-center">
                         <div class="header-title d-flex justify-content-between align-items-center">
                             <span class="fa-stack fa-2x">
@@ -173,7 +225,7 @@
                         </div>
                         <div class="d-flex align-items-center align-self-center">
                             <div class="dropdown">
-                                <select id="filter2" name="filter2" class="form-select mb-3">
+                                <select id="filter-donut" name="filter-donut" class="form-select mb-3">
                                     <option value="year" selected>This Year</option>
                                     <option value="month">This Month</option>
                                     <option value="week">This Week</option>
@@ -187,39 +239,35 @@
                 </div>
             </div>
         </div>
-    </div>
 
-    <div class="col-md-12 col-lg-5">
         <div class="row">
             <div class="col-md-12 col-lg-12">
                 <div class="card" data-aos="fade-up" data-aos-delay="900">
                     <div class="flex-wrap card-header d-flex align-items-center">
                         <span class="fa-stack fa-2x">
                             <i class="fa-solid fa-square fa-stack-2x text-primary"></i>
-                            <i class="fa-solid fa-code-fork fa-stack-1x fa-inverse"></i>
+                            <i class="fa-solid fa-list fa-stack-1x fa-inverse"></i>
                         </span>
                         <div class="header-title">
-                            <h4 class="card-title">Need your approval</h4>
+                            <h4 class="card-title">Unassigned</h4>
                         </div>
                     </div>
-                    <div class="card-body" style="height: 293px; overflow: auto">
+                    <div class="card-body" style="max-height: 400px; overflow: auto">
                         <div class="table-responsive">
                             <table id="basic-table" class="table table-striped mb-0" role="grid">
                                 <thead>
                                     <tr>
                                         <th>#</th>
                                         <th>ticket</th>
-                                        <th>Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @forelse ($ticket['unassigned'] as $ticket)
+                                    @forelse ($ticket['unassigned'] as $unassigned)
                                         <tr>
                                             <td>{{$loop->iteration}}</td>
-                                            <td>{{$ticket->ticket_number}}</td>
                                             <td>
-                                                <a href="{{ route('subdept.entry.tickets.show', $ticket->ticket_number) }}" class="btn btn-sm btn-primary">
-                                                    <i class="fa-solid fa-magnifying-glass"></i>
+                                                <a href="{{ route('subdept.entry.tickets.show', $unassigned->ticket_number) }}">
+                                                    {{$unassigned->ticket_number}}
                                                 </a>
                                             </td>
                                         </tr>
@@ -237,142 +285,5 @@
         </div>
     </div>
 
-    <script>
-        $(document).ready(function(){
-            let options = {
-                series: [], 
-                chart: {
-                    type: 'bar',
-                    height: 350
-                }, 
-                plotOptions: {
-                    bar: {
-                        horizontal: false, 
-                        columnWidth: '55%',
-                        endingShape: 'rounded',
-                        borderRadius: 5,
-                    }
-                }, 
-                dataLabels: {
-                    enabled: false
-                }, 
-                stroke: {
-                    show: true, 
-                    width: 2,
-                    curve: 'smooth',
-                    colors: ['transparent']
-                }, 
-                xaxis: {
-                    type: 'category',
-                    categories: [],
-                }, 
-                yaxis: {
-                    title: {
-                        text: 'total'
-                    }
-                }, 
-                legend: {
-                    show: false,
-                },
-                fill: {
-                    opacity: 1
-                }, 
-                tooltip: {
-                    y: {
-                        formatter: function(val){
-                            return val; 
-                        }
-                    }
-                }, 
-                noData: {
-                    text: 'No data...'
-                }
-            };
-            let barchart = new ApexCharts(document.querySelector('#category'), options);
-            barchart.render();
-
-            let url = "{{ route('admin.chart.year') }}";
-            $.getJSON(url, function(response){
-                let series     = [];
-                for (let i = 0; i < response.name.length; i++) {
-                    series.push({
-                        name: response.name[i],
-                        data: response.data[i]
-                    });
-                }
-                barchart.updateOptions({
-                    xaxis: {
-                        categories: response.month
-                    },
-                    series: series
-                })
-            })
-
-            $('#filter').on('change', function(){
-                let value = $('#filter').val();
-                switch (value) {
-                    case 'year':
-                        let url1 = "{{ route('admin.chart.year') }}";
-                        $.getJSON(url1, function(response){
-                            let series = [];
-                            for (let i = 0; i < response.name.length; i++) {
-                                series.push({
-                                    name: response.name[i],
-                                    data: response.data[i]
-                                });
-                            }
-                            barchart.updateOptions({
-                                xaxis: {
-                                    categories: response.month
-                                },
-                                series: series
-                            })
-                        })
-                        break;
-
-                        case 'month':
-                            let url2 = "{{ route('admin.chart.month') }}";
-                            $.getJSON(url2, function(response){
-                                let series2 = [];
-                                for (let i = 0; i < response.name.length; i++) {
-                                    series2.push({
-                                        name: response.name[i],
-                                        data: response.data[i]
-                                    });
-                                }
-                                barchart.updateOptions({
-                                    xaxis:{
-                                        categories: response.month
-                                    },
-                                    series: series2
-                                });
-                            })
-                        break;
-
-                    case 'week':
-                        let url3 = "{{ route('admin.chart.week') }}";
-                            $.getJSON(url3, function(response){
-                                let series2 = [];
-                                for (let i = 0; i < response.name.length; i++) {
-                                    series2.push({
-                                        name: response.name[i],
-                                        data: response.data[i]
-                                    });
-                                }
-                                barchart.updateOptions({
-                                    xaxis:{
-                                        categories: response.week
-                                    },
-                                    series: series2
-                                });
-                            })
-                        break;
-                
-                    default:
-                        break;
-                }
-            })
-
-        });
-    </script>
+    @include('admin.dashboard-chart')
 @endsection
