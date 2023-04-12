@@ -360,12 +360,31 @@
                                 '_token': token
                             }, 
                             success:function(response){
-                                // show message
-                                swal.fire({
-                                    title: response.message,
-                                    icon: 'success',
-                                    showConfirmButton: false,
-                                    timer: 2000
+                                let ticket    = response.data.ticket_number;
+                                let url_email = "{{ route('notification', ":ticket") }}";
+                                url_email     = url_email.replace(':ticket', ticket);
+
+                                // ajax email
+                                $.ajax({
+                                    url: url_email,
+                                    type: 'get',
+                                    cache: false,
+                                    success: function(response1){
+                                        swal.fire({
+                                            icon: 'success',
+                                            title: 'Ticket has been rejected',
+                                            text: 'Notification has been sended to User',
+                                            showConfirmButton: false,
+                                            timer: 2000
+                                        });
+                                    },
+                                    error: function(error1){
+                                        swal.fire({
+                                            icon: 'warning',
+                                            text: error1.responseJSON.message,
+                                            showConfirmButton: false
+                                        });
+                                    }
                                 });
 
                                 // return redirect

@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{$title}}</title>
 
     <!-- Favicon -->
@@ -58,21 +57,31 @@
                                         <i class="fa-solid fa-screwdriver-wrench"></i>
                                         <h4 class="logo-title ms-3">Helpdesk Ticketing System</h4>
                                     </div>
+                                    @if (session()->has('error'))
+                                        <div class="alert alert-danger">
+                                            {{session()->get('error')}}
+                                        </div>
+                                    @endif
                                     <h2 class="mb-2 text-center">Sign In</h2>
-                                    <form>
+                                    <form action="{{route('loginProcess')}}" method="post">
+                                        @csrf
                                         <div class="row">
                                             <div class="col-lg-12">
                                                 <div class="form-group">
                                                     <label for="username" class="form-label">Username</label>
                                                     <input type="text" class="form-control @error('username') is-invalid @enderror" name="username" id="username" placeholder="Enter your username" value="{{old('username')}}">
-                                                    <div class="invalid-feedback d-none" role="alert" id="alert-username"></div>
+                                                    @error('username')
+                                                        <div class="text text-danger">{{$message}}</div>
+                                                    @enderror
                                                 </div>
                                             </div>
                                             <div class="col-lg-12">
                                                 <div class="form-group">
                                                     <label for="password" class="form-label">Password</label>
                                                     <input type="password" class="form-control @error('password') is-invalid @enderror" name="password" id="password" placeholder="Enter your password">
-                                                    <div class="invalid-feedback d-none" role="alert" id="alert-password"></div>
+                                                    @error('password')
+                                                        <div class="text text-danger">{{$message}}</div>
+                                                    @enderror
                                                 </div>
                                             </div>
                                         </div>
@@ -119,70 +128,5 @@
     
     <!-- App Script -->
     <script src="assets/js/hope-ui.js" defer></script>
-
-    <script>
-        $('body').on('click', '#login', function(e){
-            e.preventDefault();
-
-            let username = $('#username').val();
-            let password = $('#password').val();
-            let token    = $('meta[name="csrf-token"]').attr('content');
-
-            $.ajax({
-                url: "{{route('loginProcess')}}",
-                type: "post",
-                cache: false,
-                data: {
-                    'username': username,
-                    'password': password, 
-                    '_token'  : token
-                },
-                success:function(response){
-                    if (response.success) {
-                        swal.fire({
-                            icon: 'success',
-                            title: response.message,
-                            showConfirmButton: false,
-                            timer: 2000
-                        }).then(function(){
-                            window.location.href = response.link
-                        });
-                    } else {
-                        swal.fire({
-                            icon: 'warning',
-                            title: response.message,
-                            text: 'Username or password wrong',
-                            showConfirmButton: false, 
-                            timer: 2000
-                        });
-                    }
-                }, 
-                error: function(error){
-                    console.log(error.responseJSON.message);
-                    if (error.responseJSON.username) {
-                        $('#username').addClass('is-invalid');
-                        $('#alert-username').addClass('d-block');
-                        $('#alert-username').removeClass('d-none');
-                        $('#alert-username').html(error.responseJSON.username);
-                    } else {
-                        $('#username').removeClass('is-invalid');
-                        $('#alert-username').removeClass('d-block');
-                        $('#alert-username').addClass('d-none');
-                    }
-
-                    if (error.responseJSON.password) {
-                        $('#password').addClass('is-invalid');
-                        $('#alert-password').addClass('d-block');
-                        $('#alert-password').removeClass('d-none');
-                        $('#alert-password').html(error.responseJSON.password);
-                    } else {
-                        $('#password').removeClass('is-invalid');
-                        $('#alert-password').removeClass('d-block');
-                        $('#alert-password').addClass('d-none');
-                    }
-                }
-            });
-        });
-    </script>
 </body>
 </html>

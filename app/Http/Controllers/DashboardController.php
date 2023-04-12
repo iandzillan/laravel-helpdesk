@@ -22,6 +22,7 @@ class DashboardController extends Controller
                 $view  = 'admin.dashboard';
                 $title = 'Admin Dashboard - Helpdesk Ticketing System';
                 $total_ticket      = Ticket::all();
+                $myticket          = null;
                 $approval_tl       = Ticket::where('status', 1)->get();
                 $approval_manager  = Ticket::where('status', 2)->get();
                 $unassigned_ticket = Ticket::where('status', 3)->get();
@@ -95,27 +96,27 @@ class DashboardController extends Controller
                 $view  = 'user.dashboard';
                 $title = 'User Dashboard - Helpdesk Ticketing System';
                 $total_ticket      = null;
-                $myticket          = null;
-                $approval_tl       = null;
-                $approval_manager  = null;
-                $unassigned_ticket = null;
-                $onwork_ticket     = null;
-                $pending_ticket    = null;
-                $closed_ticket     = null;
-                $rejected_ticket   = null;
+                $myticket          = Ticket::where('user_id', Auth::user()->id)->latest()->get();
+                $approval_tl       = Ticket::where('status', 1)->where('user_id', Auth::user()->id)->latest()->get();
+                $approval_manager  = Ticket::where('status', 2)->where('user_id', Auth::user()->id)->latest()->get();
+                $unassigned_ticket = Ticket::where('status', 3)->where('user_id', Auth::user()->id)->latest()->get();
+                $onwork_ticket     = Ticket::where('status', 4)->where('user_id', Auth::user()->id)->latest()->get();
+                $pending_ticket    = Ticket::where('status', 5)->where('user_id', Auth::user()->id)->latest()->get();
+                $closed_ticket     = Ticket::where('status', 6)->where('user_id', Auth::user()->id)->latest()->get();
+                $rejected_ticket   = Ticket::where('status', 7)->where('user_id', Auth::user()->id)->latest()->get();
                 break;
 
             case 'Technician':
                 $view  = 'technician.dashboard';
                 $title = 'Technician Dashboard - Helpdesk Ticketing System';
-                $total_ticket      = null;
+                $total_ticket      = Ticket::where('technician_id', Auth::user()->id)->get();
                 $myticket          = null;
                 $approval_tl       = null;
                 $approval_manager  = null;
                 $unassigned_ticket = null;
-                $onwork_ticket     = null;
-                $pending_ticket    = null;
-                $closed_ticket     = null;
+                $onwork_ticket     = Ticket::join('urgencies', 'urgencies.id', '=', 'tickets.urgency_id')->where('technician_id', Auth::user()->id)->where('status', 4)->orderBy('urgencies.hours', 'asc')->get();
+                $pending_ticket    = Ticket::join('urgencies', 'urgencies.id', '=', 'tickets.urgency_id')->where('technician_id', Auth::user()->id)->where('status', 5)->orderBy('urgencies.hours', 'asc')->get();
+                $closed_ticket     = Ticket::where('technician_id', Auth::user()->id)->where('status', 6)->latest()->get();
                 $rejected_ticket   = null;
                 break;
 

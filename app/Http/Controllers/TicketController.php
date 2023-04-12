@@ -1303,10 +1303,10 @@ class TicketController extends Controller
                     'body'        => "We would like to inform you there's a new ticket that need your approval. Please click button below to see the detail",
                     'thanks'      => "Thank you from Helpdesk Ticketing System. No need to reply this email",
                     'action_text' => "View Ticket",
-                    'action_url'  => route('subdept.entry.tickets.show', $ticket->ticket_number) 
+                    'action_url'  => route('subdept.entry.tickets.show', $ticket->ticket_number)
                 ];
                 break;
-            
+
             case 'Approved by Team Leader':
                 $department     = Auth::user()->employee->department_id;
                 $manager        = Employee::where('department_id', $department)->where('position', 'Manager')->first();
@@ -1316,7 +1316,7 @@ class TicketController extends Controller
                     'body'        => "We would like to inform you there's a new ticket that need your approval. Please click button below to see the detail",
                     'thanks'      => "Thank you from Helpdesk Ticketing System. No need to reply this email",
                     'action_text' => "View Ticket",
-                    'action_url'  => route('dept.entry.tickets.show', $ticket->ticket_number) 
+                    'action_url'  => route('dept.entry.tickets.show', $ticket->ticket_number)
                 ];
                 break;
 
@@ -1328,10 +1328,10 @@ class TicketController extends Controller
                     'body'        => "We would like to inform you there's a new ticket that need your approval. Please click button below to see the detail",
                     'thanks'      => "Thank you from Helpdesk Ticketing System. No need to reply this email",
                     'action_text' => "View Ticket",
-                    'action_url'  => route('admin.entry.tickets.show', $ticket->ticket_number) 
+                    'action_url'  => route('admin.entry.tickets.show', $ticket->ticket_number)
                 ];
                 break;
-            
+
             case 'On work':
                 $technician     = User::where('id', $ticket->technician_id)->first();
                 $reciever       = $technician->email;
@@ -1340,10 +1340,10 @@ class TicketController extends Controller
                     'body'        => "We would like to inform you there's a new ticket that assign to you with " . strtolower($ticket->urgency->name) . " urgency. Please click button below to see the detail",
                     'thanks'      => "Thank you from Helpdesk Ticketing System. No need to reply this email",
                     'action_text' => "View Ticket",
-                    'action_url'  => route('technician.tickets.onwork.show', $ticket->ticket_number) 
+                    'action_url'  => route('technician.tickets.onwork.show', $ticket->ticket_number)
                 ];
                 break;
-            
+
             case 'Closed':
                 $user           = User::where('id', $ticket->user_id)->first();
                 $reciever       = $user->email;
@@ -1352,10 +1352,22 @@ class TicketController extends Controller
                     'body'        => "We would like to inform your that your tiket has been completed. Please click button below to see the detail",
                     'thanks'      => "Thank you from Helpdesk Ticketing System. No need to reply this email",
                     'action_text' => "View Ticket",
-                    'action_url'  => route('user.my.tickets.show', $ticket->ticket_number) 
+                    'action_url'  => route('user.my.tickets.show', $ticket->ticket_number)
                 ];
                 break;
-            
+
+            case 'Rejected':
+                $user           = User::where('id', $ticket->user_id)->first();
+                $reciever       = $user->email;
+                $data_email     = [
+                    'greeting'    => "Dear {$user->employee->name}",
+                    'body'        => "We would like to inform your that your tiket has been rejected. Please click button below to see the detail",
+                    'thanks'      => "Thank you from Helpdesk Ticketing System. No need to reply this email",
+                    'action_text' => "View Ticket",
+                    'action_url'  => route('user.my.tickets.show', $ticket->ticket_number)
+                ];
+                break;
+
             default:
                 # code...
                 break;

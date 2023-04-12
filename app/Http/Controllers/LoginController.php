@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Validator;
 
 class LoginController extends Controller
 {
@@ -42,73 +41,60 @@ class LoginController extends Controller
     public function loginProcess(Request $request)
     {
         // set validation
-        $validator = Validator::make($request->all(), [
-            'username' => 'required',
-            'password' => 'required'
+        $this->validate($request, [
+            'username'  => 'required',
+            'password'  => 'required',
         ]);
 
-        // check validation
-        if ($validator->fails()) {
-            return response()->json($validator->errors(), 422);
-        }
 
         // check username & password
         if (Auth::attempt($request->only('username', 'password'))) {
             switch (Auth::user()->role) {
                 case 'Admin':
                     if (session()->has('url.intended')) {
-                        $redirect = session()->get('url.intended');
+                        return redirect(session()->get('url.intended'));
                     } else {
-                        $redirect = '/admin/dashboard';
+                        return redirect('/admin/dashboard');
                     }
                     break;
 
                 case 'Approver1':
                     if (session()->has('url.intended')) {
-                        $redirect = session()->get('url.intended');
+                        return redirect(session()->get('url.intended'));
                     } else {
-                        $redirect = '/dept/dashboard';
+                        return redirect('/dept/dashboard');
                     }
                     break;
 
                 case 'Approver2':
                     if (session()->has('url.intended')) {
-                        $redirect = session()->get('url.intended');
+                        return redirect(session()->get('url.intended'));
                     } else {
-                        $redirect = '/subdept/dashboard';
+                        return redirect('/subdept/dashboard');
                     }
                     break;
 
                 case 'User':
                     if (session()->has('url.intended')) {
-                        $redirect = session()->get('url.intended');
+                        return redirect(session()->get('url.intended'));
                     } else {
-                        $redirect = '/user/dashboard';
+                        return redirect('/user/dashboard');
                     }
                     break;
 
                 case 'Technician':
                     if (session()->has('url.intended')) {
-                        $redirect = session()->get('url.intended');
+                        return redirect(session()->get('url.intended'));
                     } else {
-                        $redirect = '/technician/dashboard';
+                        return redirect('/technician/dashboard');
                     }
                     break;
             }
-
-            return response()->json([
-                'success'  => true,
-                'message'  => 'Login Successfully',
-                'link'     => $redirect
-            ]);
         } else {
-            return response()->json([
-                'success' => false,
-                'message' => 'Login Failed'
-            ]);
+            return redirect('/')->with('error', 'Username or password might be wrong');
         }
     }
-    
+
     public function logout(Request $request)
     {
         Auth::logout();
