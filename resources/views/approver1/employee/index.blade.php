@@ -56,8 +56,6 @@
                                         <label for="employee-position" class="form-label">Position</label>
                                         <select id="employee-position" name="position" class="form-control form-select2">
                                             <option selected disabled> -- Choose -- </option>
-                                            <option value="Team Leader">Team Leader</option>
-                                            <option value="Team Member">Team Member</option>
                                         </select>
                                         <div class="invalid-feedback d-none" role="alert" id="alert-employee-position"></div>
                                     </div>
@@ -96,6 +94,30 @@
                     console.log(error.responseJSON.message);
                     $('#employee-subdept').empty();
                 }
+            });
+
+            // if subdept value has change
+            $('#employee-subdept').change(function(){
+                let subdept_id = $('#employee-subdept').val();
+                $.ajax({
+                    url: "{{ route('dept.employees.positions') }}",
+                    type: 'get',
+                    cache: false,
+                    data: {
+                        'id': subdept_id
+                    }, 
+                    success:function(response){
+                        $('#employee-position').empty();
+                        $('#employee-position').append('<option disabled selected> -- Choose -- </option>');
+                        console.log(response.includes('Team Leader'));
+                        if (response.includes('Team Leader')) {
+                            $('#employee-position').append('<option value="Team Member">Team Member</option>');
+                        } else {
+                            $('#employee-position').append('<option value="Team Leader">Team Leader</option>');
+                            $('#employee-position').append('<option value="Team Member">Team Member</option>');
+                        }
+                    }
+                });
             });
 
             // preview image

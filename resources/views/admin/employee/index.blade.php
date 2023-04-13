@@ -50,7 +50,9 @@
                                 <div class="col-xl-6 col-lg-6">
                                     <div class="form-group">
                                         <label for="manager-department" class="form-label">Department</label>
-                                        <select id="manager-department" name="department_id" class="form-control form-select2"></select>
+                                        <select id="manager-department" name="department_id" class="form-control form-select2">
+                                            <option disabled selected> -- Choose -- </option>
+                                        </select>
                                         <div class="invalid-feedback d-none" role="alert" id="alert-manager-department"></div>
                                     </div>
                                 </div>
@@ -78,8 +80,7 @@
                 type: "get",
                 cache: false,
                 success:function(response){
-                    $('#manager-department').empty();
-                    $('#manager-department').append('<option disabled selected> -- Choose -- </option>');
+                    console.log(response);
                     $.each(response, function(code, dept){
                         $('#manager-department').append(`<option value="${dept.id}">${dept.name}</option>`);
                     });
@@ -88,12 +89,6 @@
                     console.log(error.responseJSON.message);
                 }
             });
-
-            // when dept change
-            // $('#manager-department').change(function(){
-            //     $('#manager-position').val('');
-            //     $('#manager-position').val('Head of ' + $('#manager-department').find('option:selected').text());
-            // });
 
             // preview image
             $('#manager-image').change(function(){

@@ -41,6 +41,8 @@ Route::get('/logout', [LoginController::class, 'logout'])->name('logout');
 
 Route::group(['middleware' => ['auth']], function () {
     Route::get('/notification/{ticket}', [TicketController::class, 'statusUpdate'])->name('notification');
+    Route::get('/account-profile', [EmployeeController::class, 'accountProfile'])->name('accountProfile');
+    Route::patch('/account-profile/{nik}', [EmployeeController::class, 'updateProfile'])->name('profile.update');
 
     Route::group(['middleware' => ['role:Admin']], function () {
         Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');

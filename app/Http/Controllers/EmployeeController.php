@@ -5,13 +5,15 @@ namespace App\Http\Controllers;
 use App\Mail\MailUserRequest;
 use App\Models\Department;
 use App\Models\Employee;
-use App\Models\Position;
 use App\Models\SubDepartment;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Symfony\Contracts\Service\Attribute\Required;
 use Yajra\DataTables\Facades\DataTables;
 
 class EmployeeController extends Controller
@@ -49,7 +51,7 @@ class EmployeeController extends Controller
     public function getDepts()
     {
         // get all dept
-        $depts = Department::all();
+        $depts = Department::doesntHave('employees')->get();
 
         // return response
         return response()->json($depts);
@@ -67,7 +69,7 @@ class EmployeeController extends Controller
     public function getPositions(Request $request)
     {
         // gel all position based on sub department
-        $positions = Position::where('sub_department_id', $request->id)->get();
+        $positions = Employee::select('position')->where('sub_department_id', $request->id)->groupBy('position')->pluck('position');
 
         // return response
         return response()->json($positions);
@@ -561,6 +563,113 @@ class EmployeeController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'User account request has been sended'
+        ]);
+    }
+
+    public function accountProfile()
+    {
+        // get employee
+        $employee = Employee::where('id', Auth::user()->employee_id)->first();
+
+        return view('layouts.account-profile', [
+            'title'    => 'Account profile - Helpdesk Ticketing System',
+            'name'     => Auth::user()->employee->name,
+            'employee' => $employee
+        ]);
+    }
+
+    public function updateProfile(Request $request, $nik)
+    {
+        // get employee
+        $employee = Employee::where('nik', $nik)->first();
+
+        // set validation
+        if ($request->oldpassword || $request->password || $request->password_confirmation) {
+            $validator = Validator::make($request->all(), [
+                'image'                 => 'sometimes|image|mimes:jpeg,png,jpg|max:1024',
+                'name'                  => 'required',
+                'oldpassword'           => 'required',
+                'password'              => 'required|confirmed',
+                'password_confirmation' => 'required'
+            ], [
+                'oldpassword.required'  => 'The old password field is required'
+            ]);
+        } else {
+            $validator = Validator::make($request->all(), [
+                'image'                 => 'sometimes|image|mimes:jpeg,png,jpg|max:1024',
+                'name'                  => 'required',
+                'oldpassword'           => 'sometimes',
+                'password'              => 'sometimes|confirmed',
+                'password_confirmation' => 'sometimes'
+            ]);
+        }
+
+        // check validation
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 422);
+        }
+
+        // check if there's file
+        if ($request->hasFile('image')) {
+            // check if employee not use default image
+            if ($employee->image != "avtar_1.png") {
+                // delete old image
+                Storage::delete('public/uploads/photo-profile/' . $employee->image);
+            }
+
+            // get ext file
+            $image_ext = $request->image->getClientOriginalExtension();
+
+            // set new name
+            $image_name = "$request->nik-$request->name.$image_ext";
+
+            // save to app storage
+            $request->image->storeAs('public/uploads/photo-profile', $image_name);
+        } else {
+            // check if employee not use default image
+            if ($employee->image != "avtar_1.png") {
+                // get ext file
+                $image_ext = explode(".", $employee->image, 2);
+                $image_ext = end($image_ext);
+
+                // set name image
+                $image_name = "$employee->nik-$request->name.$image_ext";
+
+                // Rename image on app storage
+                Storage::move('public/uploads/photo-profile/' . $employee->image, 'public/uploads/photo-profile/' . $image_name);
+            }
+            // use old image
+            $image_name = $employee->image;
+        }
+
+        if ($request->oldpassword) {
+            // check password
+            if (Hash::check($request->oldpassword, Auth::user()->password)) {
+                $employee->image          = $image_name;
+                $employee->name           = $request->name;
+                $employee->user->password = Hash::make($request->password);
+                $employee->push();
+
+                $success = true;
+                $message = 'Your profile has been updated';
+            } else {
+                $success = false;
+                $message = 'Your old password is wrong';
+            }
+        } else {
+            $employee->image          = $image_name;
+            $employee->name           = $request->name;
+            $employee->push();
+
+            $success = true;
+            $message = 'Your profile has been updated';
+        }
+
+
+        return response()->json([
+            'success' => $success,
+            'message' => $message,
+            'data'    => $employee
         ]);
     }
 }
