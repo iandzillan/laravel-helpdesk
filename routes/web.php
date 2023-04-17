@@ -13,6 +13,9 @@ use App\Http\Controllers\SubDepartmentController;
 use App\Http\Controllers\TicketController;
 use App\Http\Controllers\UrgencyController;
 use App\Http\Controllers\UserController;
+use App\Models\Tracking;
+use Carbon\Carbon;
+use Carbon\CarbonInterval;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -257,4 +260,15 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/technician/closed-tickets', [TicketController::class, 'closed'])->name('technician.tickets.closed');
         Route::get('/technician/closed-tickets/{ticket}', [TicketController::class, 'show'])->name('technician.tickets.closed.show');
     });
+});
+
+Route::get('testing', function () {
+    $latest_tracking = Tracking::where('ticket_id', 11)->latest()->first();
+    $latest_tracking = Carbon::parse($latest_tracking->created_at);
+    $update          = Carbon::now('Asia/Jakarta');
+    $duration        = $latest_tracking->diffInMinutes($update);
+
+    echo $latest_tracking . '<hr>';
+    echo $update . '<hr>';
+    echo $duration . '<hr>';
 });

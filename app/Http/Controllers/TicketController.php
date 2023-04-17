@@ -12,6 +12,7 @@ use App\Models\Urgency;
 use App\Models\User;
 use App\Notifications\StatusUpdateNotification;
 use Carbon\Carbon;
+use Carbon\CarbonInterval;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -625,7 +626,9 @@ class TicketController extends Controller
 
             case 'Technician':
                 // get all on work tickets
-                $tickets = Ticket::join('urgencies', 'urgencies.id', '=', 'tickets.urgency_id')->where('tickets.technician_id', Auth::user()->id)->where('tickets.status', 4)->orderBy('urgencies.hours', 'asc')->get();
+                $tickets = Ticket::whereHas('urgency', function ($q) {
+                    $q->orderBy('hours', 'asc');
+                })->where('tickets.technician_id', Auth::user()->id)->where('tickets.status', 4)->get();
 
                 // define view
                 $view = 'technician.ticket.onwork';
@@ -1153,11 +1156,35 @@ class TicketController extends Controller
 
         // get ticket
         $ticket = Ticket::where('ticket_number', $ticket)->first();
+
+        // get urgency
+        $urgency = Urgency::where('id', $request->urgency_id)->first();
+
+        // count expected resolve time
+        $jam_masuk        = Carbon::createFromTime(0, 30)->toTimeString();
+        $jam_pulang       = Carbon::createFromTime(8, 30)->toTimeString();
+        $time_second      = $urgency->hours * 3600;
+        $expected_resolve = Carbon::now()->addSecond($time_second);
+        $step             = $expected_resolve->copy();
+        if ($step->between($jam_masuk, $jam_pulang) && $step->isWeekday()) {
+            $expected_finish_at = $step;
+        } else {
+            $sub  = Carbon::now()->diffInSeconds($jam_pulang);
+            $next = Carbon::create('tomorrow')->setHour(0)->setMinute(30);
+            if ($next->isWeekend()) {
+                $expected_finish_at = $next->copy()->addDay(2)->addSecond($time_second)->subSecond($sub);
+            } else {
+                $expected_finish_at = $next->copy()->addSecond($time_second)->subSecond($sub);
+            }
+        }
+
         // update ticket
-        $ticket->status        = 4;
-        $ticket->urgency_id    = $request->urgency_id;
-        $ticket->technician_id = $user->id;
-        $ticket->progress_at   = Carbon::now();
+        $ticket->status               = 4;
+        $ticket->urgency_id           = $request->urgency_id;
+        $ticket->technician_id        = $user->id;
+        $ticket->progress_at          = Carbon::now();
+        $ticket->expected_finish_at   = $expected_finish_at;
+        // $ticket->expected_finish_at   = Carbon::now()->addHour($urgency->hours);
         $ticket->save();
 
         // get technician
@@ -1192,6 +1219,7 @@ class TicketController extends Controller
             'progress' => 'required',
             'note'     => 'required'
         ]);
+
         // check if validation fails
         if ($validator->fails()) {
             // return error response
@@ -1200,11 +1228,25 @@ class TicketController extends Controller
 
         // get ticket
         $ticket = Ticket::where('ticket_number', $ticket)->first();
+
+        // get latest tracking
+        $latest_tracking = Tracking::where('ticket_id', $ticket->id)->latest()->first();
+
+        // count duration
+        $jam_masuk        = Carbon::createFromTime(0, 30)->toTimeString();
+        $jam_pulang       = Carbon::createFromTime(8, 30)->toTimeString();
+        $latest_tracking  = Carbon::parse($latest_tracking->created_at);
+        $update           = Carbon::now('Asia/Jakarta');
+        $duration         = $latest_tracking->diffFiltered(CarbonInterval::minute(), function (Carbon $date) use ($jam_masuk, $jam_pulang) {
+            return $date->between($jam_masuk, $jam_pulang);
+        }, $update);
+
         // check if progress == 100
         if ($request->progress == 100) {
-            $ticket->status   = 6;
-            $ticket->progress = $request->progress;
-            $status_tracking  = 'Ticket Closed';
+            $ticket->status    = 6;
+            $ticket->finish_at = Carbon::now();
+            $ticket->progress  = $request->progress;
+            $status_tracking   = 'Ticket Closed';
         } else {
             $ticket->progress = $request->progress;
             $status_tracking  = 'On work';
@@ -1213,9 +1255,10 @@ class TicketController extends Controller
         $ticket->save();
 
         // update tracking
-        $tracking         = new Tracking;
-        $tracking->status = $status_tracking;
-        $tracking->note   = $request->note;
+        $tracking           = new Tracking;
+        $tracking->status   = $status_tracking;
+        $tracking->note     = $request->note;
+        $tracking->duration = $duration;
         $ticket->trackings()->save($tracking);
 
         // return response
@@ -1239,19 +1282,17 @@ class TicketController extends Controller
             return response()->json($validator->errors(), 422);
         }
 
+        // count duration
+
+
         // get the ticket
         $ticket         = Ticket::where('ticket_number', $ticket)->first();
         $ticket->status = 5;
         $ticket->save();
 
-        // get technician
-        $technician = Employee::whereHas('user', function ($q) use ($ticket) {
-            $q->where('id', $ticket->technician_id);
-        })->first();
-
         // update tracking
         $tracking         = new Tracking;
-        $tracking->status = 'Ticket postponed by ' . $technician->name;
+        $tracking->status = 'Ticket Postponed';
         $tracking->note   = $request->note;
         $ticket->trackings()->save($tracking);
 
@@ -1278,7 +1319,7 @@ class TicketController extends Controller
 
         // update tracking
         $tracking         = new Tracking;
-        $tracking->status = 'Ticket continued';
+        $tracking->status = 'Ticket Continued';
         $tracking->note   = 'Ticket continued by ' . $technician->name;
         $ticket->trackings()->save($tracking);
 

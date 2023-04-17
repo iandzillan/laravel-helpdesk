@@ -51,12 +51,12 @@ class Ticket extends Model
 
     public function getCreatedAtAttribute()
     {
-        return Carbon::parse($this->attributes['created_at'])->tz('Asia/Jakarta')->format('Y-m-d H:i:s');
+        return Carbon::parse($this->attributes['created_at'])->tz('Asia/Jakarta')->isoFormat('Y-MM-DD HH:mm:ss');
     }
 
     public function getUpdatedAtAttribute()
     {
-        return Carbon::parse($this->attributes['updated_at'])->tz('Asia/Jakarta')->format('Y-m-d H:i:s');
+        return Carbon::parse($this->attributes['updated_at'])->tz('Asia/Jakarta')->isoFormat('Y-MM-DD HH:mm:ss');
     }
 
     public function getProgressAtAttribute()
@@ -64,7 +64,25 @@ class Ticket extends Model
         if ($this->attributes['progress_at'] == null) {
             return "--";
         } else {
-            return Carbon::parse($this->attributes['progress_at'])->tz('Asia/Jakarta')->format('Y-m-d H:i:s');
+            return Carbon::parse($this->attributes['progress_at'])->tz('Asia/Jakarta')->isoFormat('Y-MM-DD HH:mm:ss');
+        }
+    }
+
+    public function getExpectedFinishAtAttribute()
+    {
+        if ($this->attributes['expected_finish_at'] == null) {
+            return "--";
+        } else {
+            return Carbon::parse($this->attributes['expected_finish_at'])->tz('Asia/Jakarta')->isoFormat('Y-MM-DD HH:mm:ss');
+        }
+    }
+
+    public function getFinishAtAttribute()
+    {
+        if ($this->attributes['finish_at'] == null) {
+            return "--";
+        } else {
+            return Carbon::parse($this->attributes['finish_at'])->tz('Asia/Jakarta')->isoFormat('Y-MM-DD HH:mm:ss');
         }
     }
 

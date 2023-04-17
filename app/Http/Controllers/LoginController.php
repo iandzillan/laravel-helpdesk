@@ -48,7 +48,7 @@ class LoginController extends Controller
 
 
         // check username & password
-        if (Auth::attempt($request->only('username', 'password'))) {
+        if (Auth::attempt($request->only('username', 'password'), true, false)) {
             switch (Auth::user()->role) {
                 case 'Admin':
                     if (session()->has('url.intended')) {

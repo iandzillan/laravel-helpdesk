@@ -159,6 +159,18 @@
                                             @endif
                                         </div>
                                     </div>
+                                    <hr>
+
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <h5 class="card-title">Expected Solve at</h5>
+                                            <p class="card-text">{{ $ticket->expected_finish_at }}</p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <h5 class="card-title">Solved at</h5>
+                                            <p class="card-text">{{ $ticket->finish_at }}</p>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
