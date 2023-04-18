@@ -179,6 +179,7 @@
                                         <div class="col-md-6">
                                             <h5 class="card-title">Solved at</h5>
                                             <p class="card-text">{{ $ticket->finish_at }}</p>
+                                            <p class="card-text">Duration: {{ $duration }}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -459,7 +460,7 @@
                 //  ajax pending
                 $.ajax({
                     url: url,
-                    type: 'patch',
+                    type: 'put',
                     cache: false,
                     data: {
                         'note': note,
@@ -536,7 +537,7 @@
                         // ajax continued
                         $.ajax({
                             url: url,
-                            type: 'patch',
+                            type: 'put',
                             cache: false,
                             data: {
                                 '_token': token

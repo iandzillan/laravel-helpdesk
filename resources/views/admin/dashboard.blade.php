@@ -266,7 +266,7 @@
                                         <tr>
                                             <td>{{$loop->iteration}}</td>
                                             <td>
-                                                <a href="{{ route('subdept.entry.tickets.show', $unassigned->ticket_number) }}">
+                                                <a href="{{ route('admin.entry.tickets.show', $unassigned->ticket_number) }}">
                                                     {{$unassigned->ticket_number}}
                                                 </a>
                                             </td>

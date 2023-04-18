@@ -283,41 +283,58 @@ class TicketController extends Controller
         switch ($role) {
             case 'Admin':
                 // define view
-                $view = 'admin.ticket.show-ticket';
+                $view     = 'admin.ticket.show-ticket';
                 // get ticket
-                $ticket = Ticket::where('ticket_number', $ticket)->first();
+                $ticket   = Ticket::where('ticket_number', $ticket)->first();
+                // get sum(duration)
+                $sum      = Tracking::where('ticket_id', $ticket->id)->sum('duration');
+                $duration = CarbonInterval::second($sum)->cascade();
                 break;
 
             case 'Approver1':
                 // define view
-                $view = 'approver1.ticket.show-ticket';
+                $view     = 'approver1.ticket.show-ticket';
                 // get ticket
-                $ticket = Ticket::with('user', 'user.employee')->whereHas('user.employee', function ($q) {
+                $ticket   = Ticket::with('user', 'user.employee')->whereHas('user.employee', function ($q) {
                     $q->where('department_id', Auth::user()->employee->department_id);
                 })->where('ticket_number', $ticket)->first();
+                // get sum(duration)
+                $sum      = Tracking::where('ticket_id', $ticket->id)->sum('duration');
+                $duration = CarbonInterval::second($sum)->cascade();
                 break;
 
             case 'Approver2':
                 // define view
-                $view = 'approver2.ticket.show-ticket';
+                $view     = 'approver2.ticket.show-ticket';
                 // get ticket
-                $ticket = Ticket::with('user', 'user.employee')->whereHas('user.employee', function ($q) {
+                $ticket   = Ticket::with('user', 'user.employee')->whereHas('user.employee', function ($q) {
                     $q->where('sub_department_id', Auth::user()->employee->sub_department_id);
                 })->where('ticket_number', $ticket)->first();
+                // get sum(duration)
+                $sum      = Tracking::where('ticket_id', $ticket->id)->sum('duration');
+                $duration = CarbonInterval::second($sum)->cascade();
                 break;
 
             case 'User':
                 // define view
-                $view = 'user.ticket.show-ticket';
-                $ticket = Ticket::whereHas('user', function ($q) {
+                $view     = 'user.ticket.show-ticket';
+                // get ticket
+                $ticket   = Ticket::whereHas('user', function ($q) {
                     $q->where('user_id', Auth::user()->id);
                 })->where('ticket_number', $ticket)->first();
+                // get sum(duration)
+                $sum      = Tracking::where('ticket_id', $ticket->id)->sum('duration');
+                $duration = CarbonInterval::second($sum)->cascade();
                 break;
 
             case 'Technician':
                 // define view
-                $view = 'technician.ticket.show-ticket';
-                $ticket = Ticket::where('technician_id', Auth::user()->id)->where('ticket_number', $ticket)->first();
+                $view     = 'technician.ticket.show-ticket';
+                // get ticket
+                $ticket   = Ticket::where('technician_id', Auth::user()->id)->where('ticket_number', $ticket)->first();
+                // get sum(duration)
+                $sum      = Tracking::where('ticket_id', $ticket->id)->sum('duration');
+                $duration = CarbonInterval::second($sum)->cascade();
                 break;
 
             default:
@@ -330,7 +347,8 @@ class TicketController extends Controller
             'title'     => "$ticket->ticket_number - Helpdesk Ticketing System",
             'name'      => Auth::user()->employee->name,
             'ticket'    => $ticket,
-            'trackings' => $ticket->trackings
+            'trackings' => $ticket->trackings,
+            'duration'  => $duration->forHumans()
         ]);
     }
 
@@ -1161,20 +1179,20 @@ class TicketController extends Controller
         $urgency = Urgency::where('id', $request->urgency_id)->first();
 
         // count expected resolve time
-        $jam_masuk        = Carbon::createFromTime(0, 30)->toTimeString();
-        $jam_pulang       = Carbon::createFromTime(8, 30)->toTimeString();
-        $time_second      = $urgency->hours * 3600;
-        $expected_resolve = Carbon::now()->addSecond($time_second);
-        $step             = $expected_resolve->copy();
-        if ($step->between($jam_masuk, $jam_pulang) && $step->isWeekday()) {
-            $expected_finish_at = $step;
+        $start_work  = Carbon::createFromTime(0, 30);
+        $end_work    = Carbon::createFromTime(9, 30);
+        $time_second = $urgency->hours * 3600;
+        $progress_at = Carbon::now();
+        $expected    = $progress_at->addSecond($time_second);
+        if ($expected->between($start_work, $end_work) && !$expected->isWeekend()) {
+            $resolution = $expected;
         } else {
-            $sub  = Carbon::now()->diffInSeconds($jam_pulang);
-            $next = Carbon::create('tomorrow')->setHour(0)->setMinute(30);
-            if ($next->isWeekend()) {
-                $expected_finish_at = $next->copy()->addDay(2)->addSecond($time_second)->subSecond($sub);
+            $diff = $end_work->diffInSeconds($expected);
+            $tomorrow = $progress_at->copy()->addDay(1)->setHour(0)->setMinute(30);
+            if ($tomorrow->isWeekend()) {
+                $resolution = $progress_at->copy()->addDay(3)->setHour(0)->setMinute(30)->addSecond($diff);
             } else {
-                $expected_finish_at = $next->copy()->addSecond($time_second)->subSecond($sub);
+                $resolution = $progress_at->copy()->addDay(1)->setHour(0)->setMinute(30)->addSecond($diff);
             }
         }
 
@@ -1183,8 +1201,7 @@ class TicketController extends Controller
         $ticket->urgency_id           = $request->urgency_id;
         $ticket->technician_id        = $user->id;
         $ticket->progress_at          = Carbon::now();
-        $ticket->expected_finish_at   = $expected_finish_at;
-        // $ticket->expected_finish_at   = Carbon::now()->addHour($urgency->hours);
+        $ticket->expected_finish_at   = $resolution;
         $ticket->save();
 
         // get technician
@@ -1233,13 +1250,29 @@ class TicketController extends Controller
         $latest_tracking = Tracking::where('ticket_id', $ticket->id)->latest()->first();
 
         // count duration
-        $jam_masuk        = Carbon::createFromTime(0, 30)->toTimeString();
-        $jam_pulang       = Carbon::createFromTime(8, 30)->toTimeString();
-        $latest_tracking  = Carbon::parse($latest_tracking->created_at);
-        $update           = Carbon::now('Asia/Jakarta');
-        $duration         = $latest_tracking->diffFiltered(CarbonInterval::minute(), function (Carbon $date) use ($jam_masuk, $jam_pulang) {
-            return $date->between($jam_masuk, $jam_pulang);
-        }, $update);
+        $start_work = Carbon::createFromTime(7, 30);
+        $end_work   = Carbon::createFromTime(16, 30);
+        $latest     = Carbon::parse($latest_tracking->created_at)->isoFormat('YYYY-MM-DD HH:mm:ss');
+        $update     = Carbon::now('Asia/Jakarta');
+
+        if ($update->between($start_work, $end_work)) {
+            $yesterday = $update->copy()->subDays(1);
+            if (!$yesterday->isWeekend()) {
+                $diff     = $update->diffInDays($latest);
+                $off_time = $diff * 15 * 3600;
+                $duration = $update->diffInSeconds($latest);
+                $result   = $duration - $off_time;
+            } else {
+                $diff     = $update->diffInDaysFiltered(function (Carbon $date) {
+                    return !$date->isWeekend();
+                }, $latest);
+                $off_time = (($diff - 1) * 15 + 48) * 3600;
+                $duration = $update->diffInSeconds($latest);
+                $result   = $duration - $off_time;
+            }
+        } else {
+            $result = $update->diffInSeconds($latest);
+        }
 
         // check if progress == 100
         if ($request->progress == 100) {
@@ -1258,7 +1291,7 @@ class TicketController extends Controller
         $tracking           = new Tracking;
         $tracking->status   = $status_tracking;
         $tracking->note     = $request->note;
-        $tracking->duration = $duration;
+        $tracking->duration = $result;
         $ticket->trackings()->save($tracking);
 
         // return response
