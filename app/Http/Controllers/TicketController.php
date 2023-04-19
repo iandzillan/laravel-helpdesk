@@ -287,8 +287,8 @@ class TicketController extends Controller
                 // get ticket
                 $ticket   = Ticket::where('ticket_number', $ticket)->first();
                 // get sum(duration)
-                $sum      = Tracking::where('ticket_id', $ticket->id)->sum('duration');
-                $duration = CarbonInterval::second($sum)->cascade();
+                $sum      = Tracking::where('ticket_id', $ticket->id)->where('status', '!=', 'Ticket Continued')->sum('duration');
+                $duration = gmdate('H:i:s', $sum);
                 break;
 
             case 'Approver1':
@@ -299,8 +299,8 @@ class TicketController extends Controller
                     $q->where('department_id', Auth::user()->employee->department_id);
                 })->where('ticket_number', $ticket)->first();
                 // get sum(duration)
-                $sum      = Tracking::where('ticket_id', $ticket->id)->sum('duration');
-                $duration = CarbonInterval::second($sum)->cascade();
+                $sum      = Tracking::where('ticket_id', $ticket->id)->where('status', '!=', 'Ticket Continued')->sum('duration');
+                $duration = gmdate('H:i:s', $sum);
                 break;
 
             case 'Approver2':
@@ -311,8 +311,8 @@ class TicketController extends Controller
                     $q->where('sub_department_id', Auth::user()->employee->sub_department_id);
                 })->where('ticket_number', $ticket)->first();
                 // get sum(duration)
-                $sum      = Tracking::where('ticket_id', $ticket->id)->sum('duration');
-                $duration = CarbonInterval::second($sum)->cascade();
+                $sum      = Tracking::where('ticket_id', $ticket->id)->where('status', '!=', 'Ticket Continued')->sum('duration');
+                $duration = gmdate('H:i:s', $sum);
                 break;
 
             case 'User':
@@ -323,8 +323,8 @@ class TicketController extends Controller
                     $q->where('user_id', Auth::user()->id);
                 })->where('ticket_number', $ticket)->first();
                 // get sum(duration)
-                $sum      = Tracking::where('ticket_id', $ticket->id)->sum('duration');
-                $duration = CarbonInterval::second($sum)->cascade();
+                $sum      = Tracking::where('ticket_id', $ticket->id)->where('status', '!=', 'Ticket Continued')->sum('duration');
+                $duration = gmdate('H:i:s', $sum);
                 break;
 
             case 'Technician':
@@ -333,8 +333,8 @@ class TicketController extends Controller
                 // get ticket
                 $ticket   = Ticket::where('technician_id', Auth::user()->id)->where('ticket_number', $ticket)->first();
                 // get sum(duration)
-                $sum      = Tracking::where('ticket_id', $ticket->id)->sum('duration');
-                $duration = CarbonInterval::second($sum)->cascade();
+                $sum      = Tracking::where('ticket_id', $ticket->id)->where('status', '!=', 'Ticket Continued')->sum('duration');
+                $duration = gmdate('H:i:s', $sum);
                 break;
 
             default:
@@ -348,7 +348,7 @@ class TicketController extends Controller
             'name'      => Auth::user()->employee->name,
             'ticket'    => $ticket,
             'trackings' => $ticket->trackings,
-            'duration'  => $duration->forHumans()
+            'duration'  => $duration
         ]);
     }
 
@@ -1179,29 +1179,16 @@ class TicketController extends Controller
         $urgency = Urgency::where('id', $request->urgency_id)->first();
 
         // count expected resolve time
-        $start_work  = Carbon::createFromTime(0, 30);
-        $end_work    = Carbon::createFromTime(9, 30);
         $time_second = $urgency->hours * 3600;
         $progress_at = Carbon::now();
         $expected    = $progress_at->addSecond($time_second);
-        if ($expected->between($start_work, $end_work) && !$expected->isWeekend()) {
-            $resolution = $expected;
-        } else {
-            $diff = $end_work->diffInSeconds($expected);
-            $tomorrow = $progress_at->copy()->addDay(1)->setHour(0)->setMinute(30);
-            if ($tomorrow->isWeekend()) {
-                $resolution = $progress_at->copy()->addDay(3)->setHour(0)->setMinute(30)->addSecond($diff);
-            } else {
-                $resolution = $progress_at->copy()->addDay(1)->setHour(0)->setMinute(30)->addSecond($diff);
-            }
-        }
 
         // update ticket
         $ticket->status               = 4;
         $ticket->urgency_id           = $request->urgency_id;
         $ticket->technician_id        = $user->id;
         $ticket->progress_at          = Carbon::now();
-        $ticket->expected_finish_at   = $resolution;
+        $ticket->expected_finish_at   = $expected;
         $ticket->save();
 
         // get technician
@@ -1246,43 +1233,42 @@ class TicketController extends Controller
         // get ticket
         $ticket = Ticket::where('ticket_number', $ticket)->first();
 
-        // get latest tracking
-        $latest_tracking = Tracking::where('ticket_id', $ticket->id)->latest()->first();
+        // get SLA time
+        $sla_timer = $ticket->urgency->hours * 3600;
 
-        // count duration
-        $start_work = Carbon::createFromTime(7, 30);
-        $end_work   = Carbon::createFromTime(16, 30);
-        $latest     = Carbon::parse($latest_tracking->created_at)->isoFormat('YYYY-MM-DD HH:mm:ss');
-        $update     = Carbon::now('Asia/Jakarta');
+        // get last tracking time
+        $last_track = Tracking::where('ticket_id', $ticket->id)->latest()->first();
 
-        if ($update->between($start_work, $end_work)) {
-            $yesterday = $update->copy()->subDays(1);
-            if (!$yesterday->isWeekend()) {
-                $diff     = $update->diffInDays($latest);
-                $off_time = $diff * 15 * 3600;
-                $duration = $update->diffInSeconds($latest);
-                $result   = $duration - $off_time;
-            } else {
-                $diff     = $update->diffInDaysFiltered(function (Carbon $date) {
-                    return !$date->isWeekend();
-                }, $latest);
-                $off_time = (($diff - 1) * 15 + 48) * 3600;
-                $duration = $update->diffInSeconds($latest);
-                $result   = $duration - $off_time;
-            }
-        } else {
-            $result = $update->diffInSeconds($latest);
-        }
+        // count duration in second
+        $duration = Carbon::now('Asia/Jakarta')->diffInSeconds($last_track->created_at);
+
+        // count resolve duration
+        $sum_resolve        = Tracking::where('ticket_id', $ticket->id)->where('status', '!=', 'Ticket Continued')->sum('duration');
+        $sum_resolve        = $sum_resolve + $duration;
+        $sum_resolve_humans = CarbonInterval::second($sum_resolve)->cascade();
+
+        // count pending duration
+        $sum_pending        = Tracking::where('ticket_id', $ticket->id)->where('status', 'Ticket Continued')->sum('duration');
+        $sum_pending_humans = CarbonInterval::second($sum_pending)->cascade();
 
         // check if progress == 100
         if ($request->progress == 100) {
-            $ticket->status    = 6;
-            $ticket->finish_at = Carbon::now();
-            $ticket->progress  = $request->progress;
-            $status_tracking   = 'Ticket Closed';
+            if ($sum_resolve < $sla_timer) {
+                $isUnderSla = 1;
+            } else {
+                $isUnderSla = 0;
+            }
+
+            $ticket->status     = 6;
+            $ticket->finish_at  = Carbon::now();
+            $ticket->isUnderSla = $isUnderSla;
+            $ticket->progress   = $request->progress;
+            $status_tracking    = 'Ticket Closed.';
+            $note               = 'Resolve duration: ' . $sum_resolve_humans->forHumans() . '. Pending duration: ' . $sum_pending_humans->forHumans() . '.';
         } else {
             $ticket->progress = $request->progress;
             $status_tracking  = 'On work';
+            $note             = $request->note;
         }
         // update ticket
         $ticket->save();
@@ -1290,8 +1276,8 @@ class TicketController extends Controller
         // update tracking
         $tracking           = new Tracking;
         $tracking->status   = $status_tracking;
-        $tracking->note     = $request->note;
-        $tracking->duration = $result;
+        $tracking->note     = $note;
+        $tracking->duration = $duration;
         $ticket->trackings()->save($tracking);
 
         // return response
@@ -1315,18 +1301,15 @@ class TicketController extends Controller
             return response()->json($validator->errors(), 422);
         }
 
-        // count duration
-
-
         // get the ticket
         $ticket         = Ticket::where('ticket_number', $ticket)->first();
         $ticket->status = 5;
         $ticket->save();
 
         // update tracking
-        $tracking         = new Tracking;
-        $tracking->status = 'Ticket Postponed';
-        $tracking->note   = $request->note;
+        $tracking           = new Tracking;
+        $tracking->status   = 'Ticket Postponed';
+        $tracking->note     = $request->note;
         $ticket->trackings()->save($tracking);
 
         // return response
@@ -1350,10 +1333,18 @@ class TicketController extends Controller
             $q->where('id', $ticket->technician_id);
         })->first();
 
+        // get last tracking time
+        $last_track = Tracking::where('ticket_id', $ticket->id)->latest()->first();
+
+        // count duration in second
+        $duration = Carbon::now('Asia/Jakarta')->diffInSeconds($last_track->created_at);
+        $sum      = CarbonInterval::second($duration)->cascade();
+
         // update tracking
         $tracking         = new Tracking;
         $tracking->status = 'Ticket Continued';
-        $tracking->note   = 'Ticket continued by ' . $technician->name;
+        $tracking->note   = 'Ticket continued. Pending duration: ' . $sum->forHumans();
+        $tracking->duration = $duration;
         $ticket->trackings()->save($tracking);
 
         // return response

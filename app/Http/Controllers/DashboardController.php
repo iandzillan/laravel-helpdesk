@@ -233,6 +233,7 @@ class DashboardController extends Controller
         switch (Auth::user()->role) {
             case 'Admin':
                 $months = Ticket::select(DB::raw('MONTHNAME(created_at) as month'))
+                    ->where(DB::raw('YEAR(created_at)'), date('Y'))
                     ->where(DB::raw('MONTHNAME(created_at)'), date('F'))
                     ->groupBy('month')
                     ->pluck('month');
@@ -240,6 +241,7 @@ class DashboardController extends Controller
                 $tickets = Ticket::join('sub_categories', 'sub_categories.id', '=', 'tickets.sub_category_id')
                     ->join('categories', 'categories.id', '=', 'sub_categories.category_id')
                     ->select(DB::raw('categories.name as name, count(tickets.id) as count'))
+                    ->where(DB::raw('YEAR(tickets.created_at)'), date('Y'))
                     ->where(DB::raw('MONTHNAME(tickets.created_at)'), date('F'))
                     ->groupBy(DB::raw('name, MONTH(tickets.created_at)'))
                     ->get();
@@ -254,6 +256,7 @@ class DashboardController extends Controller
                     ->whereHas('user.employee', function ($q) {
                         $q->where('department_id', Auth::user()->employee->department_id);
                     })
+                    ->where(DB::raw('YEAR(created_at)'), date('Y'))
                     ->where(DB::raw('MONTHNAME(created_at)'), date('F'))
                     ->groupBy('month')
                     ->pluck('month')
@@ -265,6 +268,7 @@ class DashboardController extends Controller
                     ->whereHas('user.employee', function ($q) {
                         $q->where('department_id', Auth::user()->employee->department_id);
                     })
+                    ->where(DB::raw('YEAR(tickets.created_at)'), date('Y'))
                     ->where(DB::raw('MONTHNAME(tickets.created_at)'), date('F'))
                     ->groupBy(DB::raw('categories.name, MONTH(tickets.created_at)'))
                     ->get();
@@ -279,6 +283,7 @@ class DashboardController extends Controller
                     ->whereHas('user.employee', function ($q) {
                         $q->where('sub_department_id', Auth::user()->employee->sub_department_id);
                     })
+                    ->where(DB::raw('YEAR(created_at)'), date('Y'))
                     ->where(DB::raw('MONTHNAME(created_at)'), date('F'))
                     ->groupBy('month')
                     ->pluck('month')
@@ -290,6 +295,7 @@ class DashboardController extends Controller
                     ->whereHas('user.employee', function ($q) {
                         $q->where('sub_department_id', Auth::user()->employee->sub_department_id);
                     })
+                    ->where(DB::raw('YEAR(tickets.created_at)'), date('Y'))
                     ->where(DB::raw('MONTHNAME(tickets.created_at)'), date('F'))
                     ->groupBy(DB::raw('name, MONTH(tickets.created_at)'))
                     ->get();
@@ -481,6 +487,7 @@ class DashboardController extends Controller
             case 'Admin':
                 $tickets = Ticket::join('sub_categories', 'Sub_categories.id', '=', 'tickets.sub_category_id')
                     ->select(Db::raw('count(tickets.id) as count, sub_categories.name as name'))
+                    ->where(DB::raw('YEAR(tickets.created_at)'), date('Y'))
                     ->where(DB::raw('MONTHNAME(tickets.created_at)'), date('F'))
                     ->groupBy(DB::raw('sub_categories.name'))
                     ->get();
@@ -499,6 +506,7 @@ class DashboardController extends Controller
                     ->whereHas('user.employee', function ($q) {
                         $q->where('department_id', Auth::user()->employee->department_id);
                     })
+                    ->where(DB::raw('YEAR(tickets.created_at)'), date('Y'))
                     ->where(DB::raw('MONTHNAME(tickets.created_at)'), date('F'))
                     ->groupBy(DB::raw('sub_categories.name'))
                     ->get();
@@ -517,6 +525,7 @@ class DashboardController extends Controller
                     ->whereHas('user.employee', function ($q) {
                         $q->where('sub_department_id', Auth::user()->employee->sub_department_id);
                     })
+                    ->where(DB::raw('YEAR(tickets.created_at)'), date('Y'))
                     ->where(DB::raw('MONTHNAME(tickets.created_at)'), date('F'))
                     ->groupBy(DB::raw('sub_categories.name'))
                     ->get();
@@ -602,6 +611,61 @@ class DashboardController extends Controller
         return response()->json([
             'name' => $name,
             'data' => $data,
+        ]);
+    }
+
+    public function solvePercentageYear()
+    {
+        // count total ticket
+        $total = Ticket::select(DB::raw('count(id) as count'))
+            ->where(DB::raw('YEAR(created_at)'), date('Y'))
+            ->groupBy('isUnderSla')
+            ->get();
+
+        $sum = [];
+        foreach ($total as $row) {
+            $sum[] = $row->count;
+        }
+
+        return response()->json([
+            'data' => $sum
+        ]);
+    }
+
+    public function solvePercentageMonth()
+    {
+        // count total ticket
+        $total = Ticket::select(DB::raw('count(id) as count'))
+            ->where(DB::raw('YEAR(created_at)'), date('Y'))
+            ->where(DB::raw('MONTHNAME(created_at)'), date('F'))
+            ->groupBy('isUnderSla')
+            ->get();
+
+        $sum = [];
+        foreach ($total as $row) {
+            $sum[] = $row->count;
+        }
+
+        return response()->json([
+            'data' => $sum
+        ]);
+    }
+
+    public function solvePercentageWeek()
+    {
+        // count total ticket
+        $total = Ticket::select(DB::raw('count(id) as count'))
+            ->whereBetween(DB::raw('created_at'), [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])
+            ->groupBy('isUnderSla')
+            ->get();
+
+        $sum = [];
+        foreach ($total as $row) {
+            $sum[] = $row->count;
+        }
+
+        return response()->json([
+            'data' => $sum
         ]);
     }
 }

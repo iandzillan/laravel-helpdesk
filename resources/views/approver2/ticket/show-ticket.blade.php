@@ -284,27 +284,27 @@
                                 url_email     = url_email.replace(':ticket', ticket);
 
                                 // ajax email
-                                $.ajax({
-                                    url: url_email,
-                                    type: 'get',
-                                    cache: false,
-                                    success: function(response1){
-                                        swal.fire({
-                                            icon: 'success',
-                                            title: 'Ticket has been approved',
-                                            text: 'Notification has been sended to Manager',
-                                            showConfirmButton: false,
-                                            timer: 2000
-                                        });
-                                    },
-                                    error: function(error1){
-                                        swal.fire({
-                                            icon: 'warning',
-                                            text: error1.responseJSON.message,
-                                            showConfirmButton: false
-                                        });
-                                    }
-                                });
+                                // $.ajax({
+                                //     url: url_email,
+                                //     type: 'get',
+                                //     cache: false,
+                                //     success: function(response1){
+                                //         swal.fire({
+                                //             icon: 'success',
+                                //             title: 'Ticket has been approved',
+                                //             text: 'Notification has been sended to Manager',
+                                //             showConfirmButton: false,
+                                //             timer: 2000
+                                //         });
+                                //     },
+                                //     error: function(error1){
+                                //         swal.fire({
+                                //             icon: 'warning',
+                                //             text: error1.responseJSON.message,
+                                //             showConfirmButton: false
+                                //         });
+                                //     }
+                                // });
 
                                 // rederict to new entry ticket page
                                 setTimeout(() => {

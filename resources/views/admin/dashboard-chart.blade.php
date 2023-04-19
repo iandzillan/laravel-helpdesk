@@ -205,5 +205,71 @@
                     break;
             }
         })
+
+        // rate percentage chart
+        let donutRateoptions = {
+            series: [],
+            labels: ['Above SLA Time', 'Under SLA Time'],
+            chart: {
+                type: 'donut'
+            },
+            responsive: [{
+                options: {
+                    chart: {
+                        width: 200
+                    }
+                }
+            }],
+            legend: {
+                show: false,
+            },
+            noData: {
+                text: 'No data...'
+            }
+        };
+        let donutRatechart = new ApexCharts(document.querySelector('#success-rate'), donutRateoptions);
+        donutRatechart.render();
+
+        let url8 = "{{ route('admin.solvePercentage.year') }}";
+        $.getJSON(url8, function(response){
+            donutRatechart.updateOptions({
+                series: response.data
+            });
+        });
+
+        $('#filter-percentage').on('change', function(){
+            let value = $('#filter-percentage').val();
+            switch (value) {
+                case 'year':
+                    let url9 = "{{ route('admin.solvePercentage.year') }}";
+                    $.getJSON(url9, function(response){
+                        donutRatechart.updateOptions({
+                            series: response.data
+                        });
+                    });
+                    break;
+                
+                case 'month':
+                    let url10 = "{{ route('admin.solvePercentage.month') }}";
+                    $.getJSON(url10, function(response){
+                        donutRatechart.updateOptions({
+                            series: response.data
+                        });
+                    });
+                    break;
+
+                case 'week':
+                    let url11 = "{{ route('admin.solvePercentage.week') }}";
+                    $.getJSON(url11, function(response){
+                        donutRatechart.updateOptions({
+                            series: response.data
+                        });
+                    });
+                    break;
+            
+                default:
+                    break;
+            }
+        });
     });
 </script>

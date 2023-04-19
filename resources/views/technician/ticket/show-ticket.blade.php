@@ -226,7 +226,7 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Assign Technician</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">Update Progress</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <form id="form-assign">
@@ -245,7 +245,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary" id="update">Assign</button>
+                        <button type="button" class="btn btn-primary" id="update">Update</button>
                     </div>
                 </form>
             </div>
@@ -354,27 +354,27 @@
                             url_email     = url_email.replace(':ticket', ticket);
 
                             // ajax email
-                            $.ajax({
-                                url: url_email,
-                                type: 'get',
-                                cache: false,
-                                success: function(response1){
-                                    swal.fire({
-                                        icon: 'success',
-                                        title: 'Ticket closed',
-                                        text: 'Notification has been sended to the user',
-                                        showConfirmButton: false,
-                                        timer: 2000
-                                    });
-                                },
-                                error: function(error1){
-                                    swal.fire({
-                                        icon: 'warning',
-                                        text: error1.responseJSON.message,
-                                        showConfirmButton: false
-                                    });
-                                }
-                            });
+                            // $.ajax({
+                            //     url: url_email,
+                            //     type: 'get',
+                            //     cache: false,
+                            //     success: function(response1){
+                            //         swal.fire({
+                            //             icon: 'success',
+                            //             title: 'Ticket closed',
+                            //             text: 'Notification has been sended to the user',
+                            //             showConfirmButton: false,
+                            //             timer: 2000
+                            //         });
+                            //     },
+                            //     error: function(error1){
+                            //         swal.fire({
+                            //             icon: 'warning',
+                            //             text: error1.responseJSON.message,
+                            //             showConfirmButton: false
+                            //         });
+                            //     }
+                            // });
                         } else {
                             swal.fire({
                                 icon: 'success',
@@ -393,7 +393,6 @@
                         }, 2000);
                     }, 
                     error:function(error){
-                        console.log(error.responseJSON.message);
                         // show response
                         swal.fire({
                             icon: 'warning',

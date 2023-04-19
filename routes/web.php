@@ -56,6 +56,9 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/admin/dashboard/subcategory-chart-year', [DashboardController::class, 'getSubCategoryYear'])->name('admin.subcategorychart.year');
         Route::get('/admin/dashboard/subcategory-chart-month', [DashboardController::class, 'getSubCategoryMonth'])->name('admin.subcategorychart.month');
         Route::get('/admin/dashboard/subcategory-chart-week', [DashboardController::class, 'getSubCategoryWeek'])->name('admin.subcategorychart.week');
+        Route::get('/admin/dashboard/solve-percentage-year', [DashboardController::class, 'solvePercentageYear'])->name('admin.solvePercentage.year');
+        Route::get('/admin/dashboard/solve-percentage-month', [DashboardController::class, 'solvePercentageMonth'])->name('admin.solvePercentage.month');
+        Route::get('/admin/dashboard/solve-percentage-week', [DashboardController::class, 'solvePercentageWeek'])->name('admin.solvePercentage.week');
 
         Route::get('/admin/categories', [CategoryController::class, 'index'])->name('admin.categories');
         Route::post('/admin/categories', [CategoryController::class, 'store'])->name('admin.categories.store');

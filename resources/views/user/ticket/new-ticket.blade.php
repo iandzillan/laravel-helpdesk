@@ -159,27 +159,27 @@
                         url        = url.replace(':ticket', ticket);
 
                         // ajax email 
-                        $.ajax({
-                            url: url,
-                            type: 'get',
-                            cache: false,
-                            success: function(response1){
-                                swal.fire({
-                                    icon: 'success',
-                                    title: 'Ticket has been created',
-                                    text: 'Notification has been sended to Team Leader',
-                                    showConfirmButton: false,
-                                    timer: 2000
-                                });
-                            },
-                            error: function(error1){
-                                swal.fire({
-                                    icon: 'warning',
-                                    text: error1.responseJSON.message,
-                                    showConfirmButton: false
-                                });
-                            }
-                        });
+                        // $.ajax({
+                        //     url: url,
+                        //     type: 'get',
+                        //     cache: false,
+                        //     success: function(response1){
+                        //         swal.fire({
+                        //             icon: 'success',
+                        //             title: 'Ticket has been created',
+                        //             text: 'Notification has been sended to Team Leader',
+                        //             showConfirmButton: false,
+                        //             timer: 2000
+                        //         });
+                        //     },
+                        //     error: function(error1){
+                        //         swal.fire({
+                        //             icon: 'warning',
+                        //             text: error1.responseJSON.message,
+                        //             showConfirmButton: false
+                        //         });
+                        //     }
+                        // });
 
                         // reload page
                         setTimeout(() => {
