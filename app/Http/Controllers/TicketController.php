@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\TicketExport;
 use App\Models\Category;
 use App\Models\Employee;
 use App\Models\Position;
@@ -18,6 +19,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Validator;
+use Maatwebsite\Excel\Facades\Excel;
 use Yajra\DataTables\Facades\DataTables;
 
 class TicketController extends Controller
@@ -644,9 +646,9 @@ class TicketController extends Controller
 
             case 'Technician':
                 // get all on work tickets
-                $tickets = Ticket::whereHas('urgency', function ($q) {
-                    $q->orderBy('hours', 'asc');
-                })->where('tickets.technician_id', Auth::user()->id)->where('tickets.status', 4)->get();
+                $tickets = Ticket::where('tickets.technician_id', Auth::user()->id)->where('tickets.status', 4)->get()->sortBy(function ($query) {
+                    return $query->urgency->hours;
+                });
 
                 // define view
                 $view = 'technician.ticket.onwork';
@@ -675,8 +677,14 @@ class TicketController extends Controller
                 ->addColumn('name', function ($row) {
                     return $row->user->employee->name;
                 })
+                ->addColumn('technician', function ($row) {
+                    return $row->technician->employee->name;
+                })
                 ->addColumn('sub_category', function ($row) {
                     return $row->subCategory->name;
+                })
+                ->addColumn('urgency', function ($row) {
+                    return $row->urgency->hours . ' Hours';
                 })
                 ->addColumn('status', function ($row) {
                     // get status
@@ -1439,5 +1447,29 @@ class TicketController extends Controller
         }
 
         Notification::route('mail', $reciever)->notify(new StatusUpdateNotification($data_email));
+    }
+
+    public function slaReport(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'from' => 'required',
+            'to'   => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 422);
+        }
+
+        $tickets = Ticket::whereBetween('created_at', [Carbon::parse($request->from), Carbon::parse($request->to)])->get();
+
+        if ($tickets->count() == 0) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No data in this date interval',
+                'data'    => $tickets
+            ]);
+        } else {
+            return Excel::download(new TicketExport($tickets), 'SLA_Report_' . $request->from . '_' . $request->to . '.xlsx');
+        }
     }
 }

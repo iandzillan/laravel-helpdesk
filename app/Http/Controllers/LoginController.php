@@ -31,8 +31,6 @@ class LoginController extends Controller
             }
         }
 
-        dump(session('url.intended'));
-
         return view('login', [
             'title' => 'Login - Helpdesk Ticketing'
         ]);
@@ -98,9 +96,11 @@ class LoginController extends Controller
     public function logout(Request $request)
     {
         Auth::logout();
+
         $request->session()->invalidate();
-        $request->session()->flush();
+
         $request->session()->regenerateToken();
+
         return redirect('/');
     }
 }

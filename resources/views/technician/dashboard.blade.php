@@ -13,8 +13,8 @@
                                     <i class="fa-solid fa-user fa-stack-1x fa-inverse"></i>
                                 </span>
                                 <div class="progress-detail">
-                                <p  class="mb-2">Assigned Tickets</p>
-                                <h4 class="counter">{{ $ticket['onwork']->count() }}</h4>
+                                <p  class="mb-2">Tickets</p>
+                                <h4 class="counter">{{ $ticket['total']->count() }}</h4>
                                 </div>
                             </div>
                         </div>

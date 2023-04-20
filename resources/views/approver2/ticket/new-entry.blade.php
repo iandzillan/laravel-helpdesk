@@ -43,7 +43,7 @@
                     {data: 'DT_RowIndex', name: 'DT_RowIndex'},
                     {data: 'ticket_number', name: 'ticket_number'},
                     {data: 'name', name: 'name'},
-                    {data: 'sub_category', name: 'sub_category'},
+                    {data: 'subject', name: 'subject'},
                     {data: 'created_at', name: 'created_at'},
                     {data: 'updated_at', name: 'updated_at'},
                     {data: 'action', name: 'action', orderable: false, searchable: false},

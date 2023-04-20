@@ -133,6 +133,17 @@
 
     <div class="col-md-12 col-lg-12">
         <div class="row">
+            <div class="col-md-3 mb-4">
+                <button class="btn btn-primary btn-sm" data-aos="fade-up" data-aos-delay="800" id="generate-report">
+                    <i class="fa-solid fa-download"></i>
+                    Generate SLA Report
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-12 col-lg-12">
+        <div class="row">
             <div class="col-md-12">
                 <div class="card" data-aos="fade-up" data-aos-delay="800">
                     <div class="flex-wrap card-header d-flex justify-content-between align-items-center">
@@ -279,6 +290,7 @@
                                     <tr>
                                         <th>#</th>
                                         <th>ticket</th>
+                                        <th>Technician</th>
                                         <th>Progress</th>
                                     </tr>
                                 </thead>
@@ -291,6 +303,7 @@
                                                     {{$onwork->ticket_number}}
                                                 </a>
                                             </td>
+                                            <td>{{ $onwork->Technician->employee->name }}</td>
                                             <td>
                                                 <div class="progress">
                                                     <div class="progress-bar" role="progressbar" style="width: {{ $onwork->progress }}%;" aria-valuenow="{{ $onwork->progress }}" aria-valuemin="0" aria-valuemax="100">{{ $onwork->progress }}%</div>
@@ -307,6 +320,42 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Modal --}}
+    <div class="modal fade" id="modal-report" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Generate SLA Report</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="form-date">
+                    <div class="modal-body">
+                        <div class="row d-flex justify-content-center">
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="from" class="form-label">From</label>
+                                    <input type="date" name="from" id="from" class="form-control">
+                                    <div class="invalid-feedback d-none" role="alert" id="alert-form"></div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="to" class="form-label">To</label>
+                                    <input type="date" name="to" id="to" class="form-control">
+                                    <div class="invalid-feedback d-none" role="alert" id="alert-to"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" id="generate">Generate</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>

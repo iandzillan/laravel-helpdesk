@@ -366,7 +366,7 @@ class DashboardController extends Controller
                         $q->where('department_id', Auth::user()->employee->department_id);
                     })
                     ->whereBetween('tickets.created_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])
-                    ->groupBy(DB::raw('name, MONTH(tickets.created_at)'))
+                    ->groupBy(DB::raw('name, DATE(tickets.created_at)'))
                     ->get();
 
                 $tickets = $tickets->mapToGroups(function ($item, $key) {
@@ -396,7 +396,7 @@ class DashboardController extends Controller
                         $q->where('sub_department_id', Auth::user()->employee->sub_department_id);
                     })
                     ->whereBetween('tickets.created_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])
-                    ->groupBy(DB::raw('name, MONTH(tickets.created_at)'))
+                    ->groupBy(DB::raw('name, DATE(tickets.created_at)'))
                     ->get();
 
                 $tickets = $tickets->mapToGroups(function ($item, $key) {
@@ -619,6 +619,7 @@ class DashboardController extends Controller
         // count total ticket
         $total = Ticket::select(DB::raw('count(id) as count'))
             ->where(DB::raw('YEAR(created_at)'), date('Y'))
+            ->where('status', 6)
             ->groupBy('isUnderSla')
             ->get();
 
@@ -638,6 +639,7 @@ class DashboardController extends Controller
         $total = Ticket::select(DB::raw('count(id) as count'))
             ->where(DB::raw('YEAR(created_at)'), date('Y'))
             ->where(DB::raw('MONTHNAME(created_at)'), date('F'))
+            ->where('status', 6)
             ->groupBy('isUnderSla')
             ->get();
 
@@ -656,6 +658,7 @@ class DashboardController extends Controller
         // count total ticket
         $total = Ticket::select(DB::raw('count(id) as count'))
             ->whereBetween(DB::raw('created_at'), [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])
+            ->where('status', 6)
             ->groupBy('isUnderSla')
             ->get();
 

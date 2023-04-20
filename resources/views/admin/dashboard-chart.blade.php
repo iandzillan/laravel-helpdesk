@@ -1,5 +1,10 @@
 <script>
     $(document).ready(function(){
+        // generate report button action 
+        $('#generate-report').on('click', function(){
+            $('#modal-report').modal('show');
+        });
+
         // Category chart
         let baroptions = {
             series: [], 
@@ -162,9 +167,21 @@
 
         let url4 = "{{ route('admin.subcategorychart.year') }}";
         $.getJSON(url4, function(response){
+            let coloR = [];
+            let dynamicColors = function() {
+                let r = Math.floor(Math.random() * 255);
+                let g = Math.floor(Math.random() * 255);
+                let b = Math.floor(Math.random() * 255);
+                return "rgb(" + r + "," + g + "," + b + ")";
+            };
+            for (let i = 0; i < response.data.length; i++) {
+                coloR.push(dynamicColors());
+            }
+
             donutchart.updateOptions({
                 series: response.data,
-                labels: response.name
+                labels: response.name,
+                colors: coloR
             });
         });
 
@@ -174,9 +191,21 @@
                 case 'year':
                     let url5 = "{{ route('admin.subcategorychart.year') }}";
                     $.getJSON(url5, function(response){
+                        let coloR = [];
+                        let dynamicColors = function() {
+                            let r = Math.floor(Math.random() * 255);
+                            let g = Math.floor(Math.random() * 255);
+                            let b = Math.floor(Math.random() * 255);
+                            return "rgb(" + r + "," + g + "," + b + ")";
+                        };
+                        for (let i = 0; i < response.data.length; i++) {
+                            coloR.push(dynamicColors());
+                        }
+
                         donutchart.updateOptions({
                             series: response.data,
-                            labels: response.name
+                            labels: response.name,
+                            colors: coloR
                         });
                     });
                     break;
@@ -184,9 +213,21 @@
                 case 'month':
                     let url6 = "{{ route('admin.subcategorychart.month') }}";
                     $.getJSON(url6, function(response){
+                        let coloR = [];
+                        let dynamicColors = function() {
+                            let r = Math.floor(Math.random() * 255);
+                            let g = Math.floor(Math.random() * 255);
+                            let b = Math.floor(Math.random() * 255);
+                            return "rgb(" + r + "," + g + "," + b + ")";
+                        };
+                        for (let i = 0; i < response.data.length; i++) {
+                            coloR.push(dynamicColors());
+                        }
+
                         donutchart.updateOptions({
                             series: response.data,
-                            labels: response.name
+                            labels: response.name,
+                            colors: coloR
                         });
                     });
                     break;
@@ -194,9 +235,21 @@
                 case 'week':
                     let url7 = "{{ route('admin.subcategorychart.week') }}";
                     $.getJSON(url7, function(response){
+                        let coloR = [];
+                        let dynamicColors = function() {
+                            let r = Math.floor(Math.random() * 255);
+                            let g = Math.floor(Math.random() * 255);
+                            let b = Math.floor(Math.random() * 255);
+                            return "rgb(" + r + "," + g + "," + b + ")";
+                        };
+                        for (let i = 0; i < response.data.length; i++) {
+                            coloR.push(dynamicColors());
+                        }
+
                         donutchart.updateOptions({
                             series: response.data,
-                            labels: response.name
+                            labels: response.name,
+                            colors: coloR
                         });
                     });
                     break;
@@ -210,8 +263,9 @@
         let donutRateoptions = {
             series: [],
             labels: ['Above SLA Time', 'Under SLA Time'],
+            colors: ['#D4526E', '#33B2DF'],
             chart: {
-                type: 'donut'
+                type: 'donut',
             },
             responsive: [{
                 options: {
