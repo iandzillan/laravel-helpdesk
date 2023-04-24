@@ -125,4 +125,9 @@ class Ticket extends Model
 
         return $status;
     }
+
+    public function getDurationAttribute()
+    {
+        return gmdate('H:i:s', $this->attributes['duration']);
+    }
 }

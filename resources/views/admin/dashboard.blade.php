@@ -332,14 +332,14 @@
                     <h5 class="modal-title" id="exampleModalLabel">Generate SLA Report</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form id="form-date">
+                <form id="form-report">
                     <div class="modal-body">
                         <div class="row d-flex justify-content-center">
                             <div class="col-6">
                                 <div class="form-group">
                                     <label for="from" class="form-label">From</label>
                                     <input type="date" name="from" id="from" class="form-control">
-                                    <div class="invalid-feedback d-none" role="alert" id="alert-form"></div>
+                                    <div class="invalid-feedback d-none" role="alert" id="alert-from"></div>
                                 </div>
                             </div>
                             <div class="col-6">

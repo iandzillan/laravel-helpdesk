@@ -173,6 +173,7 @@
                                         <div class="col-md-6">
                                             <h5 class="card-title">Solved at</h5>
                                             <p class="card-text">{{ $ticket->finish_at }}</p>
+                                            <p class="card-text">{{ $ticket->duration }}</p>
                                         </div>
                                     </div>
                                 </div>

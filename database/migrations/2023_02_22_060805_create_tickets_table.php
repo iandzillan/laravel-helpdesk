@@ -24,6 +24,10 @@ return new class extends Migration
             $table->integer('status');
             $table->integer('progress')->nullable();
             $table->timestamp('progress_at')->nullable();
+            $table->timestamp('expected_finish_at')->nullable();
+            $table->timestamp('finish_at')->nullable();
+            $table->integer('duration')->nullable();
+            $table->integer('isUnderSla')->nullable();
             $table->timestamps();
 
             $table->foreign('urgency_id')->references('id')->on('urgencies')->onDelete('cascade');

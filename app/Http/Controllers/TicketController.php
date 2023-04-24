@@ -288,9 +288,6 @@ class TicketController extends Controller
                 $view     = 'admin.ticket.show-ticket';
                 // get ticket
                 $ticket   = Ticket::where('ticket_number', $ticket)->first();
-                // get sum(duration)
-                $sum      = Tracking::where('ticket_id', $ticket->id)->where('status', '!=', 'Ticket Continued')->sum('duration');
-                $duration = gmdate('H:i:s', $sum);
                 break;
 
             case 'Approver1':
@@ -300,9 +297,6 @@ class TicketController extends Controller
                 $ticket   = Ticket::with('user', 'user.employee')->whereHas('user.employee', function ($q) {
                     $q->where('department_id', Auth::user()->employee->department_id);
                 })->where('ticket_number', $ticket)->first();
-                // get sum(duration)
-                $sum      = Tracking::where('ticket_id', $ticket->id)->where('status', '!=', 'Ticket Continued')->sum('duration');
-                $duration = gmdate('H:i:s', $sum);
                 break;
 
             case 'Approver2':
@@ -312,9 +306,6 @@ class TicketController extends Controller
                 $ticket   = Ticket::with('user', 'user.employee')->whereHas('user.employee', function ($q) {
                     $q->where('sub_department_id', Auth::user()->employee->sub_department_id);
                 })->where('ticket_number', $ticket)->first();
-                // get sum(duration)
-                $sum      = Tracking::where('ticket_id', $ticket->id)->where('status', '!=', 'Ticket Continued')->sum('duration');
-                $duration = gmdate('H:i:s', $sum);
                 break;
 
             case 'User':
@@ -324,9 +315,6 @@ class TicketController extends Controller
                 $ticket   = Ticket::whereHas('user', function ($q) {
                     $q->where('user_id', Auth::user()->id);
                 })->where('ticket_number', $ticket)->first();
-                // get sum(duration)
-                $sum      = Tracking::where('ticket_id', $ticket->id)->where('status', '!=', 'Ticket Continued')->sum('duration');
-                $duration = gmdate('H:i:s', $sum);
                 break;
 
             case 'Technician':
@@ -334,9 +322,6 @@ class TicketController extends Controller
                 $view     = 'technician.ticket.show-ticket';
                 // get ticket
                 $ticket   = Ticket::where('technician_id', Auth::user()->id)->where('ticket_number', $ticket)->first();
-                // get sum(duration)
-                $sum      = Tracking::where('ticket_id', $ticket->id)->where('status', '!=', 'Ticket Continued')->sum('duration');
-                $duration = gmdate('H:i:s', $sum);
                 break;
 
             default:
@@ -349,8 +334,7 @@ class TicketController extends Controller
             'title'     => "$ticket->ticket_number - Helpdesk Ticketing System",
             'name'      => Auth::user()->employee->name,
             'ticket'    => $ticket,
-            'trackings' => $ticket->trackings,
-            'duration'  => $duration
+            'trackings' => $ticket->trackings
         ]);
     }
 
@@ -1271,6 +1255,7 @@ class TicketController extends Controller
             $ticket->finish_at  = Carbon::now();
             $ticket->isUnderSla = $isUnderSla;
             $ticket->progress   = $request->progress;
+            $ticket->duration   = $sum_resolve;
             $status_tracking    = 'Ticket Closed.';
             $note               = 'Resolve duration: ' . $sum_resolve_humans->forHumans() . '. Pending duration: ' . $sum_pending_humans->forHumans() . '.';
         } else {

@@ -119,6 +119,8 @@ Route::group(['middleware' => ['auth']], function () {
 
         Route::get('/admin/rejected-tickets', [TicketController::class, 'rejected'])->name('admin.tickets.rejected');
         Route::get('/admin/rejected-tickets/{ticket}', [TicketController::class, 'show'])->name('admin.tickets.rejected.show');
+
+        Route::post('/admin/sla/sla-report', [TicketController::class, 'slaReport'])->name('admin.sla.report');
     });
 
     Route::group(['middleware' => ['role:Approver1']], function () {
