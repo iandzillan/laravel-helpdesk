@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Exports\TicketExport;
 use App\Models\Category;
 use App\Models\Employee;
-use App\Models\Position;
 use App\Models\SubCategory;
 use App\Models\Ticket;
 use App\Models\Tracking;
@@ -16,7 +15,6 @@ use Carbon\Carbon;
 use Carbon\CarbonInterval;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Validator;
 use Maatwebsite\Excel\Facades\Excel;
@@ -1250,14 +1248,12 @@ class TicketController extends Controller
             } else {
                 $isUnderSla = 0;
             }
-
-            $ticket->status     = 6;
-            $ticket->finish_at  = Carbon::now();
-            $ticket->isUnderSla = $isUnderSla;
-            $ticket->progress   = $request->progress;
-            $ticket->duration   = $sum_resolve;
-            $status_tracking    = 'Ticket Closed.';
-            $note               = 'Resolve duration: ' . $sum_resolve_humans->forHumans() . '. Pending duration: ' . $sum_pending_humans->forHumans() . '.';
+            $ticket->status           = 6;
+            $ticket->finish_at        = Carbon::now();
+            $ticket->isUnderSla       = $isUnderSla;
+            $ticket->progress         = $request->progress;
+            $status_tracking          = 'Ticket Closed';
+            $note                     = 'Resolve duration: ' . $sum_resolve_humans->forHumans() . '. Pending duration: ' . $sum_pending_humans->forHumans();
         } else {
             $ticket->progress = $request->progress;
             $status_tracking  = 'On work';
@@ -1320,11 +1316,6 @@ class TicketController extends Controller
         // update status ticket
         $ticket->status = 4;
         $ticket->save();
-
-        // get technician
-        $technician = Employee::whereHas('user', function ($q) use ($ticket) {
-            $q->where('id', $ticket->technician_id);
-        })->first();
 
         // get last tracking time
         $last_track = Tracking::where('ticket_id', $ticket->id)->latest()->first();
@@ -1436,23 +1427,18 @@ class TicketController extends Controller
 
     public function slaReport(Request $request)
     {
-        $validator = Validator::make($request->all(), [
+        // set validation
+        $validate = $request->validate([
             'from' => 'required',
-            'to'   => 'required',
+            'to'   => 'required|after:from'
         ]);
 
-        if ($validator->fails()) {
-            return response()->json($validator->errors(), 422);
-        }
+        // get the tickets 
+        $tickets = Ticket::whereBetween('created_at', [Carbon::parse($validate['from']), Carbon::parse($validate['to'])])->get();
 
-        $tickets = Ticket::whereBetween('created_at', [Carbon::parse($request->from), Carbon::parse($request->to)])->get();
-
-        if ($tickets->count() == 0) {
-            return response()->json([
-                'success' => false,
-                'message' => 'No data in this date interval',
-                'data'    => $tickets
-            ]);
+        // check the tickets
+        if ($tickets->count() === 0) {
+            return back()->with('pesan', 'There is no data between ' . $validate['from'] . ' and ' . $validate['to']);
         } else {
             return Excel::download(new TicketExport($tickets), 'SLA_Report_' . $request->from . '_' . $request->to . '.xlsx');
         }

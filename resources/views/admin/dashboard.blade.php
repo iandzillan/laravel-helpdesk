@@ -133,13 +133,22 @@
 
     <div class="col-md-12 col-lg-12">
         <div class="row">
-            <div class="col-md-3 mb-4">
+            <div class="col-md-3 mb-3">
                 <button class="btn btn-primary btn-sm" data-aos="fade-up" data-aos-delay="800" id="generate-report">
                     <i class="fa-solid fa-download"></i>
                     Generate SLA Report
                 </button>
             </div>
         </div>
+        @if (session()->has('pesan'))    
+            <div class="row">
+                <div class="col mb-3">
+                    <div class="alert alert-danger" data-aos="fade-up" data-aos-delay="800">
+                        {{ session()->get('pesan') }}
+                    </div>
+                </div>
+            </div>
+        @endif
     </div>
 
     <div class="col-md-12 col-lg-12">
@@ -175,7 +184,7 @@
     <div class="col-md-12 col-lg-12">
         <div class="row">
             <div class="col-md-6">
-                <div class="card" data-aos="fade-up" data-aos-delay="800">
+                <div class="card" data-aos="fade-up">
                     <div class="flex-wrap card-header d-flex justify-content-between align-items-center">
                         <div class="header-title d-flex justify-content-between align-items-center">
                             <span class="fa-stack fa-2x">
@@ -201,7 +210,7 @@
             </div>
 
             <div class="col-md-6">
-                <div class="card" data-aos="fade-up" data-aos-delay="800">
+                <div class="card" data-aos="fade-up">
                     <div class="flex-wrap card-header d-flex justify-content-between align-items-center">
                         <div class="header-title d-flex justify-content-between align-items-center">
                             <span class="fa-stack fa-2x">
@@ -231,7 +240,7 @@
     <div class="col-md-12 col-lg-12">
         <div class="row">
             <div class="col-md-12 col-lg-6">
-                <div class="card" data-aos="fade-up" data-aos-delay="800">
+                <div class="card" data-aos="fade-up">
                     <div class="flex-wrap card-header d-flex align-items-center">
                         <span class="fa-stack fa-2x">
                             <i class="fa-solid fa-square fa-stack-2x text-primary"></i>
@@ -273,7 +282,7 @@
             </div>
 
             <div class="col-md-12 col-lg-6">
-                <div class="card" data-aos="fade-up" data-aos-delay="800">
+                <div class="card" data-aos="fade-up">
                     <div class="flex-wrap card-header d-flex align-items-center">
                         <span class="fa-stack fa-2x">
                             <i class="fa-solid fa-square fa-stack-2x text-primary"></i>
@@ -332,28 +341,34 @@
                     <h5 class="modal-title" id="exampleModalLabel">Generate SLA Report</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form id="form-report">
+                <form id="form-report" method="POST" action="{{ route('admin.sla.report') }}">
+                    @method('post')
+                    @csrf
                     <div class="modal-body">
                         <div class="row d-flex justify-content-center">
                             <div class="col-6">
                                 <div class="form-group">
                                     <label for="from" class="form-label">From</label>
-                                    <input type="date" name="from" id="from" class="form-control">
-                                    <div class="invalid-feedback d-none" role="alert" id="alert-from"></div>
+                                    <input type="date" name="from" id="from" class="form-control @error('from') is-invalid @enderror">
+                                    @error('from')
+                                        <div class="invalid-feedback" role="alert" id="alert-from">{{ $message }}</div>
+                                    @enderror
                                 </div>
                             </div>
                             <div class="col-6">
                                 <div class="form-group">
                                     <label for="to" class="form-label">To</label>
-                                    <input type="date" name="to" id="to" class="form-control">
-                                    <div class="invalid-feedback d-none" role="alert" id="alert-to"></div>
+                                    <input type="date" name="to" id="to" class="form-control @error('from') is-invalid @enderror">
+                                    @error('to')
+                                        <div class="invalid-feedback" role="alert" id="alert-to">{{ $message }}</div>
+                                    @enderror
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary" id="generate">Generate</button>
+                        <button type="submit" class="btn btn-primary" id="generate">Generate</button>
                     </div>
                 </form>
             </div>

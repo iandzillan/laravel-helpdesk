@@ -26,7 +26,6 @@ return new class extends Migration
             $table->timestamp('progress_at')->nullable();
             $table->timestamp('expected_finish_at')->nullable();
             $table->timestamp('finish_at')->nullable();
-            $table->integer('duration')->nullable();
             $table->integer('isUnderSla')->nullable();
             $table->timestamps();
 

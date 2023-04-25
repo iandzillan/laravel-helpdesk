@@ -141,6 +141,7 @@
                                         <div class="col-md-6">
                                             <h5 class="card-title">Solved at</h5>
                                             <p class="card-text">{{ $ticket->finish_at }}</p>
+                                            <p class="card-text">Duration: {{ gmdate('H:i:s', $ticket->trackings->where('status', '!=', 'Ticket Continued')->sum('duration')) }}</p>
                                         </div>
                                     </div>
                                 </div>
