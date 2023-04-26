@@ -49,6 +49,11 @@ class Ticket extends Model
         return $this->belongsTo('App\Models\SubCategory');
     }
 
+    public function feedback()
+    {
+        return $this->hasOne(Feedback::class);
+    }
+
     public function getCreatedAtAttribute()
     {
         return Carbon::parse($this->attributes['created_at'])->tz('Asia/Jakarta')->isoFormat('Y-MM-DD HH:mm:ss');

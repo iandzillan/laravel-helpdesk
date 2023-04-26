@@ -453,6 +453,15 @@
                             <span class="item-name">Rejected Tickets</span>
                         </a>
                     </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link {{(request()->segment(2) == 'feedback') ? 'active' : ''}}" aria-current="page" href="{{ route('user.feedback') }}" title="Feedbacks">
+                            <i class="icon">
+                                <i class="fa-regular fa-comment"></i>
+                            </i>
+                            <span class="item-name">Feedback</span>
+                        </a>
+                    </li>
                 @endif
 
 

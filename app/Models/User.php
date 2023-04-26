@@ -54,8 +54,13 @@ class User extends Authenticatable
         return $this->hasMany(SubCategory::class);
     }
 
-    public function ticket()
+    public function tickets()
     {
         return $this->hasMany(Ticket::class);
+    }
+
+    public function feedbacks()
+    {
+        return $this->hasMany(Feedback::class);
     }
 }

@@ -14,7 +14,6 @@
             <th>SLA Duration</th>
             <th>On work Duration</th>
             <th>Pending Duration</th>
-            <th>Success Rate (%)</th>
         </tr>
     </thead>
     <tbody>
@@ -33,13 +32,6 @@
                 <td>{{ gmdate('H:i:s', $ticket->urgency->hours * 3600) }}</td>
                 <td>{{ gmdate('H:i:s', $ticket->trackings->where('status', '!=', 'Ticket Continued')->sum('duration')) }}</td>
                 <td>{{ gmdate('H:i:s', $ticket->trackings->where('status', 'Ticket Continued')->sum('duration')) }}</td>
-                <td>
-                    @if ($ticket->trackings->where('status', '!=', 'Ticket Continued')->sum('duration') > $ticket->urgency->hours * 3600)
-                        50
-                    @else
-                        100
-                    @endif
-                </td>
             </tr>
         @empty
             <tr>

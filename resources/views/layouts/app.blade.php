@@ -43,13 +43,13 @@
     <script src="{{asset('assets/vendor/sweetalert/dist/sweetalert2.all.min.js')}}"></script>
     <link rel="stylesheet" href="{{asset('assets/vendor/sweetalert/dist/sweetalert2.min.css')}}">
 
-    {{-- select2 --}}
+    {{-- Select2 --}}
     <link rel="stylesheet" href="{{asset('assets/vendor/bootstrap-select2/css/select2.min.css')}}" />
     <link rel="stylesheet" href="{{asset('assets/vendor/bootstrap-select2/css/select2-bootstrap-5-theme.min.css')}}" />
     <script src="{{asset('assets/vendor/bootstrap-select2/js/select2.full.min.js')}}"></script>
 
-    {{-- lodaing css --}}
-    <link rel="stylesheet" href="{{asset('assets/css/loading.css')}}">
+    {{-- Rating --}}
+    <link rel="stylesheet" href="{{ asset('assets/css/rating.css') }}">
 </head>
 
 <body>

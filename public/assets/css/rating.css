@@ -1,0 +1,10 @@
+#modal-feedback input[type="radio"] {
+  display: none;
+}
+#modal-feedback input[type="radio"] ~ span {
+  cursor: pointer;
+}
+#modal-feedback input[type="radio"]:checked ~ span {
+  background-color: #e0eba1;
+  color: #fff;
+}

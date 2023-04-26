@@ -4,6 +4,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\EmployeeController;
+use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\ManagerController;
@@ -13,6 +14,7 @@ use App\Http\Controllers\SubDepartmentController;
 use App\Http\Controllers\TicketController;
 use App\Http\Controllers\UrgencyController;
 use App\Http\Controllers\UserController;
+use App\Models\Feedback;
 use App\Models\Tracking;
 use Carbon\Carbon;
 use Carbon\CarbonInterval;
@@ -121,6 +123,8 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/admin/rejected-tickets/{ticket}', [TicketController::class, 'show'])->name('admin.tickets.rejected.show');
 
         Route::post('/admin/sla/sla-report', [TicketController::class, 'slaReport'])->name('admin.sla.report');
+        Route::get('/admin/feedback', [FeedbackController::class, 'index'])->name('admin.feedback');
+        Route::get('/admin/feedback/{ticket}', [FeedbackController::class, 'show'])->name('admin.feedback.show');
     });
 
     Route::group(['middleware' => ['role:Approver1']], function () {
@@ -247,6 +251,10 @@ Route::group(['middleware' => ['auth']], function () {
 
         Route::get('/user/rejected-tickets', [TicketController::class, 'rejected'])->name('user.tickets.rejected');
         Route::get('/user/rejected-tickets/{ticket}', [TicketController::class, 'show'])->name('user.tickets.rejected.show');
+
+        Route::get('/user/feedback/', [FeedbackController::class, 'index'])->name('user.feedback');
+        Route::get('/user/feedback/{ticket}', [FeedbackController::class, 'create'])->name('user.feedback.show');
+        Route::get('/user/feedback/{ticket}/store', [FeedbackController::class, 'store'])->name('user.feedback.store');
     });
 
     Route::group(['middleware' => ['role:Technician']], function () {
