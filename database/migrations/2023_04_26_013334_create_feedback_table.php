@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('ticket_id')->unique()->nullable();
             $table->integer('rating')->nullable();
-            $table->text('note');
+            $table->text('note')->nullable();
             $table->unsignedBigInteger('user_id')->nullable();
             $table->unsignedBigInteger('technician_id')->nullable();
             $table->timestamps();

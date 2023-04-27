@@ -254,7 +254,7 @@ Route::group(['middleware' => ['auth']], function () {
 
         Route::get('/user/feedback/', [FeedbackController::class, 'index'])->name('user.feedback');
         Route::get('/user/feedback/{ticket}', [FeedbackController::class, 'create'])->name('user.feedback.show');
-        Route::get('/user/feedback/{ticket}/store', [FeedbackController::class, 'store'])->name('user.feedback.store');
+        Route::post('/user/feedback/{ticket}/store', [FeedbackController::class, 'store'])->name('user.feedback.store');
     });
 
     Route::group(['middleware' => ['role:Technician']], function () {
@@ -275,3 +275,6 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/account-profile', [EmployeeController::class, 'accountProfile'])->name('accountProfile');
     Route::patch('/account-profile/{nik}', [EmployeeController::class, 'updateProfile'])->name('profile.update');
 });
+
+Route::get('/testing', [FeedbackController::class, 'performance']);
+Route::get('/testing1', [FeedbackController::class, 'testing']);

@@ -34,10 +34,11 @@
         $(document).ready(function(){
             // draw table
             let table = $('.data-table').DataTable({
-                scrollX: true,
-                responsive: true,
                 processing: true,
                 serverSide: true,
+                initComplete: function (settings, json) {  
+                    $(".data-table").wrap("<div style='overflow:auto; width:100%; position:relative;'></div>");            
+                },
                 ajax: "{{ route('subdept.my.tickets') }}",
                 columns: [
                     {data: 'DT_RowIndex', name: 'DT_RowIndex'},

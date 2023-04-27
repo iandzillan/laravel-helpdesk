@@ -147,6 +147,23 @@
                         </a>
                     </li>
 
+                    <li><hr class="hr-horizontal"></li>
+                    <li class="nav-item static-item">
+                        <a class="nav-link static-item disabled" href="#" tabindex="-1">
+                            <span class="default-icon">Report</span>
+                            <span class="mini-icon">-</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link {{(request()->segment(2) == 'feedback') ? 'active' : ''}}" aria-current="page" href="{{route('admin.feedback')}}" title="Feedbacks">
+                            <i class="icon">
+                                <i class="fa-solid fa-comment"></i>
+                            </i>
+                            <span class="item-name">Feedbacks</span>
+                        </a>
+                    </li>
+
                     <li><hr class="hr-horizontal" /></li>
                     <li class="nav-item static-item">
                         <a class="nav-link static-item disabled" href="#" tabindex="-1">

@@ -1252,6 +1252,7 @@ class TicketController extends Controller
             $ticket->finish_at        = Carbon::now();
             $ticket->isUnderSla       = $isUnderSla;
             $ticket->progress         = $request->progress;
+            $ticket->feedback_status  = 1;
             $status_tracking          = 'Ticket Closed';
             $note                     = 'Resolve duration: ' . $sum_resolve_humans->forHumans() . '. Pending duration: ' . $sum_pending_humans->forHumans();
         } else {
@@ -1398,9 +1399,9 @@ class TicketController extends Controller
                 $reciever       = $user->email;
                 $data_email     = [
                     'greeting'    => "Dear {$user->employee->name}",
-                    'body'        => "We would like to inform your that your tiket has been completed. Please click button below to see the detail",
+                    'body'        => "We would like to inform your that your tiket has been completed. If you could please take a moment to rate your experience with our support by clicking this button.",
                     'thanks'      => "Thank you from Helpdesk Ticketing System. No need to reply this email",
-                    'action_text' => "View Ticket",
+                    'action_text' => "Give feedback",
                     'action_url'  => route('user.my.tickets.show', $ticket->ticket_number)
                 ];
                 break;

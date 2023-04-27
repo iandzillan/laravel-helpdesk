@@ -38,9 +38,11 @@
         $(document).ready(function(){
             // draw table
             let table = $('.data-table').DataTable({
-                responsive: true,
                 processing: true,
                 serverSide: true,
+                initComplete: function (settings, json) {  
+                    $(".data-table").wrap("<div style='overflow:auto; width:100%; position:relative;'></div>");            
+                },
                 ajax: "{{ route('subdept.positions') }}",
                 columns: [
                     {data: 'DT_RowIndex', name: 'DT_RowIndex'},
