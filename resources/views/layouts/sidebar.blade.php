@@ -164,6 +164,15 @@
                         </a>
                     </li>
 
+                    <li class="nav-item">
+                        <a class="nav-link {{(request()->segment(2) == 'performance') ? 'active' : ''}}" aria-current="page" href="{{route('admin.performance')}}" title="Performance">
+                            <i class="icon">
+                                <i class="fa-solid fa-users-gear"></i>
+                            </i>
+                            <span class="item-name">Performance</span>
+                        </a>
+                    </li>
+
                     <li><hr class="hr-horizontal" /></li>
                     <li class="nav-item static-item">
                         <a class="nav-link static-item disabled" href="#" tabindex="-1">

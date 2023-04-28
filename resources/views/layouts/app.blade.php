@@ -60,7 +60,7 @@
         </div>    
     </div>
     <!-- loader END -->
-
+    
     {{-- Sidebar Star --}}
     @include('layouts.sidebar')
     {{-- Sidebar End --}}

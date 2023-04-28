@@ -124,7 +124,10 @@ Route::group(['middleware' => ['auth']], function () {
 
         Route::post('/admin/sla/sla-report', [TicketController::class, 'slaReport'])->name('admin.sla.report');
         Route::get('/admin/feedback', [FeedbackController::class, 'index'])->name('admin.feedback');
-        Route::get('/admin/feedback/{ticket}', [FeedbackController::class, 'show'])->name('admin.feedback.show');
+        Route::get('/admin/feedback/rate', [FeedbackController::class, 'feedbackRate'])->name('admin.feedback.rate');
+
+        Route::get('/admin/performance', [FeedbackController::class, 'performance'])->name('admin.performance');
+        Route::get('/admin/performance/{technician}', [FeedbackController::class, 'show'])->name('admin.performance.show');
     });
 
     Route::group(['middleware' => ['role:Approver1']], function () {

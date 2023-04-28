@@ -7,6 +7,7 @@ use App\Models\Feedback;
 use App\Models\Ticket;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -20,7 +21,7 @@ class FeedbackController extends Controller
 
         switch ($role) {
             case 'Admin':
-                $view    = 'admin.ticket.feedback';
+                $view    = 'admin.report.feedback';
                 $tickets = Ticket::where('feedback_status', 2)->get();
 
                 // draw table
@@ -78,6 +79,9 @@ class FeedbackController extends Controller
                         })
                         ->addColumn('technician', function ($row) {
                             return $row->technician->employee->name;
+                        })
+                        ->addColumn('sla', function ($row) {
+                            return gmdate('H:i:s', $row->urgency->hours * 3600);
                         })
                         ->addColumn('duration', function ($row) {
                             return gmdate('H:i:s', $row->trackings->where('status', '!=', 'Ticket Continued')->sum('duration'));
@@ -152,48 +156,120 @@ class FeedbackController extends Controller
         ]);
     }
 
-    public function performance()
+    public function performance(Request $request)
     {
-        $technicians = User::with('feedbacks')->where('role', 'technician')->get();
+        $technicians = User::with('tickets', 'feedbacks')->where('role', 'technician')->get();
 
-        foreach ($technicians as $technician) {
-            echo $technician->employee->name . ' | ';
-            echo 'count ticket: ' . $technician->tickets->count() . ' | ';
-            echo 'success rate: ' . ($technician->tickets->where('isUnderSla', 1)->count() / $technician->tickets->count()) * 100 . '% | ';
-            echo '<br>';
-            // echo 'Excellent feedback: ' . $technician->feedbacks->where('rating', 3)->count() . ' | ';
-            // echo 'Neutral feedback: ' . $technician->feedbacks->where('rating', 2)->count() . ' | ';
-            // echo 'Bad feedback: ' . $technician->feedbacks->where('rating', 1)->count() . ' | ';
-            $feedbacks = $technician->feedbacks->groupBy('rating')->all();
-            dump($feedbacks);
-            $rating = [];
-            foreach ($feedbacks as $feedback) {
-                $rating[] = $feedback->count();
-            }
-            dump($rating);
-            echo '<br>';
-            foreach ($technician->tickets as $ticket) {
-                echo $ticket->ticket_number . '<br>';
-            }
-            echo '<hr>';
+        if ($request->ajax()) {
+            return DataTables::of($technicians)
+                ->addIndexColumn()
+                ->addColumn('name', function ($row) {
+                    return $row->employee->name;
+                })
+                ->addColumn('success', function ($row) {
+                    $rate = ($row->technician_tickets->where('isUnderSla', 1)->count() / $row->technician_tickets->count()) * 100 . '%';
+                    return $rate;
+                })
+                ->addColumn('action', function ($row) {
+                    $btn = '<a href="' . route('admin.performance.show', $row->id) . '" class="btn btn-primary btn-sm" title="Show Performance"><i class="fa-solid fa-magnifying-glass"></i></a>';
+                    return $btn;
+                })
+                ->rawColumns(['action'])
+                ->make(true);
         }
+
+        return view('admin.report.performance', [
+            'title' => 'Performance - Helpdesk Ticketing System',
+            'name'  => Auth::user()->employee->name
+        ]);
     }
 
-    public function testing()
+    public function feedbackRate()
     {
-        $technicians = User::where('role', 'technician')->get();
+        $rate  = [];
+        $total = [];
+        $color = [];
+        $feedbacks = Feedback::select(DB::raw('count(rating) as count, rating'))->groupBy('rating')->get();
+        foreach ($feedbacks as $feedback) {
+            switch ($feedback->rating) {
+                case 3:
+                    $rate[]  = 'Excellent';
+                    $color[] = '#33B2DF';
+                    break;
 
-        $rating = [];
-        foreach ($technicians as $technician) {
-            $feedbacks = $technician->feedbacks->groupBy('technician_id');
-            foreach ($feedbacks as $feedback) {
-                $row = $feedback->pluck('rating');
-                $rating[] = $row;
+                case 2:
+                    $rate[]  = 'Neutral / Okay';
+                    $color[] = '#13D8AA';
+                    break;
+
+                case 1:
+                    $rate[]  = 'Bad';
+                    $color[] = '#D4526E';
+                    break;
             }
+
+            $total[] = $feedback->count;
         }
 
         return response()->json([
-            'data' => $rating
+            'name'  => $rate,
+            'data'  => $total,
+            'color' => $color
         ]);
     }
+
+    public function show($technician)
+    {
+        $technician = User::where('id', $technician)->first();
+
+        return view('admin.report.technician', [
+            'title'      => $technician->employee->name . ' Performance - Helpdesk Ticketing System',
+            'name'       => Auth::user()->employee->name,
+            'technician' => $technician
+        ]);
+    }
+
+    // public function testing1()
+    // {
+    //     $technicians = User::with('feedbacks')->where('role', 'technician')->get();
+
+    //     foreach ($technicians as $technician) {
+    //         echo $technician->employee->name . ' | ';
+    //         echo 'count ticket: ' . $technician->tickets->count() . ' | ';
+    //         echo 'success rate: ' . ($technician->tickets->where('isUnderSla', 1)->count() / $technician->tickets->count()) * 100 . '% | ';
+    //         echo '<br>';
+    //         // echo 'Excellent feedback: ' . $technician->feedbacks->where('rating', 3)->count() . ' | ';
+    //         // echo 'Neutral feedback: ' . $technician->feedbacks->where('rating', 2)->count() . ' | ';
+    //         // echo 'Bad feedback: ' . $technician->feedbacks->where('rating', 1)->count() . ' | ';
+    //         $feedbacks = $technician->feedbacks->groupBy('rating')->all();
+    //         dump($feedbacks);
+    //         $rating = [];
+    //         foreach ($feedbacks as $feedback) {
+    //             $rating[] = $feedback->count();
+    //         }
+    //         dump($rating);
+    //         echo '<br>';
+    //         foreach ($technician->tickets as $ticket) {
+    //             echo $ticket->ticket_number . '<br>';
+    //         }
+    //         echo '<hr>';
+    //     }
+    // }
+
+    // public function testing()
+    // {
+    //     $technicians = User::where('role', 'technician')->get();
+
+    //     $rating = [];
+    //     foreach ($technicians as $technician) {
+    //         $good = $technician->feedbacks->where('rating', 3)->count();
+    //         $okay = $technician->feedbacks->where('rating', 2)->count();
+    //         $bad  = $technician->feedbacks->where('rating', 1)->count();
+    //         $rating[] = [$good, $okay, $bad];
+    //     }
+
+    //     return response()->json([
+    //         'data' => $rating
+    //     ]);
+    // }
 }

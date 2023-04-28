@@ -153,7 +153,7 @@
 
     <div class="col-md-12 col-lg-12">
         <div class="row">
-            <div class="col-md-12">
+            <div class="col-md-7">
                 <div class="card" data-aos="fade-up" data-aos-delay="800">
                     <div class="flex-wrap card-header d-flex justify-content-between align-items-center">
                         <div class="header-title d-flex justify-content-between align-items-center">
@@ -178,13 +178,9 @@
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <div class="col-md-12 col-lg-12">
-        <div class="row">
-            <div class="col-md-6">
-                <div class="card" data-aos="fade-up">
+            <div class="col-md-5">
+                <div class="card" data-aos="fade-up" data-aos-delay="800">
                     <div class="flex-wrap card-header d-flex justify-content-between align-items-center">
                         <div class="header-title d-flex justify-content-between align-items-center">
                             <span class="fa-stack fa-2x">
@@ -208,39 +204,13 @@
                     </div>
                 </div>
             </div>
-
-            <div class="col-md-6">
-                <div class="card" data-aos="fade-up">
-                    <div class="flex-wrap card-header d-flex justify-content-between align-items-center">
-                        <div class="header-title d-flex justify-content-between align-items-center">
-                            <span class="fa-stack fa-2x">
-                                <i class="fa-solid fa-square fa-stack-2x text-primary"></i>
-                                <i class="fa-solid fa-check fa-stack-1x fa-inverse"></i>
-                            </span>
-                            <h4 class="card-title">Success Rate</h4>
-                        </div>
-                        <div class="d-flex align-items-center align-self-center">
-                            <div class="dropdown">
-                                <select id="filter-percentage" name="filter-percentage" class="form-select mb-3">
-                                    <option value="year" selected>This Year</option>
-                                    <option value="month">This Month</option>
-                                    <option value="week">This Week</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <div id="success-rate" class="d-main"></div>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 
     <div class="col-md-12 col-lg-12">
         <div class="row">
             <div class="col-md-12 col-lg-6">
-                <div class="card" data-aos="fade-up">
+                <div class="card" data-aos="fade-up" data-aos-delay="300">
                     <div class="flex-wrap card-header d-flex align-items-center">
                         <span class="fa-stack fa-2x">
                             <i class="fa-solid fa-square fa-stack-2x text-primary"></i>
@@ -282,7 +252,7 @@
             </div>
 
             <div class="col-md-12 col-lg-6">
-                <div class="card" data-aos="fade-up">
+                <div class="card" data-aos="fade-up" data-aos-delay="300">
                     <div class="flex-wrap card-header d-flex align-items-center">
                         <span class="fa-stack fa-2x">
                             <i class="fa-solid fa-square fa-stack-2x text-primary"></i>
