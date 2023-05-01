@@ -580,7 +580,7 @@ class TicketController extends Controller
         switch ($role) {
             case 'Admin':
                 // get all on work tickets 
-                $tickets = Ticket::where('status', 4)->latest('progress_at')->get();
+                $tickets = Ticket::whereIn('status', [4,5])->latest('progress_at')->get();
 
                 // define view
                 $view = 'admin.ticket.onwork';
@@ -593,7 +593,7 @@ class TicketController extends Controller
                 // get all on work tickets 
                 $tickets = Ticket::with(['user', 'user.employee'])->whereHas('user.employee', function ($q) {
                     $q->where('department_id', Auth::user()->employee->department_id);
-                })->where('status', 4)->latest('progress_at')->get();
+                })->whereIn('status', [4,5])->latest('progress_at')->get();
 
                 // define view
                 $view = 'approver1.ticket.onwork';
@@ -606,7 +606,7 @@ class TicketController extends Controller
                 // get all on work tickets 
                 $tickets = Ticket::with(['user', 'user.employee'])->whereHas('user.employee', function ($q) {
                     $q->where('sub_department_id', Auth::user()->employee->sub_department_id);
-                })->where('status', 4)->latest('progress_at')->get();
+                })->whereIn('status', [4,5])->latest('progress_at')->get();
 
                 // define view
                 $view = 'approver2.ticket.onwork';
@@ -617,7 +617,7 @@ class TicketController extends Controller
 
             case 'User':
                 // get all on work tickets 
-                $tickets = Ticket::where('user_id', Auth::user()->id)->where('status', 4)->latest('progress_at')->get();
+                $tickets = Ticket::where('user_id', Auth::user()->id)->whereIn('status', [4,5])->latest('progress_at')->get();
 
                 // define view
                 $view = 'user.ticket.onwork';
@@ -628,7 +628,7 @@ class TicketController extends Controller
 
             case 'Technician':
                 // get all on work tickets
-                $tickets = Ticket::where('tickets.technician_id', Auth::user()->id)->where('tickets.status', 4)->get()->sortBy(function ($query) {
+                $tickets = Ticket::where('tickets.technician_id', Auth::user()->id)->whereIn('tickets.status', [4,5])->get()->sortBy(function ($query) {
                     return $query->urgency->hours;
                 });
 
@@ -1160,25 +1160,37 @@ class TicketController extends Controller
         }
 
         // get user
-        $user = User::where('employee_id', $request->technician_id)->first();
-
+        $user       = User::where('employee_id', $request->technician_id)->first();
         // get ticket
-        $ticket = Ticket::where('ticket_number', $ticket)->first();
-
+        $ticket     = Ticket::where('ticket_number', $ticket)->first();
         // get urgency
-        $urgency = Urgency::where('id', $request->urgency_id)->first();
-
-        // count expected resolve time
-        $time_second = $urgency->hours * 3600;
-        $progress_at = Carbon::now();
-        $expected    = $progress_at->addSecond($time_second);
+        $urgency    = Urgency::where('id', $request->urgency_id)->first();
+        // Set work time
+        $start      = Carbon::createFromTime(0, 30, 0);
+        $end        = Carbon::createFromTime(9, 30, 0);
+        // set progress at
+        $progress   = Carbon::now();
+        // set SLA hours
+        $sla_hours  = $urgency->hours * 3600;
+        // set expect finish at
+        $expect_finish_at = $progress->copy()->addSecond($sla_hours);
+        if (!$expect_finish_at->between($start, $end)) {
+            $diff = $expect_finish_at->diffInSeconds($end);
+            if ($expect_finish_at->addDay()->isWeekend()) {
+                $new_expect = $expect_finish_at->copy()->nextWeekday()->setTime(0, 30 , 0)->addSecond($diff);
+            } else {
+                $new_expect = $expect_finish_at->copy()->setTime(0 ,30 ,0)->addSecond($diff);
+            }
+        } else {
+            $new_expect = $expect_finish_at;
+        }
 
         // update ticket
         $ticket->status               = 4;
         $ticket->urgency_id           = $request->urgency_id;
         $ticket->technician_id        = $user->id;
-        $ticket->progress_at          = Carbon::now();
-        $ticket->expected_finish_at   = $expected;
+        $ticket->progress_at          = $progress;
+        $ticket->expected_finish_at   = $new_expect;
         $ticket->save();
 
         // get technician
@@ -1222,13 +1234,10 @@ class TicketController extends Controller
 
         // get ticket
         $ticket = Ticket::where('ticket_number', $ticket)->first();
-
         // get SLA time
         $sla_timer = $ticket->urgency->hours * 3600;
-
         // get last tracking time
         $last_track = Tracking::where('ticket_id', $ticket->id)->latest()->first();
-
         // count duration in second
         $duration = Carbon::now('Asia/Jakarta')->diffInSeconds($last_track->created_at);
 
@@ -1236,7 +1245,6 @@ class TicketController extends Controller
         $sum_resolve        = Tracking::where('ticket_id', $ticket->id)->where('status', '!=', 'Ticket Continued')->sum('duration');
         $sum_resolve        = $sum_resolve + $duration;
         $sum_resolve_humans = CarbonInterval::second($sum_resolve)->cascade();
-
         // count pending duration
         $sum_pending        = Tracking::where('ticket_id', $ticket->id)->where('status', 'Ticket Continued')->sum('duration');
         $sum_pending_humans = CarbonInterval::second($sum_pending)->cascade();
@@ -1262,7 +1270,6 @@ class TicketController extends Controller
         }
         // update ticket
         $ticket->save();
-
         // update tracking
         $tracking           = new Tracking;
         $tracking->status   = $status_tracking;
@@ -1443,5 +1450,29 @@ class TicketController extends Controller
         } else {
             return Excel::download(new TicketExport($tickets), 'SLA_Report_' . $request->from . '_' . $request->to . '.xlsx');
         }
+    }
+
+    public function testing()
+    {
+        $start      = Carbon::createFromTime(0, 30, 0);
+        $end        = Carbon::createFromTime(9, 30, 0);
+        // set progress at
+        $progress   = Carbon::now();
+        dump($progress);
+        // set SLA hours
+        $sla_hours  = 4 * 3600;
+        // set expect finish at
+        $expect_finish_at = $progress->addSecond($sla_hours);
+        if (!$expect_finish_at->between($start, $end)) {
+            $diff = $expect_finish_at->diffInSeconds($end);
+            if ($expect_finish_at->addDay()->isWeekend()) {
+                $new_expect = $expect_finish_at->copy()->nextWeekday()->setTime(0, 30 , 0)->addSecond($diff);
+                dd($new_expect->tz('Asia/Jakarta'));
+            }
+            $new_expect = $expect_finish_at->copy()->setTime(0 ,30 ,0)->addSecond($diff);
+            dd($new_expect->tz('Asia/Jakarta'));
+        }
+        $new_expect = $expect_finish_at;
+        dd($new_expect->tz('Asia/Jakarta'));
     }
 }

@@ -17,6 +17,7 @@
                                 <th>Ticket Number</th>
                                 <th>User</th>
                                 <th>Subject</th>
+                                <th>Status</th>
                                 <th>Urgency</th>
                                 <th>Created at</th>
                                 <th>Updated at</th>
@@ -46,6 +47,7 @@
                     {data: 'ticket_number', name: 'ticket_number'},
                     {data: 'name', name: 'name'},
                     {data: 'subject', name: 'subject'},
+                    {data: 'status', name: 'status'},
                     {data: 'urgency', name: 'urgency'},
                     {data: 'created_at', name: 'created_at'},
                     {data: 'updated_at', name: 'updated_at'},

@@ -279,5 +279,4 @@ Route::group(['middleware' => ['auth']], function () {
     Route::patch('/account-profile/{nik}', [EmployeeController::class, 'updateProfile'])->name('profile.update');
 });
 
-Route::get('/testing', [FeedbackController::class, 'performance']);
-Route::get('/testing1', [FeedbackController::class, 'testing']);
+Route::get('/testing', [TicketController::class, 'testing']);

@@ -16,6 +16,7 @@
                                 <th>#</th>
                                 <th>Ticket Number</th>
                                 <th>Subject</th>
+                                <th>Status</th>
                                 <th>Technician</th>
                                 <th>Created at</th>
                                 <th>Updated at</th>
@@ -44,6 +45,7 @@
                     {data: 'DT_RowIndex', name: 'DT_RowIndex'},
                     {data: 'ticket_number', name: 'ticket_number'},
                     {data: 'subject', name: 'subject'},
+                    {data: 'status', name: 'status'},
                     {data: 'technician', name: 'technician'},
                     {data: 'created_at', name: 'created_at'},
                     {data: 'updated_at', name: 'updated_at'},
