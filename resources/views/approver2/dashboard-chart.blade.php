@@ -56,7 +56,7 @@
         let url = "{{ route('subdept.categorychart.year') }}";
         $.getJSON(url, function(response){
             let series     = [];
-            for (let i = 0; i < response.name.length; i++) {
+            for (let i = 0; i < response.data.length; i++) {
                 series.push({
                     name: response.name[i],
                     data: response.data[i]

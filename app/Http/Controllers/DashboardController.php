@@ -159,7 +159,7 @@ class DashboardController extends Controller
                     ->groupBy(DB::raw('name, MONTH(tickets.created_at)'))
                     ->get();
 
-                $tickets = $tickets->mapToGroups(function ($item, $key) {
+                $map = $tickets->mapToGroups(function ($item, $key) {
                     return [$item['name'] => $item['count']];
                 });
                 break;
@@ -185,7 +185,7 @@ class DashboardController extends Controller
                     ->groupBy(DB::raw('name, MONTH(tickets.created_at)'))
                     ->get();
 
-                $tickets = $tickets->mapToGroups(function ($item, $key) {
+                $map = $tickets->mapToGroups(function ($item, $key) {
                     return [$item['name'] => $item['count']];
                 });
                 break;
@@ -202,18 +202,20 @@ class DashboardController extends Controller
                     ->all();
 
                 $tickets = Ticket::join('sub_categories', 'sub_categories.id', '=', 'tickets.sub_category_id')
-                    ->join('categories', 'categories.id', '=', 'sub_categories.category_id')
-                    ->select(DB::raw('categories.name, count(tickets.id) as count'))
                     ->whereHas('user.employee', function ($q) {
                         $q->where('sub_department_id', Auth::user()->employee->sub_department_id);
                     })
+                    ->join('categories', 'categories.id', '=', 'sub_categories.category_id')
+                    ->select(DB::raw('COUNT(tickets.id) AS count, MONTHNAME(tickets.created_at) AS month, categories.name AS name'))
                     ->where(DB::raw('YEAR(tickets.created_at)'), date('Y'))
-                    ->groupBy(DB::raw('name, MONTH(tickets.created_at)'))
+                    ->groupBy(DB::raw('name, month'))
+                    ->orderBy('month')
                     ->get();
 
-                $tickets = $tickets->mapToGroups(function ($item, $key) {
-                    return [$item['name'] => $item['count']];
+                $map = $tickets->mapToGroups(function ($item) {
+                    return [$item['month'] => $item['count']];
                 });
+
                 break;
 
             default:
@@ -222,8 +224,8 @@ class DashboardController extends Controller
         }
 
         return response()->json([
-            'name'  => $tickets->keys(),
-            'data'  => $tickets->values(),
+            'name'  => $map->keys(),
+            'data'  => $map->values(),
             'month' => $months
         ]);
     }
@@ -669,6 +671,39 @@ class DashboardController extends Controller
 
         return response()->json([
             'data' => $sum
+        ]);
+    }
+
+    public function testing()
+    {
+        // $months = Ticket::select(DB::raw('MONTHNAME(created_at) as month'))
+        //     ->whereHas('user.employee', function ($q) {
+        //         $q->where('sub_department_id', Auth::user()->employee->sub_department_id);
+        //     })
+        //     ->where(DB::raw('YEAR(created_at)'), date('Y'))
+        //     ->groupBy('month')
+        //     ->orderBy(DB::raw('MONTH(created_at)', 'asc'))
+        //     ->get();
+
+        $tickets = Ticket::join('sub_categories', 'sub_categories.id', '=', 'tickets.sub_category_id')
+            ->whereHas('user.employee', function ($q) {
+                $q->where('sub_department_id', Auth::user()->employee->sub_department_id);
+            })
+            ->join('categories', 'categories.id', '=', 'sub_categories.category_id')
+            ->select(DB::raw('COUNT(tickets.id) AS count, categories.name AS name, MONTHNAME(tickets.created_at) AS month'))
+            ->where(DB::raw('YEAR(tickets.created_at)'), date('Y'))
+            ->groupBy(DB::raw('month, name'))
+            ->get();
+
+        $data = [];
+        $map = $tickets->mapToGroups(function ($item) {
+            $data = [$item['month'] => $item['count']];
+            return $data;
+        });
+
+        return response()->json([
+            'month' => $map->keys(),
+            'category' => $map->values()
         ]);
     }
 }
