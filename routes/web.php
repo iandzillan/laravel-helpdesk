@@ -122,7 +122,9 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/admin/rejected-tickets', [TicketController::class, 'rejected'])->name('admin.tickets.rejected');
         Route::get('/admin/rejected-tickets/{ticket}', [TicketController::class, 'show'])->name('admin.tickets.rejected.show');
 
+        Route::post('/admin/sla/preview/sla-report', [TicketController::class, 'slaPreview'])->name('admin.sla.report.preview');
         Route::post('/admin/sla/sla-report', [TicketController::class, 'slaReport'])->name('admin.sla.report');
+
         Route::get('/admin/feedback', [FeedbackController::class, 'index'])->name('admin.feedback');
         Route::get('/admin/feedback/rate', [FeedbackController::class, 'feedbackRate'])->name('admin.feedback.rate');
 
@@ -279,4 +281,5 @@ Route::group(['middleware' => ['auth']], function () {
     Route::patch('/account-profile/{nik}', [EmployeeController::class, 'updateProfile'])->name('profile.update');
 });
 
-Route::get('/testing', [DashboardController::class, 'testing']);
+// Route::get('/testing', [DashboardController::class, 'testing']);
+// Route::get('/testing2', [TicketController::class, 'testing2']);

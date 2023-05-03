@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Exports\TicketExport;
 use App\Models\Category;
+use App\Models\Department;
 use App\Models\Employee;
 use App\Models\SubCategory;
 use App\Models\Ticket;
@@ -15,6 +16,7 @@ use Carbon\Carbon;
 use Carbon\CarbonInterval;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Validator;
 use Maatwebsite\Excel\Facades\Excel;
@@ -580,7 +582,7 @@ class TicketController extends Controller
         switch ($role) {
             case 'Admin':
                 // get all on work tickets 
-                $tickets = Ticket::whereIn('status', [4,5])->latest('progress_at')->get();
+                $tickets = Ticket::whereIn('status', [4, 5])->latest('progress_at')->get();
 
                 // define view
                 $view = 'admin.ticket.onwork';
@@ -593,7 +595,7 @@ class TicketController extends Controller
                 // get all on work tickets 
                 $tickets = Ticket::with(['user', 'user.employee'])->whereHas('user.employee', function ($q) {
                     $q->where('department_id', Auth::user()->employee->department_id);
-                })->whereIn('status', [4,5])->latest('progress_at')->get();
+                })->whereIn('status', [4, 5])->latest('progress_at')->get();
 
                 // define view
                 $view = 'approver1.ticket.onwork';
@@ -606,7 +608,7 @@ class TicketController extends Controller
                 // get all on work tickets 
                 $tickets = Ticket::with(['user', 'user.employee'])->whereHas('user.employee', function ($q) {
                     $q->where('sub_department_id', Auth::user()->employee->sub_department_id);
-                })->whereIn('status', [4,5])->latest('progress_at')->get();
+                })->whereIn('status', [4, 5])->latest('progress_at')->get();
 
                 // define view
                 $view = 'approver2.ticket.onwork';
@@ -617,7 +619,7 @@ class TicketController extends Controller
 
             case 'User':
                 // get all on work tickets 
-                $tickets = Ticket::where('user_id', Auth::user()->id)->whereIn('status', [4,5])->latest('progress_at')->get();
+                $tickets = Ticket::where('user_id', Auth::user()->id)->whereIn('status', [4, 5])->latest('progress_at')->get();
 
                 // define view
                 $view = 'user.ticket.onwork';
@@ -628,7 +630,7 @@ class TicketController extends Controller
 
             case 'Technician':
                 // get all on work tickets
-                $tickets = Ticket::where('tickets.technician_id', Auth::user()->id)->whereIn('tickets.status', [4,5])->get()->sortBy(function ($query) {
+                $tickets = Ticket::where('tickets.technician_id', Auth::user()->id)->whereIn('tickets.status', [4, 5])->get()->sortBy(function ($query) {
                     return $query->urgency->hours;
                 });
 
@@ -1177,9 +1179,9 @@ class TicketController extends Controller
         if (!$expect_finish_at->between($start, $end)) {
             $diff = $expect_finish_at->diffInSeconds($end);
             if ($expect_finish_at->addDay()->isWeekend()) {
-                $new_expect = $expect_finish_at->copy()->nextWeekday()->setTime(0, 30 , 0)->addSecond($diff);
+                $new_expect = $expect_finish_at->copy()->nextWeekday()->setTime(0, 30, 0)->addSecond($diff);
             } else {
-                $new_expect = $expect_finish_at->copy()->setTime(0 ,30 ,0)->addSecond($diff);
+                $new_expect = $expect_finish_at->copy()->setTime(0, 30, 0)->addSecond($diff);
             }
         } else {
             $new_expect = $expect_finish_at;
@@ -1433,6 +1435,31 @@ class TicketController extends Controller
         Notification::route('mail', $reciever)->notify(new StatusUpdateNotification($data_email));
     }
 
+    public function slaPreview(Request $request)
+    {
+        // set validation
+        $validate = $request->validate([
+            'from' => 'required',
+            'to'   => 'required|after:from'
+        ]);
+
+        // get the tickets 
+        $tickets = Ticket::whereBetween('created_at', [Carbon::parse($validate['from']), Carbon::parse($validate['to'])])->get();
+
+        // get the category
+        $categories = Category::withCount(['tickets' => function ($q) use ($validate) {
+            $q->whereBetween('tickets.created_at', [Carbon::parse($validate['from']), Carbon::parse($validate['to'])]);
+        }])->withCount('subCategories')->get();
+
+        return view('admin.export.sla-preview', [
+            'title'      => 'SLA Report Preview - Helpdesk Ticketing System',
+            'name'       => Auth::user()->employee->name,
+            'tickets'    => $tickets,
+            'validate'   => $validate,
+            'categories' => $categories,
+        ]);
+    }
+
     public function slaReport(Request $request)
     {
         // set validation
@@ -1444,11 +1471,16 @@ class TicketController extends Controller
         // get the tickets 
         $tickets = Ticket::whereBetween('created_at', [Carbon::parse($validate['from']), Carbon::parse($validate['to'])])->get();
 
+        // get the category
+        $categories = Category::withCount(['tickets' => function ($q) use ($validate) {
+            $q->whereBetween('tickets.created_at', [Carbon::parse($validate['from']), Carbon::parse($validate['to'])]);
+        }])->withCount('subCategories')->get();
+
         // check the tickets
         if ($tickets->count() === 0) {
             return back()->with('pesan', 'There is no data between ' . $validate['from'] . ' and ' . $validate['to']);
         } else {
-            return Excel::download(new TicketExport($tickets), 'SLA_Report_' . $request->from . '_' . $request->to . '.xlsx');
+            return Excel::download(new TicketExport($tickets, $validate, $categories), 'SLA_Report_' . $request->from . '_' . $request->to . '.xlsx');
         }
     }
 
@@ -1466,13 +1498,19 @@ class TicketController extends Controller
         if (!$expect_finish_at->between($start, $end)) {
             $diff = $expect_finish_at->diffInSeconds($end);
             if ($expect_finish_at->addDay()->isWeekend()) {
-                $new_expect = $expect_finish_at->copy()->nextWeekday()->setTime(0, 30 , 0)->addSecond($diff);
+                $new_expect = $expect_finish_at->copy()->nextWeekday()->setTime(0, 30, 0)->addSecond($diff);
                 dd($new_expect->tz('Asia/Jakarta'));
             }
-            $new_expect = $expect_finish_at->copy()->setTime(0 ,30 ,0)->addSecond($diff);
+            $new_expect = $expect_finish_at->copy()->setTime(0, 30, 0)->addSecond($diff);
             dd($new_expect->tz('Asia/Jakarta'));
         }
         $new_expect = $expect_finish_at;
         dd($new_expect->tz('Asia/Jakarta'));
+    }
+
+    public function testing2()
+    {
+        $from   = Carbon::create(2023, 4, 3);
+        $to     = Carbon::create(2023, 4, 28);
     }
 }
