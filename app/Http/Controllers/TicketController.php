@@ -1443,20 +1443,45 @@ class TicketController extends Controller
             'to'   => 'required|after:from'
         ]);
 
-        // get the tickets 
+        // Query for all ticket
         $tickets = Ticket::whereBetween('created_at', [Carbon::parse($validate['from']), Carbon::parse($validate['to'])])->get();
 
-        // get the category
+        // Query for total ticket based on category and sub category
         $categories = Category::withCount(['tickets' => function ($q) use ($validate) {
             $q->whereBetween('tickets.created_at', [Carbon::parse($validate['from']), Carbon::parse($validate['to'])]);
         }])->withCount('subCategories')->get();
 
+        // Query for total ticket based on department and sub department
+        $departments     = Department::withCount('subDepartments')->get();
+        foreach ($departments as $department) {
+            // for department
+            $department_ticket = Ticket::whereHas('user.employee', function ($q) use ($department) {
+                $q->where('department_id', $department->id);
+            })->whereBetween('created_at', [Carbon::parse($validate['from']), Carbon::parse($validate['to'])])->count();
+            $data_dept[] = [
+                'department'     => $department->name,
+                'tickets_count'  => $department_ticket,
+            ];
+
+            // for sub department
+            foreach ($department->subDepartments as $subdepartment) {
+                $subdepartment_ticket = Ticket::whereHas('user.employee', function ($q) use ($subdepartment) {
+                    $q->where('sub_department_id', $subdepartment->id);
+                })->whereBetween('created_at', [Carbon::parse($validate['from']), Carbon::parse($validate['to'])])->count();
+                $data_subdept[] = [
+                    'dept'    => $department->name,
+                    'subdept' => $subdepartment->name,
+                    'count'   => $subdepartment_ticket,
+                ];
+            }
+        }
+
         return view('admin.export.sla-preview', [
-            'title'      => 'SLA Report Preview - Helpdesk Ticketing System',
-            'name'       => Auth::user()->employee->name,
-            'tickets'    => $tickets,
-            'validate'   => $validate,
-            'categories' => $categories,
+            'tickets'         => $tickets,
+            'validate'        => $validate,
+            'categories'      => $categories,
+            'data_dept'       => $data_dept,
+            'data_subdept'    => $data_subdept
         ]);
     }
 
@@ -1475,6 +1500,19 @@ class TicketController extends Controller
         $categories = Category::withCount(['tickets' => function ($q) use ($validate) {
             $q->whereBetween('tickets.created_at', [Carbon::parse($validate['from']), Carbon::parse($validate['to'])]);
         }])->withCount('subCategories')->get();
+
+        // get the department
+        $departments     = Department::get(['id', 'name'])->all();
+        $data_department = [];
+        foreach ($departments as $department) {
+            $tickets = Ticket::whereHas('user.employee', function ($q) use ($department) {
+                $q->where('department_id', $department->id);
+            })->whereBetween('created_at', [Carbon::parse($validate['from']), Carbon::parse($validate['to'])])->count();
+            $data_department[] = [
+                'department' => $department->name,
+                'tickets_count' => $tickets
+            ];
+        }
 
         // check the tickets
         if ($tickets->count() === 0) {
@@ -1512,5 +1550,10 @@ class TicketController extends Controller
     {
         $from   = Carbon::create(2023, 4, 3);
         $to     = Carbon::create(2023, 4, 28);
+
+        // get the tickets 
+        $tickets = Ticket::whereBetween('created_at', [$from, $to])->get();
+        $status  = $tickets->groupBy('isUnderSla');
+        dd($status->sum('isUnderSla'));
     }
 }

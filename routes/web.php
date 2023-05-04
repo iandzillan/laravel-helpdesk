@@ -282,4 +282,4 @@ Route::group(['middleware' => ['auth']], function () {
 });
 
 // Route::get('/testing', [DashboardController::class, 'testing']);
-// Route::get('/testing2', [TicketController::class, 'testing2']);
+Route::get('/testing2', [TicketController::class, 'testing2']);

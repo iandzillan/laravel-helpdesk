@@ -13,7 +13,7 @@ class Department extends Model
 
     public function subDepartments()
     {
-        return $this->hasMany(Department::class);
+        return $this->hasMany(SubDepartment::class);
     }
 
     public function employees()
