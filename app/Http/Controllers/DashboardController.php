@@ -146,76 +146,101 @@ class DashboardController extends Controller
     {
         switch (Auth::user()->role) {
             case 'Admin':
-                $months = Ticket::select(DB::raw('MONTHNAME(created_at) as month'))
+                $months = Ticket::select(DB::raw('MONTHNAME(created_at) AS month'))
                     ->where(DB::raw('YEAR(created_at)'), date('Y'))
-                    ->groupBy('month')
-                    ->orderBy(DB::raw('MONTH(created_at)', 'asc'))
-                    ->pluck('month')->all();
-
-                $tickets = Ticket::join('sub_categories', 'sub_categories.id', '=', 'tickets.sub_category_id')
-                    ->join('categories', 'categories.id', '=', 'sub_categories.category_id')
-                    ->select(DB::raw('categories.name as name, count(tickets.id) as count'))
-                    ->where(DB::raw('YEAR(tickets.created_at)'), date('Y'))
-                    ->groupBy(DB::raw('name, MONTH(tickets.created_at)'))
+                    ->groupBy(DB::raw('month'))
                     ->get();
 
-                $map = $tickets->mapToGroups(function ($item, $key) {
+                $month  = $months->pluck('month');
+
+                foreach ($months as $item) {
+                    $categories = Category::withCount(['tickets' => function ($q) use ($item) {
+                        $q->where(DB::raw('MONTHNAME(tickets.created_at)'), $item->month)->where(DB::raw('YEAR(tickets.created_at)'), date('Y'));
+                    }])->get();
+
+                    foreach ($categories as $category) {
+                        $datas[] = [
+                            'name'  => $category->name,
+                            'count' => $category->tickets_count,
+                        ];
+                    }
+
+                    $data = collect($datas);
+                }
+
+                $map = $data->mapToGroups(function ($item) {
                     return [$item['name'] => $item['count']];
                 });
                 break;
 
             case 'Approver1':
-                $months = Ticket::select(DB::raw('MONTHNAME(created_at) as month'))
+                $months = Ticket::select(DB::raw('MONTHNAME(created_at) AS month'))
                     ->whereHas('user.employee', function ($q) {
                         $q->where('department_id', Auth::user()->employee->department_id);
                     })
                     ->where(DB::raw('YEAR(created_at)'), date('Y'))
-                    ->groupBy('month')
-                    ->orderBy(DB::raw('MONTH(created_at)', 'asc'))
-                    ->pluck('month')
-                    ->all();
-
-                $tickets = Ticket::join('sub_categories', 'sub_categories.id', '=', 'tickets.sub_category_id')
-                    ->join('categories', 'categories.id', '=', 'sub_categories.category_id')
-                    ->select(DB::raw('categories.name, count(tickets.id) as count'))
-                    ->whereHas('user.employee', function ($q) {
-                        $q->where('department_id', Auth::user()->employee->department_id);
-                    })
-                    ->where(DB::raw('YEAR(tickets.created_at)'), date('Y'))
-                    ->groupBy(DB::raw('name, MONTH(tickets.created_at)'))
+                    ->groupBy(DB::raw('month'))
                     ->get();
 
-                $map = $tickets->mapToGroups(function ($item, $key) {
+                $month  = $months->pluck('month');
+
+                foreach ($months as $item) {
+                    $categories = Category::withCount(['tickets' => function ($q) use ($item) {
+                        $q->where(DB::raw('MONTHNAME(tickets.created_at)'), $item->month)
+                            ->whereHas('user.employee', function ($q) {
+                                $q->where('department_id', Auth::user()->employee->department_id);
+                            })
+                            ->where(DB::raw('YEAR(tickets.created_at)'), date('Y'));
+                    }])->get();
+
+                    foreach ($categories as $category) {
+                        $datas[] = [
+                            'name'  => $category->name,
+                            'count' => $category->tickets_count,
+                        ];
+                    }
+
+                    $data = collect($datas);
+                }
+
+                $map = $data->mapToGroups(function ($item) {
                     return [$item['name'] => $item['count']];
                 });
                 break;
 
             case 'Approver2':
-                $months = Ticket::select(DB::raw('MONTHNAME(created_at) as month'))
+                $months = Ticket::select(DB::raw('MONTHNAME(created_at) AS month'))
                     ->whereHas('user.employee', function ($q) {
                         $q->where('sub_department_id', Auth::user()->employee->sub_department_id);
                     })
                     ->where(DB::raw('YEAR(created_at)'), date('Y'))
-                    ->groupBy('month')
-                    ->orderBy(DB::raw('MONTH(created_at)', 'asc'))
-                    ->pluck('month')
-                    ->all();
-
-                $tickets = Ticket::join('sub_categories', 'sub_categories.id', '=', 'tickets.sub_category_id')
-                    ->whereHas('user.employee', function ($q) {
-                        $q->where('sub_department_id', Auth::user()->employee->sub_department_id);
-                    })
-                    ->join('categories', 'categories.id', '=', 'sub_categories.category_id')
-                    ->select(DB::raw('COUNT(tickets.id) AS count, MONTHNAME(tickets.created_at) AS month, categories.name AS name'))
-                    ->where(DB::raw('YEAR(tickets.created_at)'), date('Y'))
-                    ->groupBy(DB::raw('name, month'))
-                    ->orderBy('month')
+                    ->groupBy(DB::raw('month'))
                     ->get();
 
-                $map = $tickets->mapToGroups(function ($item) {
-                    return [$item['month'] => $item['count']];
-                });
+                $month  = $months->pluck('month');
 
+                foreach ($months as $item) {
+                    $categories = Category::withCount(['tickets' => function ($q) use ($item) {
+                        $q->where(DB::raw('MONTHNAME(tickets.created_at)'), $item->month)
+                            ->whereHas('user.employee', function ($q) {
+                                $q->where('sub_department_id', Auth::user()->employee->sub_department_id);
+                            })
+                            ->where(DB::raw('YEAR(tickets.created_at)'), date('Y'));
+                    }])->get();
+
+                    foreach ($categories as $category) {
+                        $datas[] = [
+                            'name'  => $category->name,
+                            'count' => $category->tickets_count,
+                        ];
+                    }
+
+                    $data = collect($datas);
+                }
+
+                $map = $data->mapToGroups(function ($item) {
+                    return [$item['name'] => $item['count']];
+                });
                 break;
 
             default:
@@ -226,7 +251,7 @@ class DashboardController extends Controller
         return response()->json([
             'name'  => $map->keys(),
             'data'  => $map->values(),
-            'month' => $months
+            'month' => $month
         ]);
     }
 
@@ -234,75 +259,95 @@ class DashboardController extends Controller
     {
         switch (Auth::user()->role) {
             case 'Admin':
-                $months = Ticket::select(DB::raw('MONTHNAME(created_at) as month'))
-                    ->where(DB::raw('YEAR(created_at)'), date('Y'))
+                $months = Ticket::select(DB::raw('MONTHNAME(created_at) AS month'))
                     ->where(DB::raw('MONTHNAME(created_at)'), date('F'))
-                    ->groupBy('month')
-                    ->pluck('month');
-
-                $tickets = Ticket::join('sub_categories', 'sub_categories.id', '=', 'tickets.sub_category_id')
-                    ->join('categories', 'categories.id', '=', 'sub_categories.category_id')
-                    ->select(DB::raw('categories.name as name, count(tickets.id) as count'))
-                    ->where(DB::raw('YEAR(tickets.created_at)'), date('Y'))
-                    ->where(DB::raw('MONTHNAME(tickets.created_at)'), date('F'))
-                    ->groupBy(DB::raw('name, MONTH(tickets.created_at)'))
+                    ->groupBy(DB::raw('month'))
                     ->get();
 
-                $tickets = $tickets->mapToGroups(function ($item, $key) {
+                $month  = $months->pluck('month');
+
+                foreach ($months as $item) {
+                    $categories = Category::withCount(['tickets' => function ($q) use ($item) {
+                        $q->where(DB::raw('MONTHNAME(tickets.created_at)'), $item->month);
+                    }])->get();
+
+                    foreach ($categories as $category) {
+                        $datas[] = [
+                            'name'  => $category->name,
+                            'count' => $category->tickets_count,
+                        ];
+                    }
+
+                    $data = collect($datas);
+                }
+
+                $map = $data->mapToGroups(function ($item) {
                     return [$item['name'] => $item['count']];
                 });
                 break;
 
             case 'Approver1':
-                $months = Ticket::select(DB::raw('MONTHNAME(created_at) as month'))
+                $months = Ticket::select(DB::raw('MONTHNAME(created_at) AS month'))
                     ->whereHas('user.employee', function ($q) {
                         $q->where('department_id', Auth::user()->employee->department_id);
                     })
-                    ->where(DB::raw('YEAR(created_at)'), date('Y'))
                     ->where(DB::raw('MONTHNAME(created_at)'), date('F'))
-                    ->groupBy('month')
-                    ->pluck('month')
-                    ->all();
-
-                $tickets = Ticket::join('sub_categories', 'sub_categories.id', '=', 'tickets.sub_category_id')
-                    ->join('categories', 'categories.id', '=', 'sub_categories.category_id')
-                    ->select(DB::raw('categories.name, count(tickets.id) as count'))
-                    ->whereHas('user.employee', function ($q) {
-                        $q->where('department_id', Auth::user()->employee->department_id);
-                    })
-                    ->where(DB::raw('YEAR(tickets.created_at)'), date('Y'))
-                    ->where(DB::raw('MONTHNAME(tickets.created_at)'), date('F'))
-                    ->groupBy(DB::raw('categories.name, MONTH(tickets.created_at)'))
+                    ->groupBy(DB::raw('month'))
                     ->get();
 
-                $tickets = $tickets->mapToGroups(function ($item, $key) {
+                $month  = $months->pluck('month');
+
+                foreach ($months as $item) {
+                    $categories = Category::withCount(['tickets' => function ($q) use ($item) {
+                        $q->where(DB::raw('MONTHNAME(tickets.created_at)'), $item->month)->whereHas('user.employee', function ($q) {
+                            $q->where('department_id', Auth::user()->employee->department_id);
+                        });
+                    }])->get();
+
+                    foreach ($categories as $category) {
+                        $datas[] = [
+                            'name'  => $category->name,
+                            'count' => $category->tickets_count,
+                        ];
+                    }
+
+                    $data = collect($datas);
+                }
+
+                $map = $data->mapToGroups(function ($item) {
                     return [$item['name'] => $item['count']];
                 });
                 break;
 
             case 'Approver2':
-                $months = Ticket::select(DB::raw('MONTHNAME(created_at) as month'))
+                $months = Ticket::select(DB::raw('MONTHNAME(created_at) AS month'))
                     ->whereHas('user.employee', function ($q) {
                         $q->where('sub_department_id', Auth::user()->employee->sub_department_id);
                     })
-                    ->where(DB::raw('YEAR(created_at)'), date('Y'))
                     ->where(DB::raw('MONTHNAME(created_at)'), date('F'))
-                    ->groupBy('month')
-                    ->pluck('month')
-                    ->all();
-
-                $tickets = Ticket::join('sub_categories', 'sub_categories.id', '=', 'tickets.sub_category_id')
-                    ->join('categories', 'categories.id', '=', 'sub_categories.category_id')
-                    ->select(DB::raw('categories.name, count(tickets.id) as count'))
-                    ->whereHas('user.employee', function ($q) {
-                        $q->where('sub_department_id', Auth::user()->employee->sub_department_id);
-                    })
-                    ->where(DB::raw('YEAR(tickets.created_at)'), date('Y'))
-                    ->where(DB::raw('MONTHNAME(tickets.created_at)'), date('F'))
-                    ->groupBy(DB::raw('name, MONTH(tickets.created_at)'))
+                    ->groupBy(DB::raw('month'))
                     ->get();
 
-                $tickets = $tickets->mapToGroups(function ($item, $key) {
+                $month  = $months->pluck('month');
+
+                foreach ($months as $item) {
+                    $categories = Category::withCount(['tickets' => function ($q) use ($item) {
+                        $q->where(DB::raw('MONTHNAME(tickets.created_at)'), $item->month)->whereHas('user.employee', function ($q) {
+                            $q->where('sub_department_id', Auth::user()->employee->sub_department_id);
+                        });
+                    }])->get();
+
+                    foreach ($categories as $category) {
+                        $datas[] = [
+                            'name'  => $category->name,
+                            'count' => $category->tickets_count,
+                        ];
+                    }
+
+                    $data = collect($datas);
+                }
+
+                $map = $data->mapToGroups(function ($item) {
                     return [$item['name'] => $item['count']];
                 });
                 break;
@@ -313,9 +358,9 @@ class DashboardController extends Controller
         }
 
         return response()->json([
-            'name' => $tickets->keys(),
-            'data' => $tickets->values(),
-            'month' => $months
+            'name'  => $map->keys(),
+            'data'  => $map->values(),
+            'month' => $month
         ]);
     }
 
@@ -323,85 +368,99 @@ class DashboardController extends Controller
     {
         switch (Auth::user()->role) {
             case 'Admin':
-                $weeks = Ticket::select(DB::raw('DATE(created_at) as date'))
+                $dates = Ticket::select(DB::raw('DATE(created_at) AS date'))
                     ->whereBetween('created_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])
                     ->groupBy('date')
-                    ->pluck('date')
-                    ->all();
-
-                $week = [];
-                foreach ($weeks as $row) {
-                    $week[] = Carbon::parse($row)->tz('Asia/Jakarta')->format('Y-m-d');
-                }
-
-                $tickets = Ticket::join('sub_categories', 'sub_categories.id', '=', 'tickets.sub_category_id')
-                    ->join('categories', 'categories.id', '=', 'sub_categories.category_id')
-                    ->select(DB::raw('categories.name as name, count(tickets.id) as count'))
-                    ->whereBetween('tickets.created_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])
-                    ->groupBy(DB::raw('name, DATE(tickets.created_at)'))
                     ->get();
 
-                $tickets = $tickets->mapToGroups(function ($item, $key) {
+                $date = $dates->pluck('date');
+
+                foreach ($dates as $item) {
+                    $categories = Category::withCount(['tickets' => function ($q) use ($item) {
+                        $q->where(DB::raw('DATE(tickets.created_at)'), $item->date)
+                            ->where(DB::raw('YEAR(tickets.created_at)'), date('Y'));
+                    }])->get();
+
+                    foreach ($categories as $category) {
+                        $datas[] = [
+                            'name'  => $category->name,
+                            'count' => $category->tickets_count,
+                        ];
+                    }
+
+                    $data = collect($datas);
+                }
+
+                $map = $data->mapToGroups(function ($item) {
                     return [$item['name'] => $item['count']];
                 });
                 break;
 
             case 'Approver1':
-                $weeks = Ticket::select(DB::raw('DATE(created_at) as date'))
-                    ->whereHas('user.employee', function ($q) {
-                        $q->where('department_id', Auth::user()->employee->department_id);
-                    })
+                $dates = Ticket::select(DB::raw('DATE(created_at) AS date'))
                     ->whereBetween('created_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])
-                    ->groupBy('date')
-                    ->pluck('date')
-                    ->all();
-
-                $week = [];
-                foreach ($weeks as $row) {
-                    $week[] = Carbon::parse($row)->tz('Asia/Jakarta')->format('Y-m-d');
-                }
-
-                $tickets = Ticket::join('sub_categories', 'sub_categories.id', '=', 'tickets.sub_category_id')
-                    ->join('categories', 'categories.id', '=', 'sub_categories.category_id')
-                    ->select(DB::raw('categories.name, count(tickets.id) as count'))
                     ->whereHas('user.employee', function ($q) {
                         $q->where('department_id', Auth::user()->employee->department_id);
                     })
-                    ->whereBetween('tickets.created_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])
-                    ->groupBy(DB::raw('name, DATE(tickets.created_at)'))
+                    ->groupBy('date')
                     ->get();
 
-                $tickets = $tickets->mapToGroups(function ($item, $key) {
+                $date = $dates->pluck('date');
+
+                foreach ($dates as $item) {
+                    $categories = Category::withCount(['tickets' => function ($q) use ($item) {
+                        $q->where(DB::raw('DATE(tickets.created_at)'), $item->date)
+                            ->where(DB::raw('YEAR(tickets.created_at)'), date('Y'))
+                            ->whereHas('user.employee', function ($q) {
+                                $q->where('department_id', Auth::user()->employee->department_id);
+                            });
+                    }])->get();
+
+                    foreach ($categories as $category) {
+                        $datas[] = [
+                            'name'  => $category->name,
+                            'count' => $category->tickets_count,
+                        ];
+                    }
+
+                    $data = collect($datas);
+                }
+                $map = $data->mapToGroups(function ($item) {
                     return [$item['name'] => $item['count']];
                 });
                 break;
 
             case 'Approver2':
-                $weeks = Ticket::select(DB::raw('DATE(created_at) as date'))
-                    ->whereHas('user.employee', function ($q) {
-                        $q->where('sub_department_id', Auth::user()->employee->sub_department_id);
-                    })
+                $dates = Ticket::select(DB::raw('DATE(created_at) AS date'))
                     ->whereBetween('created_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])
-                    ->groupBy('date')
-                    ->pluck('date')
-                    ->all();
-
-                $week = [];
-                foreach ($weeks as $row) {
-                    $week[] = Carbon::parse($row)->tz('Asia/Jakarta')->format('Y-m-d');
-                }
-
-                $tickets = Ticket::join('sub_categories', 'sub_categories.id', '=', 'tickets.sub_category_id')
-                    ->join('categories', 'categories.id', '=', 'sub_categories.category_id')
-                    ->select(DB::raw('categories.name, count(tickets.id) as count'))
                     ->whereHas('user.employee', function ($q) {
                         $q->where('sub_department_id', Auth::user()->employee->sub_department_id);
                     })
-                    ->whereBetween('tickets.created_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])
-                    ->groupBy(DB::raw('name, DATE(tickets.created_at)'))
+                    ->groupBy('date')
                     ->get();
 
-                $tickets = $tickets->mapToGroups(function ($item, $key) {
+                $date = $dates->pluck('date');
+
+                foreach ($dates as $item) {
+                    $categories = Category::withCount(['tickets' => function ($q) use ($item) {
+                        $q->where(DB::raw('DATE(tickets.created_at)'), $item->date)
+                            ->where(DB::raw('YEAR(tickets.created_at)'), date('Y'))
+                            ->whereHas('user.employee', function ($q) {
+                                $q->where('sub_department_id', Auth::user()->employee->sub_department_id);
+                            });
+                    }])->get();
+
+                    foreach ($categories as $category) {
+                        $datas[] = [
+                            'name'  => $category->name,
+                            'count' => $category->tickets_count,
+                        ];
+                    }
+
+                    $data = collect($datas);
+                }
+
+                $map = $data->mapToGroups(function ($item) {
                     return [$item['name'] => $item['count']];
                 });
                 break;
@@ -412,9 +471,9 @@ class DashboardController extends Controller
         }
 
         return response()->json([
-            'name' => $tickets->keys(),
-            'data' => $tickets->values(),
-            'week' => $week
+            'name' => $map->keys(),
+            'data' => $map->values(),
+            'week' => $date
         ]);
     }
 
@@ -676,34 +735,69 @@ class DashboardController extends Controller
 
     public function testing()
     {
-        // $months = Ticket::select(DB::raw('MONTHNAME(created_at) as month'))
-        //     ->whereHas('user.employee', function ($q) {
-        //         $q->where('sub_department_id', Auth::user()->employee->sub_department_id);
-        //     })
-        //     ->where(DB::raw('YEAR(created_at)'), date('Y'))
-        //     ->groupBy('month')
-        //     ->orderBy(DB::raw('MONTH(created_at)', 'asc'))
-        //     ->get();
-
-        $tickets = Ticket::join('sub_categories', 'sub_categories.id', '=', 'tickets.sub_category_id')
-            ->whereHas('user.employee', function ($q) {
-                $q->where('sub_department_id', Auth::user()->employee->sub_department_id);
-            })
-            ->join('categories', 'categories.id', '=', 'sub_categories.category_id')
-            ->select(DB::raw('COUNT(tickets.id) AS count, categories.name AS name, MONTHNAME(tickets.created_at) AS month'))
-            ->where(DB::raw('YEAR(tickets.created_at)'), date('Y'))
-            ->groupBy(DB::raw('month, name'))
-            ->get();
-
-        $data = [];
-        $map = $tickets->mapToGroups(function ($item) {
-            $data = [$item['month'] => $item['count']];
-            return $data;
+        $months = Ticket::select(DB::raw('MONTHNAME(created_at) AS month'))->where(DB::raw('MONTHNAME(created_at)'), date('F'))->groupBy(DB::raw('month'))->get();
+        $month  = $months->pluck('month');
+        foreach ($months as $item) {
+            $categories = Category::withCount(['tickets' => function ($q) use ($item) {
+                $q->where(DB::raw('MONTHNAME(tickets.created_at)'), $item->month)->whereHas('user.employee', function ($q) {
+                    $q->where('sub_department_id', Auth::user()->employee->sub_department_id);
+                });
+            }])->get();
+            foreach ($categories as $category) {
+                $datas[] = [
+                    'name'  => $category->name,
+                    'count' => $category->tickets_count,
+                ];
+            }
+            $data = collect($datas);
+        }
+        $result = $data->mapToGroups(function ($item) {
+            return [$item['name'] => $item['count']];
         });
 
         return response()->json([
-            'month' => $map->keys(),
-            'category' => $map->values()
+            'month' => $month,
+            'data'  => $result->keys(),
+            'count' => $result->values(),
+        ]);
+    }
+
+    public function testing2()
+    {
+        $dates = Ticket::select(DB::raw('DATE(created_at) AS date'))
+            ->whereBetween('created_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])
+            ->whereHas('user.employee', function ($q) {
+                $q->where('sub_department_id', Auth::user()->employee->sub_department_id);
+            })
+            ->groupBy('date')
+            ->get();
+        $date = $dates->pluck('date');
+
+        foreach ($dates as $item) {
+            $categories = Category::withCount(['tickets' => function ($q) use ($item) {
+                $q->where(DB::raw('DATE(tickets.created_at)'), $item->date)
+                    ->where(DB::raw('YEAR(tickets.created_at)'), date('Y'))
+                    ->whereHas('user.employee', function ($q) {
+                        $q->where('sub_department_id', Auth::user()->employee->sub_department_id);
+                    });
+            }])->get();
+
+            foreach ($categories as $category) {
+                $datas[] = [
+                    'name'  => $category->name,
+                    'count' => $category->tickets_count,
+                ];
+            }
+            $data = collect($datas);
+        }
+        $result = $data->mapToGroups(function ($item) {
+            return [$item['name'] => $item['count']];
+        });
+
+        return response()->json([
+            'date'  => $date,
+            'data'  => $result->keys(),
+            'count' => $result->values(),
         ]);
     }
 }

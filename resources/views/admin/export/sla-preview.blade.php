@@ -42,290 +42,281 @@
     @else    
         <div class="card">
             <div class="card-body">
-                <form action="{{ route('admin.sla.report') }}" method="post">
-                    @method('post')
-                    @csrf
-                    <input type="hidden" name="from" value="{{ $validate['from'] }}">
-                    <input type="hidden" name="to" value="{{ $validate['to'] }}">
-                    
-                    <button type="submit" class="btn btn-primary btn-sm">
-                        <i class="fa-solid fa-download"></i>
-                        Export
-                    </button>
-                </form>
-                <br>
-
-                <div class="table-responsive">
-                    <table class="table table-bordered data-table">
-                        <thead>
-                            <tr>
-                                <th colspan="14" align="center">
-                                    <b>
-                                        Service-Level Agreement Report From {{ $validate['from'] }} - {{ $validate['to'] }} 
-                                    </b>
-                                </th>
-                            </tr>
-                            <tr>
-                                <th>No</th>
-                                <th>Created At</th>
-                                <th>Ticket Number</th>
-                                <th>User</th>
-                                <th>Subject</th>
-                                <th>Category</th>
-                                <th>Sub Category</th>
-                                <th>Technician</th>
-                                <th>Status</th>
-                                <th>Progress At</th>
-                                <th>Finish At</th>
-                                <th>SLA Duration</th>
-                                <th>On work Duration</th>
-                                <th>Pending Duration</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse ($tickets as $ticket)
-                                <tr>
-                                    <td>{{ $loop->iteration }}</td>
-                                    <td>{{ $ticket->created_at }}</td>
-                                    <td>{{ $ticket->ticket_number }}</td>
-                                    <td>{{ $ticket->user->employee->name }}</td>
-                                    <td>{{ $ticket->subject }}</td>
-                                    <td>{{ $ticket->subCategory->category->name }}</td>
-                                    <td>{{ $ticket->subCategory->name }}</td>
-                                    <td>{{ ($ticket->technician == null) ? "--" : $ticket->technician->employee->name }}</td>
-                                    <td>{{ $ticket->status }}</td>
-                                    <td>{{ $ticket->progress_at }}</td>
-                                    <td>{{ $ticket->finish_at }}</td>
-                                    <td>{{ ($ticket->urgency == null) ? "--" : gmdate('H:i:s', $ticket->urgency->hours * 3600) }}</td>
-                                    <td>{{ gmdate('H:i:s', $ticket->trackings->where('status', '!=', 'Ticket Continued')->sum('duration')) }}</td>
-                                    <td>{{ gmdate('H:i:s', $ticket->trackings->where('status', 'Ticket Continued')->sum('duration')) }}</td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="12">No data</td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-                <br>
-
-                <div class="table-responsive">
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th colspan="12" align="center">
-                                    <b>
-                                        Total ticket based on status 
-                                    </b>
-                                </th>
-                            </tr>
-                            <tr>
-                                <th>Status</th>
-                                <th>Total Ticket</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @php
-                                $status = $tickets->groupBy('status');
-                            @endphp
-                            <tr>
-                                <td>Open</td>
-                                <td>{{ ($status->get('Open') == null) ? 0 : $status->get('Open')->count() }}</td>
-                            </tr>
-                            <tr>
-                                <td>Approved by Team Leader</td>
-                                <td>{{ ($status->get('Approved by Team Leader') == null) ? 0 : $status->get('Approved by Team Leader')->count() }}</td>
-                            </tr>
-                            <tr>
-                                <td>Approved by Manager</td>
-                                <td>{{ ($status->get('Approved by Manager') == null) ? 0 : $status->get('Approved by Manager')->count() }}</td>
-                            </tr>
-                            <tr>
-                                <td>On work</td>
-                                <td>{{ ($status->get('On work') == null) ? 0 : $status->get('On work')->count() }}</td>
-                            </tr>
-                            <tr>
-                                <td>Pending</td>
-                                <td>{{ ($status->get('Pending') == null) ? 0 : $status->get('Pending')->count() }}</td>
-                            </tr>
-                            <tr>
-                                <td>Closed</td>
-                                <td>{{ ($status->get('Closed') == null) ? 0 : $status->get('Closed')->count() }}</td>
-                            </tr>
-                            <tr>
-                                <td>Rejected</td>
-                                <td>{{ ($status->get('Rejected') == null) ? 0 : $status->get('Rejected')->count() }}</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                <div class="col d-flex justify-content-end mb-3">
+                    <form action="{{ route('admin.sla.report') }}" method="post">
+                        @method('post')
+                        @csrf
+                        <input type="hidden" name="from" value="{{ $validate['from'] }}">
+                        <input type="hidden" name="to" value="{{ $validate['to'] }}">
+                        
+                        <button type="submit" class="btn btn-primary btn-sm">
+                            <i class="fa-solid fa-download"></i>
+                            Export
+                        </button>
+                    </form>
                 </div>
 
-                <div class="table-responsive">
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th colspan="2">
-                                    <b>Total Ticket Based on Category</b>
-                                </th>
-                            </tr>
-                            <tr>
-                                <th>Category</th>
-                                <th>Total Ticket</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($categories as $category)
+                <div class="col mb-3">
+                    <div class="table-responsive">
+                        <table class="table table-bordered data-table">
+                            <thead>
                                 <tr>
-                                    <td>{{ $category->name }}</td>
-                                    <td>{{ $category->tickets_count }}</td>
+                                    <th colspan="14" align="center">
+                                        <b>
+                                            Service-Level Agreement Report From {{ $validate['from'] }} - {{ $validate['to'] }} 
+                                        </b>
+                                    </th>
                                 </tr>
-                            @endforeach
-                            <tr>
-                                <td align="center">
-                                    <b>Total</b>
-                                </td>
-                                <td>
-                                    <b>{{ $categories->sum('tickets_count') }}</b>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="table-responsive">
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th colspan="3">
-                                    <b>Total Ticket Based on Sub Category</b>
-                                </th>
-                            </tr>
-                            <tr>
-                                <th>Category</th>
-                                <th>Sub Category</th>
-                                <th>Total Ticket</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($categories as $category)
-                                @foreach ($category->subCategories as $subcategory)
+                                <tr>
+                                    <th>No</th>
+                                    <th>Created At</th>
+                                    <th>Ticket Number</th>
+                                    <th>User</th>
+                                    <th>Subject</th>
+                                    <th>Category</th>
+                                    <th>Sub Category</th>
+                                    <th>Technician</th>
+                                    <th>Status</th>
+                                    <th>Progress At</th>
+                                    <th>Finish At</th>
+                                    <th>SLA Duration</th>
+                                    <th>On work Duration</th>
+                                    <th>Pending Duration</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse ($tickets as $ticket)
                                     <tr>
-                                        <td>{{ $category->name }}</td>
-                                        <td>{{ $subcategory->name }}</td>
-                                        <td>{{ $subcategory->tickets->whereBetween('created_at', [$validate['from'], $validate['to']])->count() }}</td>
+                                        <td>{{ $loop->iteration }}</td>
+                                        <td>{{ $ticket->created_at }}</td>
+                                        <td>{{ $ticket->ticket_number }}</td>
+                                        <td>{{ $ticket->user->employee->name }}</td>
+                                        <td>{{ $ticket->subject }}</td>
+                                        <td>{{ $ticket->subCategory->category->name }}</td>
+                                        <td>{{ $ticket->subCategory->name }}</td>
+                                        <td>{{ ($ticket->technician == null) ? "--" : $ticket->technician->employee->name }}</td>
+                                        <td>{{ $ticket->status }}</td>
+                                        <td>{{ $ticket->progress_at }}</td>
+                                        <td>{{ $ticket->finish_at }}</td>
+                                        <td>{{ ($ticket->urgency == null) ? "--" : gmdate('H:i:s', $ticket->urgency->hours * 3600) }}</td>
+                                        <td>{{ gmdate('H:i:s', $ticket->trackings->where('status', '!=', 'Ticket Continued')->sum('duration')) }}</td>
+                                        <td>{{ gmdate('H:i:s', $ticket->trackings->where('status', 'Ticket Continued')->sum('duration')) }}</td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="12">No data</td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="col mb-3">
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th colspan="2" align="center">
+                                        <b>
+                                            Total ticket based on status 
+                                        </b>
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <th>Status</th>
+                                    <th>Total Ticket</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($status as $item)
+                                    <tr>
+                                        <td>{{ $item['status'] }}</td>
+                                        <td align="end">{{ $item['count'] }}</td>
                                     </tr>
                                 @endforeach
-                            @endforeach
-                            <tr>
-                                <td colspan="2" align="center">
-                                    <b>Total</b>
-                                </td>
-                                <td>
-                                    <b>{{ $categories->sum('tickets_count') }}</b>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="table-responsive">
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th colspan="2">
-                                    <b>Total ticket in each department</b>
-                                </th>
-                            </tr>
-                            <tr>
-                                <th>Department</th>
-                                <th>Total Ticket</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @php
-                                $sum = 0;
-                            @endphp
-                            @foreach ($data_dept as $row)
                                 <tr>
-                                    <td>{{ $row['department'] }}</td>
-                                    <td>{{ $row['tickets_count'] }}</td>
+                                    <td align="center"><b>Total</b></td>
+                                    <td align="end"><b>{{ $status->sum('count') }}</b></td>
                                 </tr>
-                                @php
-                                    $sum += $row['tickets_count'];
-                                @endphp
-                            @endforeach
-                            <tr>
-                                <td align="center"><b>Total</b></td>
-                                <td><b>{{ $sum }}</b></td>
-                            </tr>
-                        </tbody>
-                    </table>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
 
-                <div class="table-responsive">
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th colspan="3">
-                                    <b>Total Ticket Based on Sub Department</b>
-                                </th>
-                            </tr>
-                            <tr>
-                                <th>Department</th>
-                                <th>Sub Department</th>
-                                <th>Total Ticket</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @php $sum1 = 0 @endphp
-                            @foreach ($data_subdept as $row)
+                <div class="col mb-3">
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
                                 <tr>
-                                    <td>{{ $row['dept'] }}</td>
-                                    <td>{{ $row['subdept'] }}</td>
-                                    <td>{{ $row['count'] }}</td>
+                                    <th colspan="2">
+                                        <b>Total Ticket Based on Category</b>
+                                    </th>
                                 </tr>
-                                @php
-                                    $sum1 += $row['count']
-                                @endphp
-                            @endforeach
-                            <tr>
-                                <td colspan="2" align="center">
-                                    <b>Total</b>
-                                </td>
-                                <td>
-                                    <b>{{ $sum1 }}</b>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                                <tr>
+                                    <th>Category</th>
+                                    <th>Total Ticket</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($categories as $category)
+                                    <tr>
+                                        <td>{{ $category->name }}</td>
+                                        <td align="end">{{ $category->tickets_count }}</td>
+                                    </tr>
+                                @endforeach
+                                <tr>
+                                    <td align="center">
+                                        <b>Total</b>
+                                    </td>
+                                    <td align="end">
+                                        <b>{{ $categories->sum('tickets_count') }}</b>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
 
-                <div class="table-responsive">
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th colspan="2">Total tickets based on SLA</th>
-                            </tr>
-                            <tr>
-                                <th></th>
-                                <th>Total Ticket</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @php
-                                $sla = $tickets->groupBy('isUnderSla');
-                            @endphp
-                            <tr>
-                                <td>Within SLA</td>
-                                <td>{{ ($sla->get('1') == null) ? 0 : $sla->get('1')->count() }}</td>
-                            </tr>
-                            <tr>
-                                <td>Out of SLA</td>
-                                <td>{{ ($sla->get('0') == null) ? 0 : $sla->get('0')->count() }}</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                <div class="col mb-3">
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th colspan="3">
+                                        <b>Total Ticket Based on Sub Category</b>
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <th>Category</th>
+                                    <th>Sub Category</th>
+                                    <th>Total Ticket</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($subcategory as $item)
+                                    <tr>
+                                        <td>{{ $item->category->name }}</td>
+                                        <td>{{ $item->name }}</td>
+                                        <td align="end">{{ $item->tickets_count }}</td>
+                                    </tr>
+                                @endforeach
+                                <tr>
+                                    <td colspan="2" align="center"><b>Total</b></td>
+                                    <td align="end"><b>{{ $subcategory->sum('tickets_count') }}</b></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="col mb-3">
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th colspan="2">
+                                        <b>Total ticket in each department</b>
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <th>Department</th>
+                                    <th>Total Ticket</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @php
+                                    $sum = 0;
+                                @endphp
+                                @foreach ($data_dept as $row)
+                                    <tr>
+                                        <td>{{ $row['department'] }}</td>
+                                        <td align="end">{{ $row['tickets_count'] }}</td>
+                                    </tr>
+                                    @php
+                                        $sum += $row['tickets_count'];
+                                    @endphp
+                                @endforeach
+                                <tr>
+                                    <td align="center"><b>Total</b></td>
+                                    <td align="end"><b>{{ $sum }}</b></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="col mb-3">
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th colspan="3">
+                                        <b>Total Ticket Based on Sub Department</b>
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <th>Department</th>
+                                    <th>Sub Department</th>
+                                    <th>Total Ticket</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @php $sum1 = 0 @endphp
+                                @php $sum2 = 0 @endphp
+                                @foreach ($data_subdept as $row)
+                                    <tr>
+                                        <td>{{ $row['dept'] }}</td>
+                                        <td>{{ $row['subdept'] }}</td>
+                                        <td align="end">{{ $row['count'] }}</td>
+                                    </tr>
+                                    @php $sum1 += $row['count'] @endphp
+                                @endforeach
+                                <tr>
+                                    <th colspan="3"><b>Manager</b></th>
+                                </tr>
+                                @foreach ($data_manager as $row)
+                                    <tr>
+                                        <td colspan="2">{{ $row['manager'] }} Manager</td>
+                                        <td align="end">{{ $row['count'] }}</td>
+                                    </tr>
+                                    @php $sum2 += $row['count'] @endphp
+                                @endforeach
+                                <tr>
+                                    <td colspan="2" align="center"><b>Total</b></td>
+                                    <td align="end"><b>{{ $sum1 + $sum2 }}</b></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="col mb-3">
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th colspan="2">Total tickets based on SLA</th>
+                                </tr>
+                                <tr>
+                                    <th>SLA</th>
+                                    <th>Total Ticket</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($sla as $item)
+                                    <tr>
+                                        <td>{{ $item['name'] }}</td>
+                                        <td align="end">{{ $item['count'] }}</td>
+                                    </tr>
+                                @endforeach
+                                <tr>
+                                    <td align="center"><b>Total</b></td>
+                                    <td align="end"><b>{{ $sla->sum('count') }}</b></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>

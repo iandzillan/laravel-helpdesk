@@ -209,7 +209,7 @@
 
     <div class="col-md-12 col-lg-12">
         <div class="row">
-            <div class="col-md-12 col-lg-6">
+            <div class="col-md-12 col-lg-5">
                 <div class="card" data-aos="fade-up" data-aos-delay="300">
                     <div class="flex-wrap card-header d-flex align-items-center">
                         <span class="fa-stack fa-2x">
@@ -251,7 +251,7 @@
                 </div>
             </div>
 
-            <div class="col-md-12 col-lg-6">
+            <div class="col-md-12 col-lg-7">
                 <div class="card" data-aos="fade-up" data-aos-delay="300">
                     <div class="flex-wrap card-header d-flex align-items-center">
                         <span class="fa-stack fa-2x">
