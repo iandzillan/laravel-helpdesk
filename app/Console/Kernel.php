@@ -23,14 +23,14 @@ class Kernel extends ConsoleKernel
             $tracking->status   = 'Ticket Postponed';
             $tracking->note     = 'Pending automatically by system';
 
-            $schedule->call(function() use($ticket, $tracking){
+            $schedule->call(function () use ($ticket, $tracking) {
                 $ticket->save();
                 $ticket->trackings()->save($tracking);
-            })->weekdays()->dailyAt('16:30')->timezone('Asia/Jakarta');
+            })->everyMinute();
         }
 
         // continue ticket
-        $tickets = Ticket::where('status', 5)->whereHas('trackings', function($q){
+        $tickets = Ticket::where('status', 5)->whereHas('trackings', function ($q) {
             $q->where('note', 'Pending automatically by system');
         })->get();
 
@@ -40,7 +40,7 @@ class Kernel extends ConsoleKernel
             $tracking->status   = 'Ticket Continued';
             $tracking->note     = 'Continue automatically by system';
 
-            $schedule->call(function() use($ticket, $tracking){
+            $schedule->call(function () use ($ticket, $tracking) {
                 $ticket->save();
                 $ticket->trackings()->save($tracking);
             })->weekdays()->dailyAt('7:30')->timezone('Asia/Jakarta');
@@ -52,7 +52,7 @@ class Kernel extends ConsoleKernel
      */
     protected function commands(): void
     {
-        $this->load(__DIR__.'/Commands');
+        $this->load(__DIR__ . '/Commands');
 
         require base_path('routes/console.php');
     }
