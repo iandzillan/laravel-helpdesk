@@ -294,27 +294,21 @@ class TicketController extends Controller
                 // define view
                 $view     = 'approver1.ticket.show-ticket';
                 // get ticket
-                $ticket   = Ticket::with('user', 'user.employee')->whereHas('user.employee', function ($q) {
-                    $q->where('department_id', Auth::user()->employee->department_id);
-                })->where('ticket_number', $ticket)->first();
+                $ticket   = Ticket::where('user_id', Auth::user()->id)->where('ticket_number', $ticket)->first();
                 break;
 
             case 'Approver2':
                 // define view
                 $view     = 'approver2.ticket.show-ticket';
                 // get ticket
-                $ticket   = Ticket::with('user', 'user.employee')->whereHas('user.employee', function ($q) {
-                    $q->where('sub_department_id', Auth::user()->employee->sub_department_id);
-                })->where('ticket_number', $ticket)->first();
+                $ticket   = Ticket::where('user_id', Auth::user()->id)->where('ticket_number', $ticket)->first();
                 break;
 
             case 'User':
                 // define view
                 $view     = 'user.ticket.show-ticket';
                 // get ticket
-                $ticket   = Ticket::whereHas('user', function ($q) {
-                    $q->where('user_id', Auth::user()->id);
-                })->where('ticket_number', $ticket)->first();
+                $ticket   = Ticket::where('user_id', Auth::user()->id)->where('ticket_number', $ticket)->first();
                 break;
 
             case 'Technician':
@@ -330,12 +324,16 @@ class TicketController extends Controller
         }
 
         // return view
-        return view($view, [
-            'title'     => "$ticket->ticket_number - Helpdesk Ticketing System",
-            'name'      => Auth::user()->employee->name,
-            'ticket'    => $ticket,
-            'trackings' => $ticket->trackings
-        ]);
+        if ($ticket == NULL) {
+            abort(403);
+        } else {
+            return view($view, [
+                'title'     => "$ticket->ticket_number - Helpdesk Ticketing System",
+                'name'      => Auth::user()->employee->name,
+                'ticket'    => $ticket,
+                'trackings' => $ticket->trackings
+            ]);
+        }
     }
 
     public function allTicket(Request $request)

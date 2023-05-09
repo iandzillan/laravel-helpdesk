@@ -26,7 +26,7 @@ class Kernel extends ConsoleKernel
             $schedule->call(function () use ($ticket, $tracking) {
                 $ticket->save();
                 $ticket->trackings()->save($tracking);
-            })->everyMinute();
+            })->weekdays()->dailyAt('16:30')->timezone('Asia/Jakarta');
         }
 
         // continue ticket

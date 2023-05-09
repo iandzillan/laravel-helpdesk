@@ -16,8 +16,9 @@ class LoginController extends Controller
     {
         $previousURL = session()->get('url.intended');
         $login       = url()->to('/');
+        $logout      = url()->to('/logout');
 
-        if ($previousURL != $login) {
+        if ($previousURL != $login || $previousURL != $logout) {
             $path        = parse_url($previousURL);
             $segment     = explode('/', $path['path']);
             if (count($segment) >= 3) {

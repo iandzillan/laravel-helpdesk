@@ -97,7 +97,7 @@
 
                 // ajax update isRequest
                 $.ajax({
-                    url: "{{ route('subdept.isRequest') }}",
+                    url: `/subdept/is-request/${nik}`,
                     type: 'patch',
                     cache: false,
                     data: {
@@ -112,39 +112,39 @@
                     },
                     success:function(response){
                         // ajax send email
-                        $.ajax({
-                            url: "{{route('subdept.sendRequest')}}",
-                            type: "get",
-                            cache: false,
-                            data:{
-                                'nik': nik,
-                                'name': name,
-                                'email': email,
-                                'username': username,
-                                'password': password,
-                                'password_confirmation': confirm,
-                                'role': role,
-                            },
-                            success:function(response1){
-                                // show message
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: `${response1.message}`,
-                                    showConfirmButton: false,
-                                    timer: 2000
-                                });
-                            },
-                            error:function(error1){
-                                console.log(error1.responseJSON.message);
-                                // show message
-                                Swal.fire({
-                                    icon: 'warning',
-                                    title: "User account request has been requested but email notification failed to be sent to admin",
-                                    text: `${error1.responseJSON.message}`,
-                                    showConfirmButton: false,
-                                });
-                            }
-                        });
+                        // $.ajax({
+                        //     url: "{{route('subdept.sendRequest')}}",
+                        //     type: "get",
+                        //     cache: false,
+                        //     data:{
+                        //         'nik': nik,
+                        //         'name': name,
+                        //         'email': email,
+                        //         'username': username,
+                        //         'password': password,
+                        //         'password_confirmation': confirm,
+                        //         'role': role,
+                        //     },
+                        //     success:function(response1){
+                        //         // show message
+                        //         Swal.fire({
+                        //             icon: 'success',
+                        //             title: `${response1.message}`,
+                        //             showConfirmButton: false,
+                        //             timer: 2000
+                        //         });
+                        //     },
+                        //     error:function(error1){
+                        //         console.log(error1.responseJSON.message);
+                        //         // show message
+                        //         Swal.fire({
+                        //             icon: 'warning',
+                        //             title: "User account request has been requested but email notification failed to be sent to admin",
+                        //             text: `${error1.responseJSON.message}`,
+                        //             showConfirmButton: false,
+                        //         });
+                        //     }
+                        // });
 
                         // clear form
                         $('#form-user-request').trigger('reset');

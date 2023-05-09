@@ -11,7 +11,7 @@
                 </div>
                 <div class="card-body">
                     <form id="form-update-employee" enctype="multipart/form-data" method="post">
-                        @method('patch')
+                        @method('put')
                         @csrf
                         <div class="new-user info">
                             <input type="hidden" id="employee-id" name="id" value="{{ $employee->id }}">

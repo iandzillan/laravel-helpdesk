@@ -6,14 +6,12 @@ use App\Mail\MailUserRequest;
 use App\Models\Department;
 use App\Models\Employee;
 use App\Models\SubDepartment;
-use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
-use Symfony\Contracts\Service\Attribute\Required;
 use Yajra\DataTables\Facades\DataTables;
 
 class EmployeeController extends Controller
@@ -512,10 +510,10 @@ class EmployeeController extends Controller
         ]);
     }
 
-    public function isRequest(Request $request)
+    public function isRequest(Request $request, $employee)
     {
         // get employee who has account request
-        $employee = Employee::where('nik', $request->nik)->first();
+        $employee = Employee::where('nik', $employee)->first();
 
         // set validation
         $validator = Validator::make($request->all(), [

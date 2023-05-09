@@ -195,12 +195,12 @@ Route::group(['middleware' => ['auth']], function () {
 
         Route::get('/subdept/employees', [EmployeeController::class, 'list'])->name('subdept.employees.list');
         Route::get('/subdept/employees/{employee}/edit', [EmployeeController::class, 'show'])->name('subdept.employees.show');
-        Route::patch('/subdept/employees/{employee}', [EmployeeController::class, 'update'])->name('subdept.employees.update');
+        Route::put('/subdept/employees/{employee}', [EmployeeController::class, 'update'])->name('subdept.employees.update');
         Route::delete('/subdept/employees/{employee}', [EmployeeController::class, 'destroy'])->name('subdept.employees.destroy');
 
         Route::get('/subdept/user-request', [EmployeeController::class, 'userRequestList'])->name('subdept.userrequestlist');
         Route::get('/subdept/user-request/{employee}', [EmployeeController::class, 'userRequest'])->name('subdept.userrequest');
-        Route::patch('/subdept/is-request', [EmployeeController::class, 'isRequest'])->name('subdept.isRequest');
+        Route::patch('/subdept/is-request/{employee}', [EmployeeController::class, 'isRequest'])->name('subdept.isRequest');
         Route::get('/subdept/send-request', [EmployeeController::class, 'sendRequest'])->name('subdept.sendRequest');
 
         Route::get('/subdept/create-ticket', [TicketController::class, 'createTicket'])->name('subdept.create.ticket');
