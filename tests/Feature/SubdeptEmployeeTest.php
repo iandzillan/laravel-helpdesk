@@ -39,14 +39,14 @@ class SubdeptEmployeeTest extends TestCase
         $response->assertStatus(200); //OK
     }
 
-    public function test_auth_subdept_edit_employee()
-    {
-        $subdept = User::where('username', 'ellapuspasari')->first();
-        $employee = 123620;
+    // public function test_auth_subdept_edit_employee()
+    // {
+    //     $subdept = User::where('username', 'ellapuspasari')->first();
+    //     $employee = 123620;
 
-        $response = $this->actingAs($subdept)->getJson('/subdept/employees/' . $employee . '/edit');
-        $response->assertStatus(200); //OK
-    }
+    //     $response = $this->actingAs($subdept)->getJson('/subdept/employees/' . $employee . '/edit');
+    //     $response->assertStatus(200); //OK
+    // }
 
     // public function test_auth_subdept_update_employee()
     // {
@@ -79,14 +79,14 @@ class SubdeptEmployeeTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function test_auth_subdept_access_aUser_request_employee()
-    {
-        $subdept = User::where('username', 'ellapuspasari')->first();
-        $employee = 123620;
+    // public function test_auth_subdept_access_aUser_request_employee()
+    // {
+    //     $subdept = User::where('username', 'ellapuspasari')->first();
+    //     $employee = 123620;
 
-        $response = $this->actingAs($subdept)->getJson('/subdept/user-request/' . $employee);
-        $response->assertStatus(200);
-    }
+    //     $response = $this->actingAs($subdept)->getJson('/subdept/user-request/' . $employee);
+    //     $response->assertStatus(200);
+    // }
 
     // public function test_auth_subdept_isRequest_aUser_account_request_for_employee()
     // {

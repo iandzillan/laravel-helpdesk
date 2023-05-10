@@ -16,7 +16,6 @@ use Carbon\Carbon;
 use Carbon\CarbonInterval;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Validator;
 use Maatwebsite\Excel\Facades\Excel;
@@ -294,14 +293,18 @@ class TicketController extends Controller
                 // define view
                 $view     = 'approver1.ticket.show-ticket';
                 // get ticket
-                $ticket   = Ticket::where('user_id', Auth::user()->id)->where('ticket_number', $ticket)->first();
+                $ticket   = Ticket::whereHas('user.employee', function ($q) {
+                    $q->where('department_id', Auth::user()->employee->department_id);
+                })->where('ticket_number', $ticket)->first();
                 break;
 
             case 'Approver2':
                 // define view
                 $view     = 'approver2.ticket.show-ticket';
                 // get ticket
-                $ticket   = Ticket::where('user_id', Auth::user()->id)->where('ticket_number', $ticket)->first();
+                $ticket   = Ticket::whereHas('user.employee', function ($q) {
+                    $q->where('sub_department_id', Auth::user()->employee->sub_department_id);
+                })->where('ticket_number', $ticket)->first();
                 break;
 
             case 'User':
@@ -1448,17 +1451,21 @@ class TicketController extends Controller
         $tickets = Ticket::whereBetween('created_at', [$from, $to])->get();
 
         // Query total ticket based on category
-        $categories = Category::withCount(['tickets' => function ($q) use ($from, $to) {
-            $q->whereBetween('tickets.created_at', [$from, $to]);
-        }])->get();
+        $categories = Category::withCount([
+            'tickets' => function ($q) use ($from, $to) {
+                $q->whereBetween('tickets.created_at', [$from, $to]);
+            }
+        ])->get();
 
         // Query total ticket based on sub category
         foreach ($categories as $category) {
             $subcategories = $category->subCategories;
             foreach ($subcategories as $row) {
-                $subcategory = $row->withCount(['tickets' => function ($q) use ($from, $to) {
-                    $q->whereBetween('tickets.created_at', [$from, $to]);
-                }])->get();
+                $subcategory = $row->withCount([
+                    'tickets' => function ($q) use ($from, $to) {
+                        $q->whereBetween('tickets.created_at', [$from, $to]);
+                    }
+                ])->orderBy('category_id')->get();
             }
         }
 

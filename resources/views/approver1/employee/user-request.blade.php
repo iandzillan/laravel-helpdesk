@@ -113,7 +113,7 @@
 
                 // ajax update isRequest
                 $.ajax({
-                    url: "{{ route('dept.isRequest') }}",
+                    url: `/dept/is-request/${nik}`,
                     type: 'patch',
                     cache: false,
                     data: {

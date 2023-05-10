@@ -151,7 +151,7 @@ Route::group(['middleware' => ['auth']], function () {
 
         Route::get('/dept/user-request', [EmployeeController::class, 'userRequestList'])->name('dept.userrequestlist');
         Route::get('/dept/user-request/{employee}', [EmployeeController::class, 'userRequest'])->name('dept.userrequest');
-        Route::patch('/dept/is-request', [EmployeeController::class, 'isRequest'])->name('dept.isRequest');
+        Route::patch('/dept/is-request/{employee}', [EmployeeController::class, 'isRequest'])->name('dept.isRequest');
         Route::get('/dept/send-request', [EmployeeController::class, 'sendRequest'])->name('dept.sendRequest');
 
         Route::get('/dept/create-ticket', [TicketController::class, 'createTicket'])->name('dept.create.ticket');

@@ -77,7 +77,16 @@ class SubdeptTicketTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function test_auth_subdept_get_all_entry_ticket_dataTables()
+    public function test_auth_subdept_get_ticket_detail()
+    {
+        $subdept = User::where('username', 'lamarmayasari')->first();
+        $ticket_number = "T12345620230510-000034";
+
+        $response = $this->actingAs($subdept)->get('/subdept/all-tickets/' . $ticket_number);
+        $response->assertStatus(200);
+    }
+
+    public function test_auth_subdept_get_new_entry_ticket_dataTables()
     {
         $subdept = User::where('username', 'ellapuspasari')->first();
 
@@ -85,8 +94,83 @@ class SubdeptTicketTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function test_auth_subdept_get_entry_ticket_detail()
+    public function test_auth_subdept_get_aNew_entry_ticket_detail()
+    {
+        $subdept       = User::where('username', 'lamarmayasari')->first();
+        $ticket_number = "T12345620230509-000029";
+
+        $response = $this->actingAs($subdept)->getJson('/subdept/entry-tickets/' . $ticket_number);
+        $response->assertStatus(200);
+    }
+
+    // public function test_auth_subdept_approve_aNew_entry_ticket()
+    // {
+    //     $subdept       = User::where('username', 'lamarmayasari')->first();
+    //     $ticket_number = "T12345620230510-000033";
+
+    //     $response = $this->actingAs($subdept)->putJson('/subdept/entry-tickets/' . $ticket_number . '/approve');
+    //     $response->assertStatus(200);
+    // }
+
+    // public function test_auth_subdept_reject_aNew_entry_ticket()
+    // {
+    //     $subdept       = User::where('username', 'lamarmayasari')->first();
+    //     $ticket_number = "T12345620230510-000031";
+
+    //     $response = $this->actingAs($subdept)->putJson('/subdept/entry-tickets/' . $ticket_number . '/reject', [
+    //         'note' => 'Unit Test Reject'
+    //     ]);
+    //     $response->assertStatus(200);
+    // }
+
+    public function test_auth_subdept_get_onwork_ticket_dataTables()
     {
         $subdept = User::where('username', 'lamarmayasari')->first();
+
+        $response = $this->actingAs($subdept)->getJson('/subdept/onwork-tickets');
+        $response->assertStatus(200);
+    }
+
+    public function test_auth_subdept_get_onwork_ticket_detail()
+    {
+        $subdept       = User::where('username', 'lamarmayasari')->first();
+        $ticket_number = "T12345620230502-000011";
+
+        $response = $this->actingAs($subdept)->get('/subdept/onwork-tickets/' . $ticket_number);
+        $response->assertStatus(200);
+    }
+
+    public function test_auth_subdept_get_closed_ticket_dataTables()
+    {
+        $subdept = User::where('username', 'lamarmayasari')->first();
+
+        $response = $this->actingAs($subdept)->getJson('/subdept/closed-tickets');
+        $response->assertStatus(200);
+    }
+
+    public function test_auth_subdept_get_closed_ticket_detail()
+    {
+        $subdept       = User::where('username', 'lamarmayasari')->first();
+        $ticket_number = "T12345620230419-000004";
+
+        $response = $this->actingAs($subdept)->get('/subdept/closed-tickets/' . $ticket_number);
+        $response->assertStatus(200);
+    }
+
+    public function test_auth_subdept_get_rejected_ticket_dataTables()
+    {
+        $subdept = User::where('username', 'lamarmayasari')->first();
+
+        $response = $this->actingAs($subdept)->getJson('/subdept/rejected-tickets');
+        $response->assertStatus(200);
+    }
+
+    public function test_auth_subdept_get_rejected_ticket_detail()
+    {
+        $subdept       = User::where('username', 'lamarmayasari')->first();
+        $ticket_number = "T12345620230510-000031";
+
+        $response = $this->actingAs($subdept)->get('/subdept/rejected-tickets/' . $ticket_number);
+        $response->assertStatus(200);
     }
 }
