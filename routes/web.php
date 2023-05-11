@@ -114,8 +114,11 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/admin/rejected-tickets', [TicketController::class, 'rejected'])->name('admin.tickets.rejected');
         Route::get('/admin/rejected-tickets/{ticket}', [TicketController::class, 'show'])->name('admin.tickets.rejected.show');
 
-        Route::post('/admin/sla/preview/sla-report', [TicketController::class, 'slaPreview'])->name('admin.sla.report.preview');
-        Route::post('/admin/sla/sla-report', [TicketController::class, 'slaReport'])->name('admin.sla.report');
+        Route::get('/admin/sla', [TicketController::class, 'slaReport'])->name('admin.sla');
+        Route::post('/admin/sla/create', [TicketController::class, 'slaCreate'])->name('admin.sla.create');
+        Route::get('/admin/sla/ticket-report/{from}/{to}', [TicketController::class, 'ticketReport'])->name('admin.sla.ticketReport');
+        Route::get('/admin/sla/status-report/{from}/{to}', [TicketController::class, 'statusReport'])->name('admin.sla.statusReport');
+        Route::post('/admin/sla/export/sla-report', [TicketController::class, 'slaExport'])->name('admin.sla.report');
 
         Route::get('/admin/feedback', [FeedbackController::class, 'index'])->name('admin.feedback');
         Route::get('/admin/feedback/rate', [FeedbackController::class, 'feedbackRate'])->name('admin.feedback.rate');

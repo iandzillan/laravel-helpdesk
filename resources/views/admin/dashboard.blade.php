@@ -131,7 +131,7 @@
         </div>
     </div>
 
-    <div class="col-md-12 col-lg-12">
+    {{-- <div class="col-md-12 col-lg-12">
         <div class="row">
             <div class="col-md-3 mb-3">
                 <button class="btn btn-primary btn-sm" data-aos="fade-up" data-aos-delay="800" id="generate-report">
@@ -149,7 +149,7 @@
                 </div>
             </div>
         @endif
-    </div>
+    </div> --}}
 
     <div class="col-md-12 col-lg-12">
         <div class="row">
@@ -304,14 +304,14 @@
     </div>
 
     {{-- Modal --}}
-    <div class="modal fade" id="modal-report" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    {{-- <div class="modal fade" id="modal-report" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="exampleModalLabel">Generate SLA Report</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form id="form-report" method="POST" action="{{ route('admin.sla.report.preview') }}" target="_blank">
+                <form id="form-report" method="POST" action="{{ route('admin.sla.report.preview') }}">
                     @method('post')
                     @csrf
                     <div class="modal-body">
@@ -343,7 +343,7 @@
                 </form>
             </div>
         </div>
-    </div>
+    </div> --}}
 
     @include('admin.dashboard-chart')
 @endsection

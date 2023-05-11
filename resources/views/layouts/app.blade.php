@@ -50,6 +50,9 @@
 
     {{-- Rating --}}
     <link rel="stylesheet" href="{{ asset('assets/css/rating.css') }}">
+
+    <link rel="stylesheet" href="https://unpkg.com/bootstrap-table@1.21.4/dist/bootstrap-table.min.css">
+    <script src="https://unpkg.com/bootstrap-table@1.21.4/dist/bootstrap-table.min.js"></script>
 </head>
 
 <body>

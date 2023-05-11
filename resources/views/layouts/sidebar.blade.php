@@ -156,6 +156,15 @@
                     </li>
 
                     <li class="nav-item">
+                        <a class="nav-link {{(request()->segment(2) == 'sla') ? 'active' : ''}}" aria-current="page" href="{{route('admin.sla')}}" title="Tickets">
+                            <i class="icon">
+                                <i class="fa-solid fa-print"></i>
+                            </i>
+                            <span class="item-name">SLA</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
                         <a class="nav-link {{(request()->segment(2) == 'feedback') ? 'active' : ''}}" aria-current="page" href="{{route('admin.feedback')}}" title="Feedbacks">
                             <i class="icon">
                                 <i class="fa-solid fa-comment"></i>
@@ -167,7 +176,7 @@
                     <li class="nav-item">
                         <a class="nav-link {{(request()->segment(2) == 'performance') ? 'active' : ''}}" aria-current="page" href="{{route('admin.performance')}}" title="Performance">
                             <i class="icon">
-                                <i class="fa-solid fa-users-gear"></i>
+                                <i class="fa-solid fa-gear"></i>
                             </i>
                             <span class="item-name">Performance</span>
                         </a>
