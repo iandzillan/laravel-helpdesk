@@ -1456,30 +1456,6 @@ class TicketController extends Controller
         $from = Carbon::parse($validate['from']);
         $to = Carbon::parse($validate['to'])->endOfDay();
 
-        // Call function
-        // $ticketReport = route('admin.sla.ticketReport', [$from, $to]);
-        $ticketReport = $this->ticketReport($from, $to);
-        $statusReport = $this->statusReport($from, $to);
-
-        // return response
-        return response()->json([
-            'success' => true,
-            'ticketReport' => $ticketReport,
-            'statusReport' => $statusReport
-        ]);
-    }
-
-    public function slaExport(Request $request)
-    {
-        // set validation
-        $validate = $request->validate([
-            'from' => 'required',
-            'to'   => 'required|after:from'
-        ]);
-        // change time zone to UTC
-        $from = Carbon::parse($validate['from']);
-        $to = Carbon::parse($validate['to'])->endOfDay();
-
         // Query for all ticket
         $tickets = Ticket::whereBetween('created_at', [$from, $to])->get();
 
@@ -1488,98 +1464,50 @@ class TicketController extends Controller
             $q->whereBetween('tickets.created_at', [$from, $to]);
         }])->withCount('subCategories')->get();
 
-        // Query total ticket based on sub category
-        foreach ($categories as $category) {
-            $subcategories = $category->subCategories;
-            foreach ($subcategories as $row) {
-                $subcategory = $row->withCount(['tickets' => function ($q) use ($from, $to) {
-                    $q->whereBetween('tickets.created_at', [$from, $to]);
-                }])->get();
-            }
-        }
-
         // Query for total ticket based on department and sub department
-        $departments     = Department::all();
-        foreach ($departments as $department) {
-            // for department
-            $department_ticket = Ticket::whereHas('user.employee', function ($q) use ($department) {
-                $q->where('department_id', $department->id);
-            })->whereBetween('created_at', [$from, $to])->count();
-            $data_dept[] = [
-                'department'    => $department->name,
-                'tickets_count' => $department_ticket,
-            ];
+        $depts = Department::all();
 
-            // for sub department
-            foreach ($department->subDepartments as $subdepartment) {
-                $subdepartment_ticket = Ticket::whereHas('user.employee', function ($q) use ($subdepartment) {
-                    $q->where('sub_department_id', $subdepartment->id);
-                })->whereBetween('created_at', [$from, $to])->count();
-                $data_subdept[] = [
-                    'dept'    => $department->name,
-                    'subdept' => $subdepartment->name,
-                    'count'   => $subdepartment_ticket,
-                ];
-            }
-
-            // count for manager
-            $manager_ticket = Ticket::whereHas('user.employee', function ($q) use ($department) {
-                $q->where('department_id', $department->id)->where('position', 'Manager');
-            })->whereBetween('created_at', [$from, $to])->count();
-            $data_manager[] = [
-                'manager' => $department->name,
-                'count'   => $manager_ticket
-            ];
+        if ($tickets == null) {
+            // Call function
+            $ticketReport       = null;
+            $statusReport       = null;
+            $categoryReport     = null;
+            $subcategoryReport  = null;
+            $deptReport         = null;
+            $subdeptReport      = null;
+            $managerReport      = null;
+            $slaCount           = null;
+        } else {
+            // Call function
+            $ticketReport       = $this->ticketReport($tickets);
+            $statusReport       = $this->statusReport($tickets);
+            $categoryReport     = $this->categoryReport($categories);
+            $subcategoryReport  = $this->subcategoryReport($categories, $from, $to);
+            $deptReport         = $this->deptReport($depts, $from, $to);
+            $subdeptReport      = $this->subdeptReport($depts, $from, $to);
+            $managerReport      = $this->managerReport($depts, $from, $to);
+            $slaCount           = $this->slaCount($tickets);
         }
 
-
-        // query tickets based on status
-        $statusQuery = $tickets->groupBy('status');
-        $open        = ($statusQuery->get('Open') == null) ? 0 : $statusQuery->get('Open')->count();
-        $approve2    = ($statusQuery->get('Approved by Team Leader') == null) ? 0 : $statusQuery->get('Approved by Team Leader')->count();
-        $approve1    = ($statusQuery->get('Approved by Manager') == null) ? 0 : $statusQuery->get('Approved by Manager')->count();
-        $onwork      = ($statusQuery->get('On work') == null) ? 0 : $statusQuery->get('On work')->count();
-        $pending     = ($statusQuery->get('Pending') == null) ? 0 : $statusQuery->get('Pending')->count();
-        $closed      = ($statusQuery->get('Closed') == null) ? 0 : $statusQuery->get('Closed')->count();
-        $rejected    = ($statusQuery->get('Rejected') == null) ? 0 : $statusQuery->get('Rejected')->count();
-        $statusCollection = collect([
-            ['status' => 'Open', 'count' => $open],
-            ['status' => 'Approved by Team Leader', 'count' => $approve2],
-            ['status' => 'Approved by Manager', 'count' => $approve1],
-            ['status' => 'On work', 'count' => $onwork],
-            ['status' => 'Pending', 'count' => $pending],
-            ['status' => 'Closed', 'count' => $closed],
-            ['status' => 'Rejected', 'count' => $rejected],
+        // return response
+        return response()->json([
+            'success'           => true,
+            'from'              => $from->isoFormat('dddd, D MMMM YYYY HH:mm'),
+            'to'                => $to->isoFormat('dddd, D MMMM YYYY HH:mm'),
+            'ticketReport'      => $ticketReport,
+            'statusReport'      => $statusReport,
+            'categoryReport'    => $categoryReport,
+            'subcategoryReport' => $subcategoryReport,
+            'deptReport'        => $deptReport,
+            'subdeptReport'     => $subdeptReport,
+            'managerReport'     => $managerReport,
+            'slaCount'          => $slaCount
         ]);
-
-        // query ticket based on SLA
-        $slaQuery    = $tickets->groupBy('isUnderSla');
-        $within      = ($slaQuery->get(1) == null) ? 0 : $slaQuery->get(1)->count();
-        $outof       = ($slaQuery->get(0) == null) ? 0 : $slaQuery->get(0)->count();
-        $slaCollection = collect([
-            ['name' => 'Within', 'count' => $within],
-            ['name' => 'Out of', 'count' => $outof]
-        ]);
-
-        $data = [
-            'tickets'         => $tickets,
-            'validate'        => $validate,
-            'categories'      => $categories,
-            'subcategories'   => $subcategory,
-            'data_dept'       => $data_dept,
-            'data_subdept'    => $data_subdept,
-            'data_manager'    => $data_manager,
-            'status'          => $statusCollection,
-            'sla'             => $slaCollection
-        ];
-
-        return Excel::download(new TicketExport($data), 'SLA_Report_' . $request->from . '_' . $request->to . '.xlsx');
     }
 
-    public function ticketReport($from, $to)
+    public function ticketReport($tickets)
     {
-        // Query for all ticket
-        $tickets = Ticket::whereBetween('created_at', [$from, $to])->get();
+        $ticketReport = [];
         foreach ($tickets as $ticket) {
             $ticketReport[] = collect([
                 'created_at'    => $ticket->created_at,
@@ -1601,11 +1529,8 @@ class TicketController extends Controller
         return $ticketReport;
     }
 
-    public function statusReport($from, $to)
+    public function statusReport($tickets)
     {
-        // Query for all ticket
-        $tickets = Ticket::whereBetween('created_at', [$from, $to])->get();
-
         // query tickets based on status
         $statusQuery = $tickets->groupBy('status');
         $open        = ($statusQuery->get('Open') == null) ? 0 : $statusQuery->get('Open')->count();
@@ -1630,42 +1555,120 @@ class TicketController extends Controller
         return $collections;
     }
 
-    public function totalCategoryTicket($from, $to)
+    public function categoryReport($categories)
     {
-        // Query for total ticket based on category and sub category
-        $categories = Category::withCount(['tickets' => function ($q) use ($from, $to) {
-            $q->whereBetween('tickets.created_at', [$from, $to]);
-        }])->withCount('subCategories')->get();
+        $collections = [];
+        foreach ($categories as $category) {
+            $collections[] = collect([
+                'category' => $category->name,
+                'count'    => $category->tickets_count
+            ]);
+        }
 
-        return DataTables::of($categories)->addIndexColumn()->make(true);
+        return $collections;
     }
 
-    public function totalSubcategoryTicket($from, $to)
+    public function subcategoryReport($categories, $from, $to)
     {
-        // Query for total ticket based on category and sub category
-        $categories = Category::withCount(['tickets' => function ($q) use ($from, $to) {
-            $q->whereBetween('tickets.created_at', [$from, $to]);
-        }])->withCount('subCategories')->get();
-
+        $collections = [];
         // Query total ticket based on sub category
         foreach ($categories as $category) {
             $subcategories = $category->subCategories;
-            foreach ($subcategories as $row) {
-                $subcategory = $row->withCount(['tickets' => function ($q) use ($from, $to) {
+            foreach ($subcategories as $subcategory) {
+                $data = $subcategory->withCount(['tickets' => function ($q) use ($from, $to) {
                     $q->whereBetween('tickets.created_at', [$from, $to]);
                 }])->get();
             }
         }
 
-        return DataTables::of($subcategory)
-            ->addIndexColumn()
-            ->addColumn('category', function ($row) {
-                return $row->category->name;
-            })
-            ->make(true);
+        foreach ($data as $item) {
+            $collections[] = collect([
+                'category' => $item->category->name,
+                'subcategory' => $item->name,
+                'count' => $item->tickets_count
+            ]);
+        }
+
+        return $collections;
     }
 
-    public function totalTicketDepartment($from, $to)
+    public function deptReport($depts, $from, $to)
     {
+        $collections = [];
+
+        foreach ($depts as $dept) {
+            // for department
+            $tickets_count = Ticket::whereHas('user.employee', function ($q) use ($dept) {
+                $q->where('department_id', $dept->id);
+            })->whereBetween('created_at', [$from, $to])->count();
+
+            $collections[] = collect([
+                'dept' => $dept->name,
+                'count'      => $tickets_count
+            ]);
+        }
+
+        return $collections;
+    }
+
+    public function subdeptReport($depts, $from, $to)
+    {
+        $collections = [];
+        foreach ($depts as $dept) {
+            // for sub department
+            foreach ($dept->subDepartments as $subdept) {
+                $tickets_count = Ticket::whereHas('user.employee', function ($q) use ($subdept) {
+                    $q->where('sub_department_id', $subdept->id);
+                })->whereBetween('created_at', [$from, $to])->count();
+
+                $collections[] = collect([
+                    'dept'    => $dept->name,
+                    'subdept' => $subdept->name,
+                    'count'   => $tickets_count
+                ]);
+            }
+        }
+
+        return $collections;
+    }
+
+    public function managerReport($depts, $from, $to)
+    {
+        $collections = [];
+        foreach ($depts as $dept) {
+            // count for manager
+            $tickets_count = Ticket::whereHas('user.employee', function ($q) use ($dept) {
+                $q->where('department_id', $dept->id)->where('position', 'Manager');
+            })->whereBetween('created_at', [$from, $to])->count();
+
+            $collections[] = collect([
+                'manager' => $dept->name,
+                'count'   => $tickets_count
+            ]);
+        }
+
+        return $collections;
+    }
+
+    public function slaCount($tickets)
+    {
+        // query ticket based on SLA
+        $slaQuery    = $tickets->groupBy('isUnderSla');
+        $within      = ($slaQuery->get(1) == null) ? 0 : $slaQuery->get(1)->count();
+        $outof       = ($slaQuery->get(0) == null) ? 0 : $slaQuery->get(0)->count();
+        $collections = collect([
+            ['name' => 'Within', 'count' => $within],
+            ['name' => 'Out of', 'count' => $outof]
+        ]);
+
+        return $collections;
+    }
+
+    public function slaExport(Request $request)
+    {
+        $data = $this->slaCreate($request);
+        $data = json_decode($data->content(), true);
+
+        return Excel::download(new TicketExport($data), 'SLA_Report_' . $request->from . '_' . $request->to . '.xlsx');
     }
 }

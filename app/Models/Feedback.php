@@ -27,4 +27,13 @@ class Feedback extends Model
     {
         return $this->belongsTo(Ticket::class);
     }
+
+    public function getRatingAttribute($value)
+    {
+        if ($this->attributes['rating'] == null) {
+            return '--';
+        } else {
+            return $value;
+        }
+    }
 }

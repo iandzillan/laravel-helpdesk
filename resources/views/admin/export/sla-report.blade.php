@@ -3,48 +3,44 @@
         <tr>
             <th colspan="13" align="center">
                 <b>
-                    SERVICE-LEVEL AGREEMENT REPORT ({{ $validate['from'] }} - {{ $validate['to'] }}) 
+                    SERVICE-LEVEL AGREEMENT REPORT ({{ $from }} - {{ $to }}) 
                 </b>
             </th>
         </tr>
         <tr>
-            <th>Created At</th>
-            <th>Ticket Number</th>
-            <th>User</th>
-            <th>Subject</th>
-            <th>Category</th>
-            <th>Sub Category</th>
-            <th>Technician</th>
-            <th>Status</th>
-            <th>Progress At</th>
-            <th>Finish At</th>
-            <th>SLA Duration</th>
-            <th>On work Duration</th>
-            <th>Pending Duration</th>
+            <th><b>Created At</b></th>
+            <th><b>Ticket Number</b></th>
+            <th><b>User</b></th>
+            <th><b>Subject</b></th>
+            <th><b>Category</b></th>
+            <th><b>Sub Category</b></th>
+            <th><b>Technician</b></th>
+            <th><b>Status</b></th>
+            <th><b>Progress At</b></th>
+            <th><b>Finish At</b></th>
+            <th><b>SLA Duration</b></th>
+            <th><b>On work Duration</b></th>
+            <th><b>Pending Duration</b></th>
         </tr>
     </thead>
     <tbody>
-        @forelse ($tickets as $ticket)
+        @foreach ($tickets as $ticket)
             <tr>
-                <td>{{ $ticket->created_at }}</td>
-                <td>{{ $ticket->ticket_number }}</td>
-                <td>{{ $ticket->user->employee->name }}</td>
-                <td>{{ $ticket->subject }}</td>
-                <td>{{ $ticket->subCategory->category->name }}</td>
-                <td>{{ $ticket->subCategory->name }}</td>
-                <td>{{ ($ticket->technician == null) ? "--" : $ticket->technician->employee->name }}</td>
-                <td>{{ $ticket->status }}</td>
-                <td>{{ $ticket->progress_at }}</td>
-                <td>{{ $ticket->finish_at }}</td>
-                <td>{{ ($ticket->urgency == null) ? "--" : gmdate('H:i:s', $ticket->urgency->hours * 3600) }}</td>
-                <td>{{ gmdate('H:i:s', $ticket->trackings->where('status', '!=', 'Ticket Continued')->sum('duration')) }}</td>
-                <td>{{ gmdate('H:i:s', $ticket->trackings->where('status', 'Ticket Continued')->sum('duration')) }}</td>
+                <td>{{ $ticket['created_at'] }}</td>
+                <td>{{ $ticket['ticket_number'] }}</td>
+                <td>{{ $ticket['user'] }}</td>
+                <td>{{ $ticket['user'] }}</td>
+                <td>{{ $ticket['category'] }}</td>
+                <td>{{ $ticket['subcategory'] }}</td>
+                <td>{{ $ticket['technician'] }}</td>
+                <td>{{ $ticket['status'] }}</td>
+                <td>{{ $ticket['progress_at'] }}</td>
+                <td>{{ $ticket['finish_at'] }}</td>
+                <td>{{ $ticket['urgency'] }}</td>
+                <td>{{ $ticket['onwork'] }}</td>
+                <td>{{ $ticket['pending'] }}</td>
             </tr>
-        @empty
-            <tr>
-                <td colspan="12">No data</td>
-            </tr>
-        @endforelse
+        @endforeach
     </tbody>
 </table>
 
@@ -55,20 +51,22 @@
             <th colspan="2" align="center"><b>TOTAL TICKET BASED ON STATUS</b></th>
         </tr>
         <tr>
-            <th>Status</th>
-            <th>Total Ticket</th>
+            <th><b>Status</b></th>
+            <th><b>Total Ticket</b></th>
         </tr>
     </thead>
     <tbody>
+        @php $statusSum = 0; @endphp
         @foreach ($status as $item)
             <tr>
                 <td>{{ $item['status'] }}</td>
                 <td align="end">{{ $item['count'] }}</td>
             </tr>
+            @php $statusSum += $item['count']; @endphp
         @endforeach
         <tr>
-            <td align="center"><b>TOTAL</b></td>
-            <td align="end"><b>{{ $status->sum('count') }}</b></td>
+            <td><b>TOTAL</b></td>
+            <td align="end"><b>{{ $statusSum }}</b></td>
         </tr>
     </tbody>
 </table>
@@ -80,20 +78,22 @@
             <th colspan="2" align="center"><b>TOTAL TICKET BASED ON CATEGORY</b></th>
         </tr>
         <tr>
-            <th>Category</th>
-            <th>Total Ticket</th>
+            <th><b>Category</b></th>
+            <th><b>Total Ticket</b></th>
         </tr>
     </thead>
     <tbody>
+        @php $categorySum = 0; @endphp
         @foreach ($categories as $category)
             <tr>
-                <td>{{ $category->name }}</td>
-                <td align="end">{{ $category->tickets_count }}</td>
+                <td>{{ $category['category'] }}</td>
+                <td align="end">{{ $category['count'] }}</td>
             </tr>
+            @php $categorySum += $category['count']; @endphp
         @endforeach
         <tr>
-            <td align="center"><b>TOTAL</b></td>
-            <td align="end"><b>{{ $categories->sum('tickets_count') }}</b></td>
+            <td><b>TOTAL</b></td>
+            <td align="end"><b>{{ $categorySum }}</b></td>
         </tr>
     </tbody>
 </table>
@@ -105,22 +105,26 @@
             <th colspan="3" align="center"><b>TOTAL TICKET BASED ON SUB CATEGORY</b></th>
         </tr>
         <tr>
-            <th>Category</th>
-            <th>Sub Category</th>
-            <th>Total Ticket</th>
+            <th><b>Category</b></th>
+            <th><b>Sub Category</b></th>
+            <th><b>Total Ticket</b></th>
         </tr>
     </thead>
     <tbody>
+        @php $subcategorySum = 0; @endphp
         @foreach ($subcategories as $subcategory)
             <tr>
-                <td>{{ $subcategory->category->name }}</td>
-                <td>{{ $subcategory->name }}</td>
-                <td align="end">{{ $subcategory->tickets_count }}</td>
+                <td>{{ $subcategory['category'] }}</td>
+                <td>{{ $subcategory['subcategory'] }}</td>
+                <td align="end">{{ $subcategory['count'] }}</td>
             </tr>
+            @php
+                $subcategorySum += $subcategory['count'];
+            @endphp
         @endforeach
         <tr>
-            <td colspan="2" align="center"><b>Total</b></td>
-            <td align="end"><b>{{ $subcategories->sum('tickets_count') }}</b></td>
+            <td colspan="2"><b>Total</b></td>
+            <td align="end"><b>{{ $subcategorySum }}</b></td>
         </tr>
     </tbody>
 </table>
@@ -132,26 +136,24 @@
             <th colspan="2" align="center"><b>TOTAL TICKET BASED ON DEPARTMENT</b></th>
         </tr>
         <tr>
-            <th>Department</th>
-            <th>Total Ticket</th>
+            <th><b>Department</b></th>
+            <th><b>Total Ticket</b></th>
         </tr>
     </thead>
     <tbody>
-        @php
-            $sum = 0;
-        @endphp
-        @foreach ($data_dept as $row)
+        @php $deptSum = 0; @endphp
+        @foreach ($depts as $dept)
             <tr>
-                <td>{{ $row['department'] }}</td>
-                <td align="end">{{ $row['tickets_count'] }}</td>
+                <td>{{ $dept['dept'] }}</td>
+                <td align="end">{{ $dept['count'] }}</td>
             </tr>
             @php
-                $sum += $row['tickets_count'];
+                $deptSum += $dept['count'];
             @endphp
         @endforeach
         <tr>
-            <td align="center"><b>TOTAL</b></td>
-            <td align="end"><b>{{ $sum }}</b></td>
+            <td><b>TOTAL</b></td>
+            <td align="end"><b>{{ $deptSum }}</b></td>
         </tr>
     </tbody>
 </table>
@@ -163,35 +165,35 @@
             <th colspan="3" align="center"><b>TOTAL TICKET BASED ON SUB DEPARTMENT</b></th>
         </tr>
         <tr>
-            <th>Department</th>
-            <th>Sub Department</th>
-            <th>Total Ticket</th>
+            <th><b>Department</b></th>
+            <th><b>Sub Department</b></th>
+            <th><b>Total Ticket</b></th>
         </tr>
     </thead>
     <tbody>
-        @php $sum1 = 0 @endphp
-        @php $sum2 = 0 @endphp
-        @foreach ($data_subdept as $row)
+        @php $subdeptSum = 0 @endphp
+        @php $managerSum = 0 @endphp
+        @foreach ($subdepts as $subdept)
             <tr>
-                <td>{{ $row['dept'] }}</td>
-                <td>{{ $row['subdept'] }}</td>
-                <td align="end">{{ $row['count'] }}</td>
+                <td>{{ $subdept['dept'] }}</td>
+                <td>{{ $subdept['subdept'] }}</td>
+                <td align="end">{{ $subdept['count'] }}</td>
             </tr>
-            @php $sum1 += $row['count'] @endphp
+            @php $subdeptSum += $subdept['count'] @endphp
         @endforeach
         <tr>
-            <th colspan="3" align="center"><b>MANAGER</b></th>
+            <th colspan="3"><b>MANAGER</b></th>
         </tr>
-        @foreach ($data_manager as $row)
+        @foreach ($managers as $manager)
             <tr>
-                <td colspan="2">{{ $row['manager'] }} Manager</td>
-                <td align="end">{{ $row['count'] }}</td>
+                <td colspan="2">{{ $manager['manager'] }} Manager</td>
+                <td align="end">{{ $manager['count'] }}</td>
             </tr>
-            @php $sum2 += $row['count'] @endphp
+            @php $managerSum += $manager['count'] @endphp
         @endforeach
         <tr>
-            <td colspan="2" align="center"><b>TOTAL</b></td>
-            <td align="end"><b>{{ $sum1 + $sum2 }}</b></td>
+            <td colspan="2"><b>TOTAL</b></td>
+            <td align="end"><b>{{ $subdeptSum + $managerSum }}</b></td>
         </tr>
     </tbody>
 </table>
@@ -203,20 +205,22 @@
             <th colspan="2" align="center"><b>TOTAL TICKET BASED ON SLA</b></th>
         </tr>
         <tr>
-            <th>SLA</th>
-            <th>Total Ticket</th>
+            <th><b>SLA</b></th>
+            <th><b>Total Ticket</b></th>
         </tr>
     </thead>
     <tbody>
-        @foreach ($sla as $item)
+        @php $slaSum = 0; @endphp
+        @foreach ($slas as $sla)
             <tr>
-                <td>{{ $item['name'] }}</td>
-                <td align="end">{{ $item['count'] }}</td>
+                <td>{{ $sla['name'] }}</td>
+                <td align="end">{{ $sla['count'] }}</td>
             </tr>
+            @php $slaSum += $sla['count'] @endphp
         @endforeach
         <tr>
-            <td align="center"><b>TOTAL</b></td>
-            <td align="end"><b>{{ $sla->sum('count') }}</b></td>
+            <td><b>TOTAL</b></td>
+            <td align="end"><b>{{ $slaSum }}</b></td>
         </tr>
     </tbody>
 </table>

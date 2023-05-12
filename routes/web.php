@@ -116,8 +116,6 @@ Route::group(['middleware' => ['auth']], function () {
 
         Route::get('/admin/sla', [TicketController::class, 'slaReport'])->name('admin.sla');
         Route::post('/admin/sla/create', [TicketController::class, 'slaCreate'])->name('admin.sla.create');
-        Route::get('/admin/sla/ticket-report/{from}/{to}', [TicketController::class, 'ticketReport'])->name('admin.sla.ticketReport');
-        Route::get('/admin/sla/status-report/{from}/{to}', [TicketController::class, 'statusReport'])->name('admin.sla.statusReport');
         Route::post('/admin/sla/export/sla-report', [TicketController::class, 'slaExport'])->name('admin.sla.report');
 
         Route::get('/admin/feedback', [FeedbackController::class, 'index'])->name('admin.feedback');
@@ -275,7 +273,3 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/account-profile', [EmployeeController::class, 'accountProfile'])->name('accountProfile');
     Route::patch('/account-profile/{nik}', [EmployeeController::class, 'updateProfile'])->name('profile.update');
 });
-
-Route::get('/testing', [DashboardController::class, 'testing']);
-Route::get('/testing2', [DashboardController::class, 'testing2']);
-// Route::get('/testing2', [TicketController::class, 'testing2']);

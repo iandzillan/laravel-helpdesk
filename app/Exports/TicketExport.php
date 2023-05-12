@@ -10,7 +10,8 @@ class TicketExport implements FromView, ShouldAutoSize
 {
     protected $data;
     protected $tickets;
-    protected $validate;
+    protected $from;
+    protected $to;
     protected $categories;
     protected $subcategories;
     protected $data_dept;
@@ -21,29 +22,31 @@ class TicketExport implements FromView, ShouldAutoSize
 
     public function __construct($data)
     {
-        $this->tickets       = $data['tickets'];
-        $this->validate      = $data['validate'];
-        $this->categories    = $data['categories'];
-        $this->subcategories = $data['subcategories'];
-        $this->data_dept     = $data['data_dept'];
-        $this->data_subdept  = $data['data_subdept'];
-        $this->data_manager  = $data['data_manager'];
-        $this->status        = $data['status'];
-        $this->sla           = $data['sla'];
+        $this->tickets       = $data['ticketReport'];
+        $this->from          = $data['from'];
+        $this->to            = $data['to'];
+        $this->categories    = $data['categoryReport'];
+        $this->subcategories = $data['subcategoryReport'];
+        $this->data_dept     = $data['deptReport'];
+        $this->data_subdept  = $data['subdeptReport'];
+        $this->data_manager  = $data['managerReport'];
+        $this->status        = $data['statusReport'];
+        $this->sla           = $data['slaCount'];
     }
 
     public function view(): View
     {
         return view('admin.export.sla-report', [
+            'from'          => $this->from,
+            'to'            => $this->to,
             'tickets'       => $this->tickets,
-            'validate'      => $this->validate,
+            'status'        => $this->status,
             'categories'    => $this->categories,
             'subcategories' => $this->subcategories,
-            'data_dept'     => $this->data_dept,
-            'data_subdept'  => $this->data_subdept,
-            'data_manager'  => $this->data_manager,
-            'status'        => $this->status,
-            'sla'           => $this->sla,
+            'depts'         => $this->data_dept,
+            'subdepts'      => $this->data_subdept,
+            'managers'      => $this->data_manager,
+            'slas'          => $this->sla,
         ]);
     }
 }
