@@ -1255,9 +1255,9 @@ class TicketController extends Controller
         // check if progress == 100
         if ($request->progress == 100) {
             if ($sum_resolve < $sla_timer) {
-                $isUnderSla = 1;
+                $isUnderSla = 2;
             } else {
-                $isUnderSla = 0;
+                $isUnderSla = 1;
             }
             $ticket->status           = 6;
             $ticket->finish_at        = Carbon::now();
@@ -1654,8 +1654,8 @@ class TicketController extends Controller
     {
         // query ticket based on SLA
         $slaQuery    = $tickets->groupBy('isUnderSla');
-        $within      = ($slaQuery->get(1) == null) ? 0 : $slaQuery->get(1)->count();
-        $outof       = ($slaQuery->get(0) == null) ? 0 : $slaQuery->get(0)->count();
+        $within      = ($slaQuery->get(2) == null) ? 0 : $slaQuery->get(2)->count();
+        $outof       = ($slaQuery->get(1) == null) ? 0 : $slaQuery->get(1)->count();
         $collections = collect([
             ['name' => 'Within', 'count' => $within],
             ['name' => 'Out of', 'count' => $outof]

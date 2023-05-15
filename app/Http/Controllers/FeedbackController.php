@@ -48,6 +48,10 @@ class FeedbackController extends Controller
                                     return '<i class="text-success">Excellent</i>';
                                     break;
 
+                                case null:
+                                    return '<i class="text-warning">Null</i>';
+                                    break;
+
                                 default:
                                     return 'Undefined';
                                     break;
@@ -55,7 +59,7 @@ class FeedbackController extends Controller
                         })
                         ->addColumn('note', function ($row) {
                             if ($row->feedback->note == null) {
-                                return '<i>No Comment<i>';
+                                return '--';
                             } else {
                                 return $row->feedback->note;
                             }
@@ -166,8 +170,8 @@ class FeedbackController extends Controller
                     return $row->employee->name;
                 })
                 ->addColumn('success', function ($row) {
-                    $rate = ($row->technician_tickets->where('isUnderSla', 1)->count() / $row->technician_tickets->count()) * 100 . '%';
-                    return $rate;
+                    $rate = ($row->technician_tickets->where('isUnderSla', 2)->count() / $row->technician_tickets->count()) * 100 . '%';
+                    return number_format((float)$rate, 2, '.', '');
                 })
                 ->addColumn('action', function ($row) {
                     $btn = '<a href="' . route('admin.performance.show', $row->id) . '" class="btn btn-primary btn-sm" title="Show Performance"><i class="fa-solid fa-magnifying-glass"></i></a>';
@@ -227,48 +231,4 @@ class FeedbackController extends Controller
             'technician' => $technician
         ]);
     }
-
-    // public function testing1()
-    // {
-    //     $technicians = User::with('feedbacks')->where('role', 'technician')->get();
-
-    //     foreach ($technicians as $technician) {
-    //         echo $technician->employee->name . ' | ';
-    //         echo 'count ticket: ' . $technician->tickets->count() . ' | ';
-    //         echo 'success rate: ' . ($technician->tickets->where('isUnderSla', 1)->count() / $technician->tickets->count()) * 100 . '% | ';
-    //         echo '<br>';
-    //         // echo 'Excellent feedback: ' . $technician->feedbacks->where('rating', 3)->count() . ' | ';
-    //         // echo 'Neutral feedback: ' . $technician->feedbacks->where('rating', 2)->count() . ' | ';
-    //         // echo 'Bad feedback: ' . $technician->feedbacks->where('rating', 1)->count() . ' | ';
-    //         $feedbacks = $technician->feedbacks->groupBy('rating')->all();
-    //         dump($feedbacks);
-    //         $rating = [];
-    //         foreach ($feedbacks as $feedback) {
-    //             $rating[] = $feedback->count();
-    //         }
-    //         dump($rating);
-    //         echo '<br>';
-    //         foreach ($technician->tickets as $ticket) {
-    //             echo $ticket->ticket_number . '<br>';
-    //         }
-    //         echo '<hr>';
-    //     }
-    // }
-
-    // public function testing()
-    // {
-    //     $technicians = User::where('role', 'technician')->get();
-
-    //     $rating = [];
-    //     foreach ($technicians as $technician) {
-    //         $good = $technician->feedbacks->where('rating', 3)->count();
-    //         $okay = $technician->feedbacks->where('rating', 2)->count();
-    //         $bad  = $technician->feedbacks->where('rating', 1)->count();
-    //         $rating[] = [$good, $okay, $bad];
-    //     }
-
-    //     return response()->json([
-    //         'data' => $rating
-    //     ]);
-    // }
 }

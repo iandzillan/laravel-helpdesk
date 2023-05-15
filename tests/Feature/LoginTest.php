@@ -32,6 +32,8 @@ class LoginTest extends TestCase
             'password' => ''
         ]);
 
+        $response->assertStatus(302);
+        $response->assertRedirect('/');
         $response->assertSessionHasErrors();
     }
 }

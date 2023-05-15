@@ -66,8 +66,8 @@
                                     <i class="fa-solid fa-hammer text-white"></i>
                                 </div>
                                 <div class="text-end">
-                                    <h2 class="counter">{{ $technician->technician_tickets->where('status', 4)->count() }}</h2>
-                                    On Work
+                                    <h2 class="counter">{{ $technician->technician_tickets->whereIn('status', ['On work', 'Pending'])->count() }}</h2>
+                                    On Work / Pending
                                 </div>
                             </div>
                         </div>
@@ -82,7 +82,11 @@
                                     <i class="fa-regular fa-circle-check text-white"></i>
                                 </div>
                                 <div class="text-end">
-                                    <h2 class="counter">{{ ($technician->technician_tickets->where('isUnderSla', 1)->count() / $technician->technician_tickets->count()) * 100 }} %</h2>
+                                    @php 
+                                        $success = ($technician->technician_tickets->where('isUnderSla', 2)->count() / $technician->technician_tickets->count()) * 100;
+                                        $success = number_format((float)$success, 2, '.', ''); 
+                                    @endphp
+                                    <h2 class="counter">{{ $success }} %</h2>
                                     SLA Success
                                 </div>
                             </div>
@@ -98,7 +102,11 @@
                                     <i class="fa-solid fa-circle-xmark text-white"></i>
                                 </div>
                                 <div class="text-end">
-                                    <h2 class="counter">{{ ($technician->technician_tickets->where('isUnderSla', 0)->count() / $technician->technician_tickets->count()) * 100 }} %</h2>
+                                    @php 
+                                        $failed = ($technician->technician_tickets->where('isUnderSla', 1)->count() / $technician->technician_tickets->count()) * 100;
+                                        $failed = number_format((float)$failed, 2, '.', ''); 
+                                    @endphp
+                                    <h2 class="counter">{{ $failed }} %</h2>
                                     SLA Failed
                                 </div>
                             </div>
@@ -142,30 +150,40 @@
                                         <td>{{ gmdate('H:i:s', $ticket->trackings->where('status', '!=', 'Ticket Continued')->sum('duration')) }}</td>
                                         <td>{{ gmdate('H:i:s', $ticket->trackings->where('status', 'Ticket Continued')->sum('duration')) }}</td>
                                         <td class="text-center">
-                                            @if ($ticket->isUnderSla == 1)
-                                                <i class="fa-regular fa-circle-check text-success"></i>
-                                            @else
-                                                <i class="fa-regular fa-circle-xmark text-danger"></i>
-                                            @endif
+                                            @switch($ticket->isUnderSla)
+                                                @case(2)
+                                                    <i class="fa-regular fa-circle-check text-success"></i>
+                                                    @break
+                                                @case(1)
+                                                    <i class="fa-regular fa-circle-xmark text-danger"></i>
+                                                    @break
+                                                @default
+                                                    <i class="fa-regular fa-circle-minus text-secondary"></i>
+                                            @endswitch
                                         </td>
                                         <td>
-                                            @if ($ticket->feedback_status == 1)
-                                                <i class="text-info">No feedback yet</i>
-                                            @else
-                                                @switch($ticket->feedback->rating)
-                                                    @case(1)
-                                                        <i class="text-danger">Bad</i>
-                                                        @break
-                                                    @case(2)
-                                                        <i class="text-secondary">Neutral / Okay</i>
-                                                        @break
-                                                    @case(3)
-                                                        <i class="text-success">Excellent</i>
-                                                        @break
-                                                    @default
-                                                        <i class="text-info">Not Rated</i>
-                                                @endswitch
-                                            @endif
+                                            @switch($ticket->feedback_status)
+                                                @case(1)
+                                                    <i class="text-info">No feedback yet</i>
+                                                    @break
+                                                @case(2)
+                                                    @switch($ticket->feedback->rating)
+                                                        @case(1)
+                                                            <i class="text-danger">Bad</i>
+                                                            @break
+                                                        @case(2)
+                                                            <i class="text-secondary">Neutral / Okay</i>
+                                                            @break
+                                                        @case(3)
+                                                            <i class="text-success">Excellent</i>
+                                                            @break
+                                                        @default
+                                                            <i class="text-info">Not Rated</i>
+                                                    @endswitch
+                                                    @break
+                                                @default
+                                                    <i class="text-info">Still on work</i>
+                                            @endswitch
                                         </td>
                                     </tr>
                                 @endforeach

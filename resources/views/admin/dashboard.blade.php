@@ -274,7 +274,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @forelse ($ticket['onwork'] as $onwork)
+                                    @forelse ($ticket['total']->whereIn('status', ['On work', 'Pending']) as $onwork)
                                         <tr>
                                             <td>{{$loop->iteration}}</td>
                                             <td>
